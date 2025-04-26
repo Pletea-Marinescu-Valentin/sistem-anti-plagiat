@@ -19,6 +19,8 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv/
+venv/
 
 # directoare specifice proiectului
 recordings/
@@ -27,6 +29,7 @@ snapshots/
 *.mp4
 *.jpg
 *.png
+.devcontainer/
 
 # fisiere temporare
 .DS_Store
@@ -35,3 +38,7 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+# fisiere ce trebuie descarcate manual
+yolov8s.pt
+shape_predictor_68_face_landmarks.dat
