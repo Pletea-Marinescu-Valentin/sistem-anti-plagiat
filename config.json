@@ -1,0 +1,33 @@
+{
+    "camera": {
+        "index": 0,
+        "mirror_image": false
+    },
+    "detection": {
+        "object": {
+            "confidence_threshold": 0.5,
+            "objects_of_interest": [
+                "telefon",
+                "smartwatch"
+            ]
+        }
+    },
+    "recording": {
+        "save_path": "./recordings",
+        "record_all": true
+    },
+    "reporting": {
+        "save_path": "./reports",
+        "export_formats": [
+            "html",
+            "csv",
+            "json"
+        ]
+    },
+    "snapshots": {
+        "save_path": "./snapshots"
+    },
+    "ui": {
+        "theme": "dark"
+    }
+}
