@@ -1,0 +1,32 @@
+{
+    "name": "Python Anti-Plagiat",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "--name=anti-plagiat-dev",
+        "--net=host",
+        "--privileged"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "donjayamanne.python-extension-pack"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "editor.formatOnSave": true
+            }
+        }
+    },
+    "forwardPorts": [
+        5000
+    ],
+    "containerEnv": {
+        "DISPLAY": ":0"
+    },
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    ]
+}
