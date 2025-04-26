@@ -29,7 +29,6 @@ snapshots/
 *.mp4
 *.jpg
 *.png
-.devcontainer/
 
 # fisiere temporare
 .DS_Store
