@@ -11,8 +11,6 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
 from PyQt5.QtGui import QImage, QPixmap, QColor, QPalette
 from main import SistemAntiPlagiat
 
-os.environ["QT_LOGGING_RULES"] = "qt.qpa.xcb=false"
-
 class VideoProcessingThread(QThread):
     frame_ready = pyqtSignal(np.ndarray)
     violation_detected = pyqtSignal(dict)
@@ -69,11 +67,7 @@ class VideoProcessingThread(QThread):
                                 self.violation_detected.emit(recent_violations)
                         except Exception as e:
                             print(f"Eroare la procesarea frame-ului: {e}")
-                    else:
-                        # in cazul frame-urilor intermediate, emitem pe cel original, dar cu overlay-ul de baza(fara detectii)
-                        basic_frame = self.system.video_handler.prepare_frame_for_display(frame, [], 0.5, 0.5)
-                        self.frame_ready.emit(basic_frame)
-
+                            
                 # o scurta pauza pentru a nu supraincarca CPU
                 self.msleep(15)
         except Exception as e:
