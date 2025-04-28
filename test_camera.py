@@ -8,17 +8,25 @@ def test_camera():
         print("Nu s-a putut accesa camera web")
         return False
     
-    ret, frame = cap.read()
-    if not ret:
-        print("Nu s-a putut citi frame-ul din camera")
-        cap.release()
-        return False
-    
-    # Salveaza un frame pentru a verifica
-    cv2.imwrite("test_camera.jpg", frame)
-    print("Imagine de test salvata in 'test_camera.jpg'")
-    
-    cap.release()
+    # Afiseaza rezoluția camerei
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    print(f"Rezoluția camerei: {int(width)}x{int(height)}")
+
+    # Afiseaza un preview live al camerei
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Nu s-a putut citi frame-ul din camera")
+            break
+
+        cv2.imshow("Preview Camera", frame)
+
+        # Inchide preview-ul daca utilizatorul apasa tasta 'q'
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
     return True
 
 if __name__ == "__main__":
