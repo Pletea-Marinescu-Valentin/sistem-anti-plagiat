@@ -4,11 +4,12 @@ Un sistem de monitorizare pentru prevenirea plagiatului in timpul examenelor, im
 
 ## Functionalitati
 
-- Monitorizarea in timp real a candidatului
-- Detectarea directiei privirii
-- Detectarea obiectelor interzise (telefoane, smartwatch-uri)
-- Inregistrare video
-- Generare rapoarte de incalcari
+- **Monitorizare în timp real**: Urmărește activitatea candidatului folosind camera web.
+- **Detectarea direcției privirii**: Utilizează algoritmi de urmărire a privirii pentru a identifica direcția în care se uită candidatul.
+- **Detectarea obiectelor interzise**: Recunoaște obiecte precum telefoane mobile sau smartwatch-uri în cadrul video.
+- **Înregistrare video**: Salvează fluxul video pentru o analiză ulterioară.
+- **Generare rapoarte**: Creează rapoarte detaliate despre încălcările detectate, inclusiv timestamp-uri și descrieri.
+- **Export date**: Permite exportarea datelor în formate utilizabile pentru arhivare sau analiză ulterioară.
 
 ## Instalare
 
