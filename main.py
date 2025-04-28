@@ -8,6 +8,18 @@ from modules.violation_monitor import ViolationMonitor
 from modules.video_handler import VideoHandler
 from modules.report_generator import ReportGenerator
 from modules.data_exporter import DataExporter
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("sistem_anti_plagiat.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 class SistemAntiPlagiat:
     def __init__(self, config):
@@ -47,7 +59,7 @@ class SistemAntiPlagiat:
                 self.video_writer = cv2.VideoWriter(
                     self.recording_path, fourcc, 20.0, (w, h)
                 )
-                print(f"Inregistrare video in: {self.recording_path}")
+                logger.info(f"Inregistrare video in: {self.recording_path}")
 
             if self.video_writer is not None:
                 self.video_writer.write(display_frame)
@@ -94,7 +106,7 @@ class SistemAntiPlagiat:
 
             cap = cv2.VideoCapture(0)
             if not cap.isOpened():
-                print("Nu s-a putut accesa camera")
+                logger.error("Nu s-a putut accesa camera")
                 return None
 
             ret, frame = cap.read()
@@ -105,7 +117,7 @@ class SistemAntiPlagiat:
                 return snapshot_path
             return None
         except Exception as e:
-            print(f"Eroare la capturare: {e}")
+            logger.exception(f"Eroare la capturare: {e}")
             return None
 
     def export_report(self, file_path):
@@ -134,7 +146,7 @@ class SistemAntiPlagiat:
                 return bool(result)
             return False
         except Exception as e:
-            print(f"Eroare la export: {e}")
+            logger.exception(f"Eroare la export: {e}")
             return False
 
     def set_mirror_mode(self, mirror_mode):
