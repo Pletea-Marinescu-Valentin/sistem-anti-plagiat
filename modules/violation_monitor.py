@@ -15,11 +15,10 @@ class ViolationMonitor:
         # timpul ultimei incalcari inregistrate
         self.last_log_time = 0
         # intervalul minim intre inregistrari in secunde
-        self.min_log_interval = 3
+        self.min_log_interval = 1.5
 
     def check_violations(self, direction, objects):
         violations = []
-        current_time = datetime.now()
 
         # verificam directia privirii
         if direction in self.direction_messages:
