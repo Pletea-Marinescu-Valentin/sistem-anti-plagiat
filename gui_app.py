@@ -322,53 +322,53 @@ class AntiPlagiatGUI(QMainWindow):
             self.display_placeholder()
 
     def toggle_recording(self):
-       if not self.recording:
-           # daca monitorizarea nu este pornita, o pornim
-           if not self.monitoring:
-               self.toggle_monitoring()
+        if not self.recording:
+            # daca monitorizarea nu este pornita, o pornim
+            if not self.monitoring:
+                self.toggle_monitoring()
 
            # porneste inregistrarea
-           self.system.start_recording()
-           self.record_button.setText("Stop Inregistrare")
-           self.recording = True
+            self.system.start_recording()
+            self.record_button.setText("Stop Inregistrare")
+            self.recording = True
 
-           # porneste timer-ul pentru timpul de inregistrare
-           self.recording_start_time = datetime.now()
-           self.timer.start(1000)  # Actualizeaza la fiecare secunda
-       else:
-           # opreste inregistrarea
-           self.system.stop_recording()
-           self.record_button.setText("Start Inregistrare")
-           self.recording = False
+            # porneste timer-ul pentru timpul de inregistrare
+            self.recording_start_time = datetime.now()
+            self.timer.start(1000)  # Actualizeaza la fiecare secunda
+        else:
+            # opreste inregistrarea
+            self.system.stop_recording()
+            self.record_button.setText("Start Inregistrare")
+            self.recording = False
 
-           # opreste timer-ul
-           self.timer.stop()
-           self.recording_time_label.setText("Timp inregistrare: 00:00:00")
+            # opreste timer-ul
+            self.timer.stop()
+            self.recording_time_label.setText("Timp inregistrare: 00:00:00")
 
-           # afiseaza mesaj de confirmare
-           QMessageBox.information(self, "Inregistrare Oprita",
-                                  f"Inregistrarea a fost salvata in:\n{self.system.get_recording_path()}")
+            # afiseaza mesaj de confirmare
+            QMessageBox.information(self, "Inregistrare Oprita",
+                                    f"Inregistrarea a fost salvata in:\n{self.system.get_recording_path()}")
 
     def toggle_pause(self):
-       self.video_thread.pause()
-       if self.video_thread.paused:
-           self.pause_button.setText("Reluare")
-       else:
-           self.pause_button.setText("Pauza")
+        self.video_thread.pause()
+        if self.video_thread.paused:
+            self.pause_button.setText("Reluare")
+        else:
+            self.pause_button.setText("Pauza")
 
     def toggle_mirror(self, state):
-       is_checked = state == Qt.Checked
-       self.config["camera"]["mirror_image"] = is_checked
-       if hasattr(self, 'system'):
-           self.system.set_mirror_mode(is_checked)
+        is_checked = state == Qt.Checked
+        self.config["camera"]["mirror_image"] = is_checked
+        if hasattr(self, 'system'):
+            self.system.set_mirror_mode(is_checked)
 
     def capture_snapshot(self):
-       if self.monitoring:
-           path = self.system.capture_snapshot()
-           if path:
-               QMessageBox.information(self, "Captura Realizata", f"Imaginea a fost salvata in:\n{path}")
-           else:
-               QMessageBox.warning(self, "Eroare", "Nu s-a putut salva captura.")
+        if self.monitoring:
+            path = self.system.capture_snapshot()
+            if path:
+                QMessageBox.information(self, "Captura Realizata", f"Imaginea a fost salvata in:\n{path}")
+            else:
+                QMessageBox.warning(self, "Eroare", "Nu s-a putut salva captura.")
 
     def export_report(self):
         if not hasattr(self.system, 'violation_monitor') or not self.system.violation_monitor.get_logs():
@@ -436,4 +436,4 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
-   main()
+    main()
