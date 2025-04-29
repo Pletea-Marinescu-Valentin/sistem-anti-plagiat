@@ -74,7 +74,6 @@ class ObjectDetector:
         h_resized, w_resized = resized_frame.shape[:2]
 
         for box in result.boxes:
-            class_id = int(box.cls)
             confidence = float(box.conf)
 
             if confidence < self.confidence_threshold:
