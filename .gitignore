@@ -44,3 +44,13 @@ shape_predictor_68_face_landmarks.dat
 
 # log file
 sistem_anti_plagiat.log
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.toc
+*.out
+*.synctex.gz
+*.pdf
