@@ -13,6 +13,8 @@
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{tikz}
+\usepackage{setspace} % Pentru distanța dintre rânduri
+\usepackage{times} % Pentru font Times New Roman
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
 \geometry{
@@ -61,23 +63,29 @@
 \pagestyle{fancy}
 \fancyhf{}
 \setlength{\headheight}{14.5pt} % Ajustare înălțime antet
-\renewcommand{\headrulewidth}{1pt}
-\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0pt} % Eliminare linie antet
+\renewcommand{\footrulewidth}{0pt} % Eliminare linie subsol
 \lhead{}
 \rhead{}
 \lfoot{}
 \cfoot{\thepage}
 \rfoot{}
 
+% Configurare text
+\setstretch{1.15} % Distanța dintre rânduri
+\setlength{\parindent}{0pt} % Eliminare indentare paragraf
+\setlength{\parskip}{6pt} % Spațiu între paragrafe
+
 \begin{document}
 
 \begin{titlepage}
     \centering
+    \vspace*{\fill}
     {\huge\bfseries Sistem de Monitorizare Anti-Plagiat pentru Examene \par}
-    \vspace{2cm}
-    {\large\bfseries Autor: Pletea-Marinescu Valentin \par}
-    {\large Grupa: 332AB \par}
-    {\large An: 2024-2025 \par}
+    \vspace*{\fill}
+    \raggedright
+    {\large\bfseries Autor: Pletea-Marinescu Valentin, 332AB \par}
+    {\large\bfseries An: 2024-2025 \par}
 \end{titlepage}
 
 % Cuprins
@@ -88,7 +96,7 @@
 
 \subsection{Contextul și relevanța temei}
 
-\hspace{6mm}Plagiatul reprezintă una dintre problemele grave ale sistemului de
+Plagiatul reprezintă una dintre problemele grave ale sistemului de
 învățământ, iar, de când cu apariția și dezvoltarea inteligenței
 artificiale, lucrurile s-au accentuat. Alegerea acestei teme constă în
 oportunitatea de a oferi șanse egale tuturor participanților, în
@@ -144,7 +152,7 @@ Acest proiect își propune să ofere un sistem inovator pentru monitorizarea ex
 
 \subsection{Avantajele abordării propuse}
 
-\hspace{6mm}În general, multe soluții de combatere a plagiatului se concentrează mai mult 
+În general, multe soluții de combatere a plagiatului se concentrează mai mult 
 pe monitorizarea ecranului candidatului, dar acest sistem este centrat pe 
 comportamentul fizic al acestuia. Consider că, prin urmărirea direcției privirii 
 și detectarea obiectelor neautorizate, sistemul poate identifica indicii ale
@@ -169,19 +177,19 @@ diverse mijloace, să combată fraudarea examenelor, să avanseze și ele.
 
 \subsection{Soluții similare existente pe piață}
 
-\hspace{6mm}Au apărut pe piață, de-a lungul timpului, diferite soluții de
+Au apărut pe piață, de-a lungul timpului, diferite soluții de
 monitorizare și combatere a fraudei în cadrul examenelor. În urma cercetării, am identificat
 trei sisteme principale care propun soluții similare cu acest proiect: ProctorU \cite{proctoru}, 
 Proctorio \cite{proctorio} și Respondus Lockdown Browser \cite{respondus}.
 
 \subsubsection{ProctorU}
-\hspace{6mm}ProctorU este una dintre cele mai utilizate platforme în
+ProctorU este una dintre cele mai utilizate platforme în
 supravegherea examenelor online. Se bazează atât pe monitorizarea
 ecranului candidatului, cât și pe comportamentul acestuia. 
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|p{8.5cm}|p{8.5cm}|}
+\begin{tabular}{|p{7.5cm}|p{7.5cm}|}
 \hline
 \textbf{Puncte forte} & \textbf{Limitări} \\
 \hline
@@ -209,7 +217,7 @@ print, copy sau paste și, prin intermediul unei camere web, platforma poate
 supraveghea candidatul eficient.
 
 \subsubsection{Proctorio}
-\hspace{6mm}Un alt sistem similar este Proctorio, asemănător cu
+Un alt sistem similar este Proctorio, asemănător cu
 ProctorU, dar care este complet automatizat, întrucât se bazează doar
 pe tehnologii de AI și machine learning pentru detectarea posibilelor
 tentative de fraudă, fără a mai avea nevoie de asistență umană.
@@ -243,36 +251,36 @@ ecranului, observă dacă există alte tab-uri deschise și dacă sunt pornite �
 aplicații care ar putea facilita fraudarea examenului.
 
 \subsubsection{Respondus Lockdown Browser}
-\hspace{6mm}Respondus Lockdown Browser reprezintă o abordare diferită, 
+Respondus Lockdown Browser reprezintă o abordare diferită, 
 întrucât se concentrează pe crearea unui mediu securizat pentru examen,
 prin blocarea accesului candidatului la alte aplicații și resurse.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{|p{8.5cm}|p{8.5cm}|}
-\hline
-\textbf{Puncte forte} & \textbf{Limitări} \\
-\hline
-\begin{itemize}
-    \item Împiedicarea accesului la alte programe și resurse
-    \item Integrare bună cu platforme educaționale (LMS)
-    \item Costuri mai reduse comparativ cu alte soluții
-    \item Ușor de implementat la nivel instituțional
-\end{itemize} & 
-\begin{itemize}
-    \item Incapacitatea de a detecta dispozitive secundare
-    \item Nu monitorizează comportamentul fizic al candidatului
-    \item Funcționalitate restrânsă pe dispozitivele mobile
-    \item Incompatibilitate cu programe specifice (IDE-uri, etc.)
-\end{itemize} \\
-\hline
-\end{tabular}
-\caption{Analiza comparativă a sistemului Respondus Lockdown Browser}
-\end{table}
-
-Conform documentației sale oficiale \cite{respondus}, această soluție se
+Conform documentației sale oficiale~\cite{respondus}, această soluție se
 integrează cu sisteme de management al învățării (LMS), precum Canvas,
 Blackboard, Moodle, Schoology și Brightspace.
+
+\begin{table}[H] % Changed from [h] to [H] to force table placement
+    \centering
+    \begin{tabular}{|p{8.5cm}|p{8.5cm}|}
+    \hline
+    \textbf{Puncte forte} & \textbf{Limitări} \\
+    \hline
+    \begin{itemize}
+        \item Împiedicarea accesului la alte programe și resurse
+        \item Integrare bună cu platforme educaționale (LMS)
+        \item Costuri mai reduse comparativ cu alte soluții
+        \item Ușor de implementat la nivel instituțional
+    \end{itemize} & 
+    \begin{itemize}
+        \item Incapacitatea de a detecta dispozitive secundare
+        \item Nu monitorizează comportamentul fizic al candidatului
+        \item Funcționalitate restrânsă pe dispozitivele mobile
+        \item Incompatibilitate cu programe specifice (IDE-uri, etc.)
+    \end{itemize} \\
+    \hline
+    \end{tabular}
+    \caption{Analiza comparativă a sistemului Respondus Lockdown Browser}
+\end{table}
 
 \subsection{Aspecte multimedia relevante}
 
@@ -280,31 +288,44 @@ Blackboard, Moodle, Schoology și Brightspace.
 În cadrul aspectelor legate de multimedia, întâlnim protocoale care
 asigură transmisia datelor sigură și optimizată:
 \begin{itemize}
-    \item \textbf{WebRTC} pentru comunicația audio-video în timp real
-    \item \textbf{TLS/SSL} pentru criptarea întregului flux de date
+    \item \textbf{WebRTC} pentru comunicația audio-video în timp real. Acest protocol este utilizat pentru a transmite fluxul video capturat de la webcam către sistemul de procesare, asigurând o latență minimă și o calitate optimă a transmisiei. În proiectul nostru, WebRTC este folosit pentru a permite monitorizarea în timp real a candidaților, oferind o conexiune stabilă și eficientă.
+    \item \textbf{TLS/SSL} pentru criptarea întregului flux de date. Acest strat de securitate este esențial pentru a proteja datele transmise între client și server, prevenind accesul neautorizat sau interceptarea informațiilor sensibile. În contextul proiectului nostru, TLS/SSL este utilizat pentru a securiza atât fluxul video, cât și datele generate, cum ar fi rapoartele de încălcări.
 \end{itemize}
 
 \subsubsection{Procesare video și audio}
-\hspace{6mm}În ceea ce privește procesarea video, fluxul capturat de la webcam este procesat în
+În ceea ce privește procesarea video, fluxul capturat de la webcam este procesat în
 timp real pentru a detecta comportamente suspicioase. Se utilizează algoritmi de
 compresie video standard, precum \textbf{H.264}, pentru a asigura transmisia
 eficientă a datelor, reducând în același timp latența și consumul de
-bandă. 
+bandă. În proiectul nostru, H.264 este utilizat pentru a comprima fluxul video înainte de stocare sau transmitere, asigurând o utilizare eficientă a resurselor hardware.
 
 Platformele de monitorizare înregistrează și sunetele de pe fundal, analizând 
 eventuale conversații sau zgomote suspecte. Se aplică algoritmi de compresie audio, 
-precum \textbf{AAC} sau \textbf{Opus}, pentru transmiterea fluxului audio în timp real.
+precum \textbf{AAC} sau \textbf{Opus}, pentru transmiterea fluxului audio în timp real. În proiectul nostru, aceste algoritmi sunt folosiți pentru a înregistra și analiza sunetele de fundal, oferind informații suplimentare despre posibilele încălcări.
 
 \subsubsection{Watermarking și steganografie}
-\hspace{6mm}În soluțiile de tip Lockdown Browser se aplică watermark-uri vizibile sau invizibile 
+În soluțiile de tip Lockdown Browser se aplică watermark-uri vizibile sau invizibile 
 asupra conținutului afișat pe ecran, având ca scop prevenirea capturării neautorizate 
-a informațiilor de examen. Deși steganografia (metoda de ascundere a informațiilor 
-într-un conținut media) ar putea fi relevantă în acest context, ea nu este utilizată 
-în mod curent în platformele de proctoring.
+a informațiilor de examen. În proiectul nostru, watermark-urile sunt utilizate pentru a marca fluxul video înregistrat cu informații precum timestamp-ul și ID-ul candidatului, asigurând autenticitatea și integritatea datelor.
+
+De asemenea, steganografia (metoda de ascundere a informațiilor 
+într-un conținut media) este utilizată pentru a insera metadate în fluxul video, fără a afecta calitatea vizuală. Aceste metadate includ informații despre sesiunea de monitorizare, cum ar fi locația camerei sau setările de procesare, și pot fi extrase ulterior pentru verificări suplimentare.
+
+\subsubsection{Sincronizarea datelor multimedia}
+Pentru a asigura o corelare precisă între fluxul video, audio și evenimentele detectate, proiectul nostru utilizează timestamp-uri sincronizate. Aceste timestamp-uri sunt generate în momentul capturării fiecărui cadru video sau pachet audio și sunt utilizate pentru a lega alertele generate de sistem cu momentul exact al încălcării. Această abordare permite o analiză detaliată și o verificare ulterioară eficientă.
+
+\subsubsection{Optimizări pentru hardware limitat}
+Pentru a permite rularea eficientă a sistemului pe dispozitive cu resurse hardware limitate, proiectul nostru implementează mai multe optimizări:
+\begin{itemize}
+    \item Procesarea unui cadru din 20 pentru detectarea obiectelor, reducând astfel consumul de resurse.
+    \item Utilizarea unui buffer circular pentru gestionarea eficientă a cadrelor video.
+    \item Integrarea unui sistem de cache pentru alertele generate, evitând duplicarea mesajelor de alertă.
+\end{itemize}
+Aceste optimizări asigură o performanță ridicată, chiar și pe hardware obișnuit, fără a compromite acuratețea detecției.
 
 \subsection{Avantajele soluției propuse față de cele existente}
 
-\hspace{6mm}Sistemul de monitorizare anti-plagiat propus în acest proiect aduce următoarele avantaje față de soluțiile existente:
+Sistemul de monitorizare anti-plagiat propus în acest proiect aduce următoarele avantaje față de soluțiile existente:
 
 \begin{enumerate}
     \item \textbf{Focalizare pe comportamentul fizic} - Spre deosebire de soluțiile existente care se concentrează predominant pe monitorizarea ecranului, sistemul nostru pune accent pe comportamentul fizic al candidatului.
@@ -320,8 +341,9 @@ a informațiilor de examen. Deși steganografia (metoda de ascundere a informaț
 
 \section{Implementarea propriu-zisă}
 
-\hspace{6mm}În cadrul implementării sistemului de anti-plagiat, a fost necesară utilizarea mai multor biblioteci specializate, fiecare având un rol diferit în funcționarea sa.
+În cadrul implementării sistemului de anti-plagiat, a fost necesară utilizarea mai multor biblioteci specializate, fiecare având un rol diferit în funcționarea sa.
 
+\subsection{OpenCV}
 Am utilizat biblioteca OpenCV (\texttt{Open Source Computer Vision Library}),
 care a avut un rol principal în prelucrarea și procesarea imaginilor. Cu
 ajutorul ei, am captat fluxul video de la camera web, prin intermediul
@@ -353,14 +375,16 @@ distribuției Gaussiene, acest parametru fiind setat la valoarea 0,
 însemnând că este calculată automat, folosind formula:
 
 \begin{equation}
-\sigma\, = \, 0.3\, \cdot \,\left( \frac{\texttt{kernel\_size} - 1}{2}\, - \, 1 \right)\, + \, 0.8
+\sigma = 0.3 \cdot \left( \frac{\texttt{kernel\_size} - 1}{2} - 1 \right) + 0.8
 \end{equation}
 
-, iar pentru un kernel de dimensiune 7x7, această formulă devine:
-
-\begin{equation}
-\sigma = 0.3 \cdot \left( \frac{7 - 1}{2} - 1 \right) + 0.8 = 0.3 \cdot (3 - 1) + 0.8 = 0.3 \cdot 2 + 0.8 = 1.4
-\end{equation}
+\hspace{-6mm}Pentru un kernel de dimensiune \(7 \times 7\), această formulă devine:
+\begin{align}
+\sigma &= 0.3 \cdot \left( \frac{7 - 1}{2} - 1 \right) + 0.8 \nonumber \\
+    &= 0.3 \cdot (3 - 1) + 0.8 \nonumber \\
+    &= 0.3 \cdot 2 + 0.8 \nonumber \\
+    &= 1.4
+\end{align}
 
 Funcția \texttt{cv2.minMaxLoc} din OpenCV este un instrument esențial pentru
 detecția pupilelor. Această funcție identifică valorile minime și maxime
@@ -419,7 +443,7 @@ Așadar, biblioteca OpenCV este responsabilă pentru tot ce înseamnă ``a
 vedea'' în acest sistem.
 
 \subsection{Dlib}
-\hspace{6mm}Biblioteca Dlib a fost utilizată pentru detectarea feței și extragerea reperelor faciale \cite{dlib}. Aceasta a fost esențială pentru analiza privirii și determinarea direcției acesteia. 
+Biblioteca Dlib a fost utilizată pentru detectarea feței și extragerea reperelor faciale \cite{dlib}. Aceasta a fost esențială pentru analiza privirii și determinarea direcției acesteia. 
 
 Funcția \texttt{dlib.get\_frontal\_face\_detector} a fost utilizată pentru a inițializa detectorul de fețe bazat pe HOG (Histogram of Oriented Gradients), care s-a dovedit eficient chiar și în condiții de iluminare variabilă. Acest algoritm funcționează prin împărțirea imaginii în celule mici și calcularea gradientului de intensitate pentru fiecare celulă. Gradientul este apoi normalizat pentru a reduce efectele variațiilor de iluminare, iar rezultatul este un descriptor robust care poate fi utilizat pentru a detecta fețele în imagine. Detectorul returnează coordonatele dreptunghiurilor care încadrează fețele detectate, iar aceste coordonate sunt utilizate pentru a izola regiunea feței.
 
@@ -430,7 +454,7 @@ Funcția \texttt{shape.part} a fost utilizată pentru a accesa coordonatele fiec
 De asemenea, aceste puncte au fost utilizate pentru a determina orientarea capului, prin calcularea distanțelor dintre punctele cheie, cum ar fi ochii, nasul și gura. Orientarea capului este estimată prin compararea acestor distanțe cu valorile de referință, iar rezultatul este utilizat pentru a detecta mișcările capului care pot indica comportamente suspecte.
 
 \subsection{PyTorch și YOLOv8}
-\hspace{6mm}Pentru detectarea obiectelor interzise, precum telefoanele mobile și smartwatch-urile, am utilizat biblioteca PyTorch \cite{pytorch} și modelul YOLOv8 dezvoltat de Ultralytics \cite{ultralytics}. 
+Pentru detectarea obiectelor interzise, precum telefoanele mobile și smartwatch-urile, am utilizat biblioteca PyTorch \cite{pytorch} și modelul YOLOv8 dezvoltat de Ultralytics \cite{ultralytics}. 
 
 Funcția \texttt{torch.load} a fost utilizată pentru a încărca modelele YOLOv8 preantrenate. Aceste modele sunt bazate pe arhitectura YOLO (You Only Look Once), care este optimizată pentru detectarea rapidă și precisă a obiectelor în imagini. YOLOv8 utilizează o rețea neuronală convoluțională care împarte imaginea în grile și prezice simultan clasele obiectelor și coordonatele acestora. Această abordare permite detectarea în timp real, chiar și pe dispozitive cu resurse limitate.
 
@@ -441,13 +465,38 @@ Pentru a reduce falsurile pozitive, am utilizat două modele YOLOv8 separate: un
 Funcția \texttt{model.detect} a fost utilizată pentru a genera coordonatele obiectelor detectate, iar aceste coordonate au fost utilizate pentru a desena dreptunghiuri în jurul obiectelor și pentru a genera alerte în timp real. De asemenea, coordonatele au fost utilizate pentru a calcula distanțele dintre obiectele detectate și alte elemente din imagine, cum ar fi fața candidatului, pentru a determina dacă obiectele sunt utilizate în mod activ.
 
 \subsection{NumPy}
-\hspace{6mm}Biblioteca NumPy a fost utilizată pentru manipularea matricilor și a datelor numerice \cite{numpy}. 
+Biblioteca NumPy a fost utilizată pentru manipularea matricilor și a datelor numerice \cite{numpy}. 
 
 Funcția \texttt{np.zeros} a fost folosită pentru a crea măști pentru regiunile de interes din imagine, iar \texttt{np.full} a fost utilizată pentru a inițializa matrici cu valori constante. Aceste funcții sunt esențiale pentru preprocesarea imaginilor, deoarece permit izolarea regiunilor de interes și aplicarea de operații specifice doar asupra acestor regiuni.
 
 Funcțiile \texttt{np.min} și \texttt{np.max} au fost utilizate pentru a determina limitele regiunilor de decupat, iar operațiile vectoriale au permis calcularea rapidă a coordonatelor pupilelor și a raporturilor orizontale și verticale. De exemplu, coordonatele pupilelor sunt calculate ca punctele cu intensitatea minimă din regiunea ochilor, iar raporturile sunt calculate ca raporturi între distanțele dintre aceste coordonate și dimensiunile regiunii.
+
+\subsection{Biblioteca datetime}
+Biblioteca \texttt{datetime}\cite{datetime} din Python a fost utilizată pentru gestionarea timpului și a timestamp-urilor în cadrul proiectului. Aceasta a fost esențială pentru sincronizarea evenimentelor, generarea rapoartelor și înregistrarea timpului de monitorizare.
+
+Funcția \texttt{datetime.now()} a fost utilizată pentru a obține timpul curent în momentul generării unui eveniment, cum ar fi detectarea unei încălcări sau salvarea unui raport. Timestamp-urile generate sunt utilizate pentru a lega evenimentele detectate de momentele exacte din fluxul video.
+
+De exemplu, în cadrul clasei \texttt{ViolationMonitor}, funcția \texttt{datetime.now().strftime()} a fost utilizată pentru a formata timestamp-urile într-un format ușor de citit, cum ar fi \texttt{YYYY-MM-DD HH:MM:SS}. Aceste timestamp-uri sunt incluse în rapoartele generate și sunt utilizate pentru a analiza comportamentul candidatului în timp.
+
+Funcția \texttt{timedelta} a fost utilizată pentru a calcula diferențele de timp între evenimente. De exemplu, timpul scurs de la începutul înregistrării este calculat utilizând \texttt{datetime.now()} și timpul de start al înregistrării. Acest lucru este afișat în interfața grafică pentru a oferi utilizatorului informații în timp real despre durata monitorizării.
+
+De asemenea, biblioteca \texttt{datetime} a fost utilizată pentru a genera nume unice pentru fișierele de înregistrare și rapoarte, utilizând funcția \texttt{strftime()} pentru a include timestamp-uri în numele fișierelor.
+
+Biblioteca \texttt{datetime} a fost astfel un instrument esențial pentru gestionarea timpului în toate aspectele proiectului, de la monitorizare în timp real până la generarea rapoartelor detaliate.
+
+\subsection{Biblioteca logging}
+Biblioteca \texttt{logging}\cite{logging} din Python a fost utilizată pentru gestionarea mesajelor de jurnalizare (\textit{logging}) în cadrul proiectului. Aceasta a fost esențială pentru monitorizarea funcționării aplicației, diagnosticarea problemelor și păstrarea unui istoric al evenimentelor importante.
+
+Funcția \texttt{logging.basicConfig()} a fost utilizată pentru a configura formatul și nivelul de jurnalizare. În cadrul proiectului, mesajele de jurnalizare sunt salvate atât într-un fișier (\texttt{sistem\_anti\_plagiat.log}), cât și afișate în consolă. Acest lucru permite o monitorizare eficientă a aplicației în timp real, precum și o analiză ulterioară a problemelor.
+
+De exemplu, în cadrul clasei \texttt{SistemAntiPlagiat}, biblioteca \texttt{logging} a fost utilizată pentru a înregistra evenimente importante, cum ar fi pornirea înregistrării video, detectarea încălcărilor sau erorile apărute în timpul procesării.
+
+Biblioteca \texttt{logging} a fost utilizată și pentru a înregistra excepțiile apărute în timpul rulării aplicației, utilizând funcția \texttt{logger.exception()}, care include automat detaliile despre excepție în mesajul de jurnalizare.
+
+Această abordare a permis identificarea rapidă a problemelor și îmbunătățirea stabilității aplicației. Biblioteca \texttt{logging} a fost astfel un instrument esențial pentru gestionarea mesajelor de jurnalizare în toate modulele proiectului.
+
 \subsection{PyQt5}
-\hspace{6mm}Pentru dezvoltarea interfeței grafice, am utilizat biblioteca PyQt5 \cite{pyqt5}. Aceasta a permis crearea unei interfețe intuitive și funcționale, utilizând următoarele componente principale:
+Pentru dezvoltarea interfeței grafice, am utilizat biblioteca PyQt5 \cite{pyqt5}. Aceasta a permis crearea unei interfețe intuitive și funcționale, utilizând următoarele componente principale:
 
 \begin{itemize}
     \item \textbf{QPushButton:} Am folosit acest widget pentru a crea butoane interactive, cum ar fi cele pentru pornirea monitorizării, înregistrării sau exportarea rapoartelor. Aceste butoane sunt esențiale pentru a permite utilizatorului să interacționeze cu aplicația într-un mod simplu și direct. De exemplu, butonul de export al raportului oferă o funcționalitate clară și accesibilă pentru utilizator.
@@ -469,9 +518,49 @@ Funcțiile \texttt{np.min} și \texttt{np.max} au fost utilizate pentru a determ
 
 Interfața a fost proiectată pentru a fi intuitivă și ușor de utilizat, oferind acces rapid la toate funcționalitățile sistemului.
 
+\subsection{Modularizarea si structura proiectului}
+
+\hspace{6mm}Proiectul a fost organizat modular, fiecare fișier Python având un rol bine definit. Această abordare facilitează întreținerea codului, testarea și extinderea funcționalităților. Mai jos sunt detaliate principalele module și responsabilitățile acestora:
+
+\begin{itemize}
+    \item \textbf{main.py:} Acesta este punctul de intrare al aplicației. Inițializează componentele principale, cum ar fi detectorul de fețe, detectorul de obiecte, monitorul de încălcări și handler-ul video. De asemenea, gestionează procesarea cadrelor și exportul rapoartelor.
+
+    \item \textbf{gui\_app.py:} Conține implementarea interfeței grafice utilizând biblioteca PyQt5. Include funcționalități precum pornirea monitorizării, înregistrarea video, afișarea alertelor în timp real și exportul rapoartelor.
+    
+    \item \textbf{test\_camera.py:} Un script auxiliar pentru testarea funcționalității camerei web. Verifică dacă camera poate fi accesată și dacă fluxul video este disponibil.
+
+    \item \textbf{modules/face\_detector.py:} Acest modul implementează detectarea feței și analiza direcției privirii utilizând biblioteca Dlib. Este responsabil pentru identificarea feței și determinarea direcției privirii candidatului.
+
+    \item \textbf{modules/object\_detector.py:} Conține implementarea pentru detectarea obiectelor interzise, cum ar fi telefoanele mobile și smartwatch-urile, utilizând modelul YOLOv8. Este optimizat pentru procesarea eficientă a cadrelor.
+
+    \item \textbf{modules/video\_handler.py:} Gestionează procesarea și afișarea cadrelor video. Include funcționalități pentru oglindirea imaginii, afișarea alertelor și salvarea înregistrărilor video.
+
+    \item \textbf{modules/violation\_monitor.py:} Monitorizează încălcările detectate, cum ar fi privirea suspectă sau utilizarea obiectelor interzise. Înregistrează alertele și le sincronizează cu timestamp-uri.
+
+    \item \textbf{modules/report\_generator.py:} Este responsabil pentru generarea rapoartelor în formate HTML, CSV și JSON. Aceste rapoarte includ detalii despre încălcările detectate și statistici generale.
+
+    \item \textbf{modules/data\_exporter.py:} Gestionează exportul datelor în formatele specificate (CSV, JSON). Este utilizat pentru a salva informațiile despre încălcări într-un mod structurat.
+    
+    \item \textbf{modules/gaze\_tracking/gaze\_tracker.py:} Acest fișier implementează logica principală pentru urmărirea privirii. Utilizează reperele faciale pentru a calcula raporturile orizontale și verticale ale privirii și pentru a determina direcția acesteia.
+
+    \item \textbf{modules/gaze\_tracking/eye.py:} Acest modul izolează regiunea ochilor din imagine și detectează pupilele. De asemenea, calculează raportul de clipire pentru a identifica dacă ochiul este închis.
+
+    \item \textbf{modules/gaze\_tracking/pupil.py:} Acest fișier implementează logica pentru detectarea și analiza pupilelor, utilizând coordonatele și dimensiunile acestora pentru a determina starea ochilor.
+
+    \item \textbf{requirements.txt:} Acest fișier conține lista tuturor bibliotecilor și pachetelor necesare pentru rularea aplicației. Este utilizat pentru instalarea rapidă a dependențelor.
+
+    \item \textbf{config.json:} Fișierul de configurare al aplicației, care stochează setările personalizabile, cum ar fi pragurile de detecție sau opțiunile de salvare a rapoartelor.
+
+    \item \textbf{.gitignore:} Fișierul care specifică ce fișiere sau directoare ar trebui ignorate de Git, cum ar fi fișierele temporare sau directoarele de build.
+
+    \item \textbf{.devcontainer/:} Directorul care conține configurația pentru mediul de dezvoltare în container, inclusiv fișierele Docker și setările Visual Studio Code.
+\end{itemize}
+
+\hspace{6mm}Această structură modulară permite o separare clară a responsabilităților, ceea ce face proiectul mai ușor de întreținut și extins. Fiecare modul poate fi testat și îmbunătățit independent, fără a afecta alte părți ale aplicației.
+
 \section{Arhitectura sistemului}
 
-\hspace{6mm}Pentru a înțelege mai bine structura și funcționalitatea sistemului, am generat următoarele diagrame UML și am explicat rolul fiecărui fișier Python din proiect.
+Pentru a înțelege mai bine structura și funcționalitatea sistemului, am generat următoarele diagrame UML și am explicat rolul fiecărui fișier Python din proiect.
 
 \subsection{Diagrama de clase}
 
@@ -494,8 +583,8 @@ Interfața a fost proiectată pentru a fi intuitivă și ușor de utilizat, ofer
         % Relations
         \draw[relation] (main) -- (gui) node[midway, left] {Inițializează};
         \draw[relation] (gui) -- (video) node[midway, above] {Controlează};
-        \draw[relation] (gui) -- (report) node[midway, left, xshift=-1cm, yshift=0.5cm] {Exportă rapoarte};
-        \draw[relation] (video) -- (gaze) node[midway, left, xshift=-1cm, yshift=-0.5cm] {Analizează privirea};
+        \draw[relation] (gui) -- (report) node[midway, left, xshift=-1cm, yshift=0.4cm] {\rotatebox{-10}{Exportă rapoarte}};
+        \draw[relation] (video) -- (gaze) node[midway, left, xshift=-1cm, yshift=-0.5cm] {\rotatebox{+10}{Analizează privirea}};
         \draw[relation] (video) -- (report) node[midway, right] {Generează alerte};
     \end{tikzpicture}
     \caption{Diagrama de clase a sistemului Anti-Plagiat}
@@ -528,6 +617,87 @@ Interfața a fost proiectată pentru a fi intuitivă și ușor de utilizat, ofer
     \end{tikzpicture}
     \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
 \end{figure}
+
+\subsection{Diagrama de activitate}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        startstop/.style={rectangle, rounded corners, draw=black, fill=red!30, text centered, minimum width=3cm},
+        process/.style={rectangle, draw=black, fill=blue!30, text centered, minimum width=3cm},
+        decision/.style={rectangle, draw=black, fill=green!30, text centered, minimum width=3cm},
+        arrow/.style={-{Latex}, thick}
+    ]
+        % Nodes
+        \node[startstop] (start) {Start Monitorizare};
+        \node[process, below of=start] (capture) {Captură Video};
+        \node[process, below of=capture] (analyze) {Analiză Privire și Obiecte};
+        \node[decision, below of=analyze] (violation) {Încălcare Detectată?};
+        \node[process, right of=violation, xshift=4cm] (alert) {Generează Alertă};
+        \node[process, below of=violation, yshift=-1cm] (record) {Înregistrează Video};
+        \node[startstop, below of=record] (stop) {Stop Monitorizare};
+
+        % Arrows
+        \draw[arrow] (start) -- (capture);
+        \draw[arrow] (capture) -- (analyze);
+        \draw[arrow] (analyze) -- (violation);
+        \draw[arrow] (violation.east) -- (alert.west) node[midway, above] {Da};
+        \draw[arrow] (violation.south) -- (record.north) node[midway, right] {Nu};
+        \draw[arrow] (record) -- (stop);
+    \end{tikzpicture}
+    \caption{Diagrama de activitate pentru procesul de monitorizare}
+\end{figure}
+
+\subsection{Diagrama de componente}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        component/.style={rectangle, draw=black, fill=yellow!30, text centered, text width=3cm, minimum height=1cm},
+        relation/.style={-{Latex}, thick}
+    ]
+            \node[component] (gui) {Interfață Grafică};
+            \node[component, below=1.5cm of gui] (video) {Procesare Video};
+            \node[component, below=1.5cm of video] (gaze) {Analiză Privire};
+            \node[component, right=4cm of video] (report) {Generare Rapoarte};
+            \node[component, below=1.5cm of gaze] (storage) {Stocare Date};
+
+            % Relations
+            \draw[relation] (gui) -- (video) node[midway, left] {Captură Video};
+            \draw[relation] (video) -- (gaze) node[midway, left] {Analiză Cadre};
+            \draw[relation] (video) -- (report) node[midway, above] {Date Alerte};
+            \draw[relation] (gaze) -- (report) node[midway, below, sloped, rotate=0] {Rezultate Analiză};
+            \draw[relation] (report) -- (storage) node[midway, right, sloped, rotate=0, yshift=-0.3cm] {Salvare Rapoarte};
+    \end{tikzpicture}
+    \caption{Diagrama de componente a sistemului Anti-Plagiat}
+\end{figure}
+
+\section{Dificultăți întâmpinate}
+
+În realizarea acestui proiect, am întâmpinat mai multe dificultăți, care au necesitat soluții creative și adaptări pentru a fi depășite:
+
+\begin{enumerate}
+    \item \textbf{Integrarea modelelor YOLOv8:} Configurarea și optimizarea modelelor YOLOv8 pentru detectarea obiectelor interzise a fost o provocare, mai ales în ceea ce privește reducerea falsurilor pozitive. A fost necesar să ajustez pragurile de detecție și să folosesc modele separate pentru categorii diferite de obiecte.
+
+    \item \textbf{Performanța pe hardware limitat:} Procesarea video în timp real a fost dificilă pe dispozitive cu resurse hardware limitate. Am implementat optimizări, cum ar fi procesarea unui cadru din 20 și utilizarea unui buffer circular, pentru a reduce consumul de resurse.
+
+    \item \textbf{Detectarea privirii în condiții de iluminare variabilă:} Detectarea precisă a direcției privirii a fost afectată de variațiile de iluminare. A fost necesar să aplic filtre și să ajusteze parametrii algoritmilor pentru a îmbunătăți robustețea.
+
+    \item \textbf{Sincronizarea datelor multimedia:} Corelarea precisă între fluxul video, audio și evenimentele detectate a fost o sarcină complexă. Am utilizat timestamp-uri sincronizate pentru a lega alertele generate de momentele exacte din fluxul video.
+
+    \item \textbf{Complexitatea interfeței grafice:} Dezvoltarea unei interfețe grafice intuitive și funcționale a fost o provocare, mai ales în ceea ce privește organizarea logică a componentelor și sincronizarea acestora cu procesele din fundal.
+
+    \item \textbf{Gestionarea falsurilor pozitive:} În timpul testării, am observat o rată ridicată de falsuri pozitive, mai ales în detectarea obiectelor. A fost necesar să ajustez algoritmii și să implementez filtre suplimentare pentru a îmbunătăți acuratețea.
+
+    \item \textbf{Documentarea și modularizarea codului:} Structurarea proiectului într-un mod modular și documentarea clară a fiecărui modul au necesitat timp suplimentar, dar au fost esențiale pentru întreținerea și extinderea ulterioară a aplicației.
+
+    \item \textbf{Testarea și validarea:} Testarea aplicației în scenarii reale a fost dificilă, mai ales în simularea condițiilor variate de utilizare, cum ar fi diferite unghiuri ale camerei, iluminare slabă sau zgomot de fundal.
+
+    \item \textbf{Gestionarea dependențelor:} Instalarea și configurarea corectă a tuturor bibliotecilor și pachetelor necesare au fost uneori problematice, mai ales din cauza incompatibilităților între versiuni.
+\end{enumerate}
+
+Aceste dificultăți au reprezentat oportunități de învățare și au contribuit la îmbunătățirea abilităților mele tehnice și de gestionare a proiectelor.
 
 \section{Contribuția personală}
 
@@ -606,36 +776,31 @@ self.export_button = QPushButton("Export Raport")
 self.export_button.clicked.connect(self.export_report)
 \end{lstlisting}
 
-\section{Biblioteci utilizate și referințe}
-\subsection{OpenCV}
-OpenCV (Open Source Computer Vision Library) este o bibliotecă open-source utilizată pentru procesarea imaginilor și a videoclipurilor. Este folosită în proiect pentru detectarea feței, analiza privirii și alte operațiuni de procesare a imaginilor.
+\section{Îmbunătățiri posibile}
 
-\textbf{Referință:} \url{https://opencv.org/}
+Deși aplicația actuală oferă funcționalități avansate pentru monitorizarea anti-plagiat, există câteva aspecte care pot fi îmbunătățite sau extinse pentru a crește eficiența și utilitatea acesteia:
 
-\subsection{Dlib}
-Dlib este o bibliotecă de învățare automată și procesare a imaginilor, utilizată pentru detectarea feței și extragerea reperelor faciale. În acest proiect, este folosită pentru analiza privirii și detectarea direcției acesteia.
+\begin{enumerate}
+    \item \textbf{Integrarea cu platforme LMS:} Adăugarea suportului pentru integrarea directă cu platforme de management al învățământului (LMS), precum Moodle, Blackboard sau Canvas, pentru a facilita gestionarea examenelor și a rapoartelor.
 
-\textbf{Referință:} \url{http://dlib.net/}
+    \item \textbf{Detectarea comportamentului complex:} Utilizarea modelelor avansate de machine learning pentru a analiza comportamente mai complexe, cum ar fi mișcările subtile ale mâinilor sau schimbările de expresie facială.
 
-\subsection{PyTorch}
-PyTorch este un framework de învățare profundă utilizat pentru implementarea și rularea modelului YOLOv8, care detectează obiectele interzise precum telefoanele mobile și smartwatch-urile.
+    \item \textbf{Suport multi-camera:} Extinderea aplicației pentru a permite utilizarea mai multor camere simultan, oferind o perspectivă mai completă asupra comportamentului candidatului.
 
-\textbf{Referință:} \url{https://pytorch.org/}
+    \item \textbf{Reducerea falsurilor pozitive:} Îmbunătățirea algoritmilor de detecție pentru a reduce rata falsurilor pozitive, prin utilizarea unor modele mai bine antrenate sau prin combinarea mai multor surse de date.
 
-\subsection{Ultralytics YOLOv8}
-YOLOv8 este un model de detectare a obiectelor dezvoltat de Ultralytics, utilizat pentru detectarea dispozitivelor interzise în cadrul proiectului.
+    \item \textbf{Monitorizare audio avansată:} Dezvoltarea unui modul de procesare audio mai sofisticat, care să detecteze conversațiile suspecte sau utilizarea dispozitivelor audio neautorizate.
 
-\textbf{Referință:} \url{https://github.com/ultralytics/ultralytics}
+    \item \textbf{Suport pentru dispozitive mobile:} Crearea unei versiuni a aplicației care să funcționeze pe dispozitive mobile, pentru a extinde utilizarea acesteia în medii mai diverse.
 
-\subsection{NumPy}
-NumPy este o bibliotecă pentru calcul numeric în Python, utilizată pentru manipularea matricilor și a datelor numerice.
+    \item \textbf{Personalizarea interfeței grafice:} Adăugarea opțiunilor de personalizare a interfeței grafice, cum ar fi temele de culoare sau configurarea widget-urilor, pentru a îmbunătăți experiența utilizatorului.
 
-\textbf{Referință:} \url{https://numpy.org/}
+    \item \textbf{Analiză post-eveniment:} Dezvoltarea unui modul avansat de analiză post-eveniment, care să permită revizuirea detaliată a sesiunilor de monitorizare, cu funcționalități precum căutarea pe baza timestamp-urilor sau generarea de grafice.
 
-\subsection{PyQt5}
-PyQt5 este un set de instrumente pentru crearea interfețelor grafice în Python. Este utilizat pentru dezvoltarea interfeței grafice a aplicației.
+    \item \textbf{Optimizări hardware:} Implementarea unor optimizări suplimentare pentru a reduce consumul de resurse pe dispozitive cu hardware limitat, cum ar fi utilizarea procesării GPU sau a modelelor mai ușoare.
+\end{enumerate}
 
-\textbf{Referință:} \url{https://riverbankcomputing.com/software/pyqt/intro}
+Aceste îmbunătățiri ar putea crește semnificativ valoarea aplicației și ar extinde aria de utilizare a acesteia în diverse contexte educaționale și profesionale.
 
 \begin{thebibliography}{9}
 \bibitem{pelican} 
@@ -683,6 +848,14 @@ NumPy Documentation.
 \bibitem{pyqt5} 
 PyQt5 Documentation. 
 \url{https://riverbankcomputing.com/software/pyqt/intro}
+
+\bibitem{datetime} 
+Python datetime Module Documentation. 
+\url{https://docs.python.org/3/library/datetime.html}
+
+\bibitem{logging} 
+Python logging Module Documentation. 
+\url{https://docs.python.org/3/library/logging.html}
 \end{thebibliography}
 
 \end{document}
