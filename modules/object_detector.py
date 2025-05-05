@@ -1,4 +1,5 @@
 import cv2
+import torch
 from ultralytics import YOLO
 
 class ObjectDetector:
@@ -14,13 +15,19 @@ class ObjectDetector:
         }
 
         try:
-            # model optimizat: YOLOv8s
-            self.phone_model = YOLO("yolov8s.pt") # pentru telefon
-            self.watch_model = YOLO("yolov8s.pt") # pentru smartwatch
-            self.device = "cpu"
-            print("folosim CPU pentru detectie")
+            # verifica daca exista GPU
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            print(f"folosim {self.device.upper()} pentru detectie")
+
+            self.phone_model = YOLO("yolov8s.pt")
+            self.phone_model.to(self.device)
+
+            self.watch_model = YOLO("yolov8s.pt")
+            self.watch_model.to(self.device)
+
         except Exception as e:
             print(f"eroare incarcare modele yolov8: {e}")
+            self.device = "cpu"
 
         self.frame_count = 0
         self.process_every_n_frames = 30
@@ -28,6 +35,7 @@ class ObjectDetector:
         self.last_annotated_frame = None
 
         print("detector obiecte initializat.")
+
 
     def detect_objects(self, frame):
         self.frame_count += 1
