@@ -138,7 +138,7 @@ class GazeTracker(object):
             # distanta centre ochi
             eye_distance = right_center_x - left_center_x
 
-            # width frame
+            # latime cadru
             if self.frame is not None:
                 frame_width = self.frame.shape[1]
             else:
@@ -147,7 +147,7 @@ class GazeTracker(object):
             # normalizare distanta
             eye_position_factor = eye_distance / (frame_width * 0.3)
 
-            # ajustare ratio
+            # ajustare rata
             adjusted_ratio = pupil_ratio
 
             # cap intors stanga
