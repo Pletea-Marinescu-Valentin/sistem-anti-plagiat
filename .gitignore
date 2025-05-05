@@ -29,6 +29,7 @@ snapshots/
 *.mp4
 *.jpg
 *.png
+/screenshots/
 
 # fisiere temporare
 .DS_Store
