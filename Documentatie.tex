@@ -17,6 +17,10 @@
 \usepackage{times} % Pentru font Times New Roman
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
+% Eliminare redundanțe și avertismente
+\restylefloat{table}
+\restylefloat{figure}
+
 \geometry{
     a4paper,
     top=2.5cm,
@@ -65,11 +69,7 @@
 \setlength{\headheight}{14.5pt} % Ajustare înălțime antet
 \renewcommand{\headrulewidth}{0pt} % Eliminare linie antet
 \renewcommand{\footrulewidth}{0pt} % Eliminare linie subsol
-\lhead{}
-\rhead{}
-\lfoot{}
 \cfoot{\thepage}
-\rfoot{}
 
 % Configurare text
 \setstretch{1.15} % Distanța dintre rânduri
@@ -378,7 +378,7 @@ distribuției Gaussiene, acest parametru fiind setat la valoarea 0,
 \sigma = 0.3 \cdot \left( \frac{\texttt{kernel\_size} - 1}{2} - 1 \right) + 0.8
 \end{equation}
 
-\hspace{-6mm}Pentru un kernel de dimensiune \(7 \times 7\), această formulă devine:
+Pentru un kernel de dimensiune \(7 \times 7\), această formulă devine:
 \begin{align}
 \sigma &= 0.3 \cdot \left( \frac{7 - 1}{2} - 1 \right) + 0.8 \nonumber \\
     &= 0.3 \cdot (3 - 1) + 0.8 \nonumber \\
@@ -568,7 +568,9 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
     \centering
     \begin{tikzpicture}[
         class/.style={rectangle, draw=black, rounded corners, text centered, text width=4cm, minimum height=1cm, font=\sffamily},
+        smallclass/.style={rectangle, draw=black, rounded corners, text centered, text width=3cm, minimum height=0.8cm, font=\sffamily},
         relation/.style={-{Latex}, thick},
+        shortrelation/.style={-{Latex}, thick, shorten >=2mm, shorten <=4mm},
         aggregation/.style={-{Diamond[open]}, thick},
         composition/.style={-{Diamond}, thick},
         dependency/.style={dashed, -{Latex}, thick}
@@ -576,9 +578,14 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
         % Classes
         \node[class] (main) {main.py\\\textit{Punctul de intrare}};
         \node[class, below=2cm of main] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}};
-        \node[class, right=4cm of gui] (video) {VideoHandler\\\textit{Procesare video}};
+        \node[class, right=3.5cm of gui] (video) {VideoHandler\\\textit{Procesare video}};
         \node[class, below=2cm of gui] (gaze) {GazeTracker\\\textit{Analiză privire}};
         \node[class, below=2cm of video] (report) {ReportGenerator\\\textit{Generare rapoarte}};
+        \node[class, below=2cm of report] (exporter) {DataExporter\\\textit{Export date}};
+        \node[class, right=1.5cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}};
+        \node[class, below=2cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}};
+        \node[smallclass, below=2cm of gaze, xshift=4cm] (eye) {Eye\\\textit{Analiză ochi}};
+        \node[class, below=2cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}};
 
         % Relations
         \draw[relation] (main) -- (gui) node[midway, left] {Inițializează};
@@ -586,6 +593,11 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
         \draw[relation] (gui) -- (report) node[midway, left, xshift=-1cm, yshift=0.4cm] {\rotatebox{-10}{Exportă rapoarte}};
         \draw[relation] (video) -- (gaze) node[midway, left, xshift=-1cm, yshift=-0.5cm] {\rotatebox{+10}{Analizează privirea}};
         \draw[relation] (video) -- (report) node[midway, right] {Generează alerte};
+        \draw[relation] (video) -- (object) node[midway, above, yshift=0.55cm] {Detectează obiecte};
+        \draw[relation] (gaze) -- (violation) node[midway, left] {Monitorizează};
+        \draw[relation] (gaze) -- (eye) node[midway, left, xshift=1.7cm] {\rotatebox{-39}{Analizează}};
+        \draw[relation] (eye) -- (pupil) node[midway, left] {Detectează};
+        \draw[relation] (report) -- (exporter) node[midway, left] {Exportă date};
     \end{tikzpicture}
     \caption{Diagrama de clase a sistemului Anti-Plagiat}
 \end{figure}
@@ -597,26 +609,31 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
     \begin{tikzpicture}[
         actor/.style={draw, ellipse, minimum height=1cm, minimum width=2cm, font=\sffamily},
         process/.style={draw, rectangle, minimum height=1cm, minimum width=2.5cm, font=\sffamily},
-        arrow/.style={-{Latex}, thick},
-        dashedarrow/.style={dashed, -{Latex}, thick}
-    ]
+        arrow/.style={-{Latex}, thick, shorten >=2mm, shorten <=2mm},
+        dashedarrow/.style={dashed, -{Latex}, thick, shorten >=2mm, shorten <=2mm},
+        node distance=2.5cm
+        ]
         % Nodes
-            \node[actor] (user) {Utilizator};
-            \node[process, right=4cm of user] (gui) {AntiPlagiatGUI};
-            \node[process, right=4cm of gui] (video) {VideoHandler};
-            \node[process, below=2cm of video] (gaze) {GazeTracker};
-            \node[process, below=2cm of gui] (report) {ReportGenerator};
+        \node[actor] (user) {Utilizator};
+        \node[process, right=2.5cm of user] (gui) {AntiPlagiatGUI};
+        \node[process, right=2.5cm of gui] (video) {VideoHandler};
+        \node[process, below=1.8cm of video] (gaze) {GazeTracker};
+        \node[process, below=1.8cm of gui] (report) {ReportGenerator};
+        \node[process, below=1.8cm of gaze] (violation) {ViolationMonitor};
+        \node[process, right=1.4cm of gaze] (object) {ObjectDetector};
 
-            % Arrows
-            \draw[arrow] (user) -- (gui) node[midway, above, yshift=0.2cm] {Pornește monitorizarea};
-            \draw[arrow] (gui) -- (video) node[midway, above, yshift=0.2cm] {Captură video};
-            \draw[arrow] (video) -- (gaze) node[midway, left, xshift=3cm] {Analiză privire};
-            \draw[arrow] (video) -- (report) node[midway, right, xshift=-0.68cm] {\rotatebox{+25}{Generează alerte}};
-            \draw[arrow] (report) -- (gui) node[midway, right, xshift=0.2cm] {Afișează alerte};
-            \draw[dashedarrow] (gui) -- (user) node[midway, below, yshift=-0.2cm] {Afișează rezultate};
-    \end{tikzpicture}
-    \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
-\end{figure}
+        % Arrows
+        \draw[arrow] (user) -- (gui) node[midway, above, yshift=0.4cm] {Pornește monitorizarea};
+        \draw[arrow] (gui) -- (video) node[midway, above, yshift=0.2cm] {Captură video};
+        \draw[arrow] (video) -- (gaze) node[midway, left, xshift=1.5cm] {Analiză privire};
+        \draw[arrow] (video) -- (object) node[midway, right, xshift=-1cm] {\rotatebox{-30}{Detectează obiecte}};
+        \draw[arrow] (gaze) -- (violation) node[midway, left, xshift=2.5cm] {Monitorizează încălcări};
+        \draw[arrow] (violation) -- (report) node[midway, left] {Generează alerte};
+        \draw[arrow] (report) -- (gui) node[midway, right, xshift=0.2cm] {Afișează alerte};
+        \draw[dashedarrow] (gui) -- (user) node[midway, below, yshift=-0.2cm] {Afișează rezultate};
+        \end{tikzpicture}
+        \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
+    \end{figure}
 
 \subsection{Diagrama de activitate}
 
@@ -775,6 +792,20 @@ Am dezvoltat o interfață grafică intuitivă utilizând PyQt5, care permite ut
 self.export_button = QPushButton("Export Raport")
 self.export_button.clicked.connect(self.export_report)
 \end{lstlisting}
+
+\subsection{Editarea parametrilor limitei privirii în timp real}
+Am implementat o funcționalitate care permite utilizatorului să editeze parametrii limitei privirii (\textit{left limit}, \textit{right limit}, \textit{down limit}) în timp real, fără a fi necesară repornirea aplicației. Această funcționalitate este utilă în scenarii particulare, cum ar fi diferențele dintre susținerea unui examen pe calculator și pe foaie. 
+
+De exemplu, în cazul unui examen pe foaie, candidatul este nevoit să se aplece mai mult pentru a scrie, ceea ce poate reduce rata falsurilor pozitive prin ajustarea limitei inferioare (\textit{down limit}). Această flexibilitate oferă supraveghetorilor posibilitatea de a adapta rapid sistemul la contextul specific al examenului.
+
+\textbf{Exemplu din cod:}
+\begin{lstlisting}[language=Python]
+# filepath: /home/valentin/Desktop/anti-plagiat/gui_app.py
+self.config["detection"]["gaze"]["down_limit"] = self.down_limit_spinbox.value() / 100
+self.system.face_detector.gaze_tracker.down_limit = self.config["detection"]["gaze"]["down_limit"]
+\end{lstlisting}
+
+Această funcționalitate contribuie la reducerea falsurilor pozitive și la creșterea acurateței sistemului în diverse contexte educaționale.
 
 \section{Îmbunătățiri posibile}
 
