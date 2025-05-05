@@ -119,7 +119,7 @@ class GazeTracker(object):
         """update frame si analiza"""
         self.frame = frame
         return self._analyze()
-
+    
     def horizontal_ratio(self):
         """calculeaza raport orizontal"""
         if not self.pupils_located:
@@ -163,11 +163,42 @@ class GazeTracker(object):
 
     def vertical_ratio(self):
         """calculeaza raport vertical"""
-        if self.pupils_located:
-            pupil_left = self.eye_left.pupil.y / (self.eye_left.center[1] * 2 - 10)
-            pupil_right = self.eye_right.pupil.y / (self.eye_right.center[1] * 2 - 10)
-            return (pupil_left + pupil_right) / 2
-        return 0.5
+        if not self.pupils_located:
+            return 0.5
+
+        # calcul pozitie pupile
+        pupil_left = self.eye_left.pupil.y / (self.eye_left.center[1] * 2 - 10)
+        pupil_right = self.eye_right.pupil.y / (self.eye_right.center[1] * 2 - 10)
+        pupil_ratio = (pupil_left + pupil_right) / 2
+
+        # ajustare factor pozitie cap
+        if self.eye_left.origin and self.eye_right.origin:
+            eye_center_y = (self.eye_left.origin[1] + self.eye_left.center[1] +
+                            self.eye_right.origin[1] + self.eye_right.center[1]) / 2
+            mouth_y = self.eye_left.origin[1] + self.eye_left.center[1] + 50  # aproximare pentru gura
+
+            # distanta ochi-gura
+            face_height = abs(eye_center_y - mouth_y)
+
+            # normalizare distanta
+            if face_height > 0:
+                eye_position_factor = abs(self.eye_left.origin[1] - eye_center_y) / face_height
+            else:
+                eye_position_factor = 0.5
+
+            # ajustare ratio
+            adjusted_ratio = pupil_ratio
+
+            # cap inclinat in jos
+            if eye_position_factor > 0.6:
+                adjusted_ratio = min(0.4, pupil_ratio)
+            # cap inclinat in sus
+            elif eye_position_factor < 0.4:
+                adjusted_ratio = max(0.6, pupil_ratio)
+
+            return adjusted_ratio
+
+        return pupil_ratio
 
     def is_right(self):
         """verifica privire dreapta"""
