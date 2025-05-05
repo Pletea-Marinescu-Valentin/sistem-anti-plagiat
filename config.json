@@ -10,6 +10,11 @@
                 "telefon",
                 "smartwatch"
             ]
+        },
+        "gaze": {
+            "left_limit": 0.62,
+            "right_limit": 0.38,
+            "down_limit": 0.6
         }
     },
     "recording": {
