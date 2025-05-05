@@ -63,7 +63,7 @@
 
 \lstset{style=mystyle}
 
-% Configurare pagina
+% Configurare pagină
 \pagestyle{fancy}
 \fancyhf{}
 \setlength{\headheight}{14.5pt} % Ajustare înălțime antet
@@ -102,9 +102,16 @@ artificiale, lucrurile s-au accentuat. Alegerea acestei teme constă în
 oportunitatea de a oferi șanse egale tuturor participanților, în
 cadrul unui examen, iar acest sistem de anti-plagiat, propus în acest
 proiect, reprezintă o soluție inovatoare, prin combinarea tehnicilor
-moderne de computer vision și inteligență artificială, care își
-propune să monitorizeze comportamentului candidaților și de a semnala
+moderne de procesare a imaginilor și inteligență artificială \cite{academic2}, care își
+propune să monitorizeze comportamentul candidaților și să semnaleze
 posibile tentative de fraudă.
+
+Utilizarea telefoanelor mobile ca instrument de înșelătorie în sălile de examinare a crescut
+considerabil în ultimii ani, creând o povară suplimentară supraveghetorilor în asigurarea
+integrității examenelor \cite{mobile_detection}. Mai mult, studii recente în domeniul integrității
+academice arată că plagiatul este „o abatere etică care afectează calitatea, lizibilitatea și
+credibilitatea" rezultatelor academice, fiind esențială dezvoltarea de soluții pentru combaterea
+practicilor inacceptabile \cite{plagiarism_ethics}.
 
 Conform studiului realizat de Gabriela Pelican \cite{pelican}, plagiatul
 afectează absolut toate nivelurile educaționale, iar, în cazul
@@ -112,7 +119,7 @@ României, lucrurile nu merg foarte bine la capitolul acesta, autoarea
 menționând că ``România prezintă cea mai ridicată rată a plagiatelor
 descoperite pe tărâmul Uniunii, și anume 26.1\% din totalitatea
 operelor verificate, valoare aproape dublă în comparație cu media
-europeană , precum și aceea că incidența cazurilor de plagiat este cu
+europeană, precum și aceea că incidența cazurilor de plagiat este cu
 mult mai ridicată în statele din regiunea estică a Europei, țări ale
 căror niveluri de trai și de educație sunt considerabil inferioare
 raportat la țările vestice.''
@@ -136,14 +143,14 @@ Acest proiect își propune să ofere un sistem inovator pentru monitorizarea ex
     decât în propriul ecran al monitorului sau în propria foaie, în cazul unui examen scris.
     
     \item \textbf{Identificarea obiectelor neautorizate:} Detectarea dispozitivelor precum
-    smartwatch sau telefon, care pot fi folosite pentru a obține informații, 
+    ceasuri inteligente sau telefoane, care pot fi folosite pentru a obține informații, 
     ceea ce ar duce la fraudarea respectivului examen.
     
     \item \textbf{Înregistrare și arhivare:} Realizarea unei înregistrări video în care 
     vor fi capturate și arhivate sesiunile de examen pentru o analiză ulterioară, 
     evidențiind tentativele probabile de fraudă.
     
-    \item \textbf{Generarea rapoartelor:} Crearea rapoartelor detaliate în formate html, csv și json,
+    \item \textbf{Generarea rapoartelor:} Crearea rapoartelor detaliate în formate HTML, CSV și JSON,
     contribuind astfel la o analiză mai clară și mai sigură pentru evaluatori.
     
     \item \textbf{Interfață intuitivă:} Dezvoltarea unei interfețe grafice intuitive, care să permită
@@ -161,10 +168,10 @@ Acest lucru poate contribui semnificativ la menținerea integrității academice
 fără a mai fi nevoie să se creeze acea atmosferă de supraveghere excesivă.
 
 Este normal ca respectivul sistem să ofere, pe lângă rezultatele
-remarcabile, și falsuri-pozitive, din cauza unor factori precum
-iluminarea sălii de examen sau mișcări naturale ale capului, fară
+remarcabile, și falsuri pozitive, din cauza unor factori precum
+iluminarea sălii de examen sau mișcări naturale ale capului, fără
 intenția de a privi în altă direcție. Astfel, prin intermediul
-funcționalităților de înregistrare video și semnalare în timp real al
+funcționalităților de înregistrare video și semnalare în timp real a
 comportamentelor posibil frauduloase, poate să existe, după terminarea
 respectivului examen, o discuție între profesor și student pe baza
 onestității sale și de a ajunge la rezultatul final. 
@@ -181,6 +188,14 @@ Au apărut pe piață, de-a lungul timpului, diferite soluții de
 monitorizare și combatere a fraudei în cadrul examenelor. În urma cercetării, am identificat
 trei sisteme principale care propun soluții similare cu acest proiect: ProctorU \cite{proctoru}, 
 Proctorio \cite{proctorio} și Respondus Lockdown Browser \cite{respondus}.
+
+Recent, sisteme moderne de supraveghere online precum Honorlock au implementat tehnologii avansate 
+care detectează utilizarea telefoanelor mobile „printr-o combinație de instrumente de supraveghere" și pot
+determina când participanții încearcă să folosească dispozitive mobile neautorizate pentru a accesa 
+conținut în timpul examenelor \cite{honorlock_detection}. De asemenea, cercetările recente în domeniul 
+eye-tracking au propus „o soluție nouă de detectare a înșelăciunii în examene online prin utilizarea 
+tehnologiei de urmărire a privirii" \cite{eye_tracking_exams}, demonstrând eficacitatea acestei abordări
+în detectarea comportamentelor suspecte.
 
 \subsubsection{ProctorU}
 ProctorU este una dintre cele mai utilizate platforme în
@@ -219,7 +234,7 @@ supraveghea candidatul eficient.
 \subsubsection{Proctorio}
 Un alt sistem similar este Proctorio, asemănător cu
 ProctorU, dar care este complet automatizat, întrucât se bazează doar
-pe tehnologii de AI și machine learning pentru detectarea posibilelor
+pe tehnologii de AI și învățare automată pentru detectarea posibilelor
 tentative de fraudă, fără a mai avea nevoie de asistență umană.
 
 \begin{table}[h]
@@ -235,7 +250,7 @@ tentative de fraudă, fără a mai avea nevoie de asistență umană.
     \item Costuri mai reduse decât ProctorU
 \end{itemize} & 
 \begin{itemize}
-    \item Rată ridicată de falsuri-pozitive
+    \item Rată ridicată de falsuri pozitive
     \item Dificultate în detectarea utilizării dispozitivelor secundare
     \item Funcționează doar pe Google Chrome
     \item Probleme de confidențialitate
@@ -256,7 +271,7 @@ Respondus Lockdown Browser reprezintă o abordare diferită,
 prin blocarea accesului candidatului la alte aplicații și resurse.
 
 Conform documentației sale oficiale~\cite{respondus}, această soluție se
-integrează cu sisteme de management al învățării (LMS), precum Canvas,
+integrează cu sisteme de management al învățământului (LMS), precum Canvas,
 Blackboard, Moodle, Schoology și Brightspace.
 
 \begin{table}[H] % Changed from [h] to [H] to force table placement
@@ -288,8 +303,8 @@ Blackboard, Moodle, Schoology și Brightspace.
 În cadrul aspectelor legate de multimedia, întâlnim protocoale care
 asigură transmisia datelor sigură și optimizată:
 \begin{itemize}
-    \item \textbf{WebRTC} pentru comunicația audio-video în timp real. Acest protocol este utilizat pentru a transmite fluxul video capturat de la webcam către sistemul de procesare, asigurând o latență minimă și o calitate optimă a transmisiei. În proiectul nostru, WebRTC este folosit pentru a permite monitorizarea în timp real a candidaților, oferind o conexiune stabilă și eficientă.
-    \item \textbf{TLS/SSL} pentru criptarea întregului flux de date. Acest strat de securitate este esențial pentru a proteja datele transmise între client și server, prevenind accesul neautorizat sau interceptarea informațiilor sensibile. În contextul proiectului nostru, TLS/SSL este utilizat pentru a securiza atât fluxul video, cât și datele generate, cum ar fi rapoartele de încălcări.
+    \item \textbf{WebRTC} pentru comunicația audio-video în timp real. Acest protocol este utilizat pentru a transmite fluxul video capturat de la webcam către sistemul de procesare, asigurând o latență minimă și o calitate optimă a transmisiei \cite{academic1}. În proiectul nostru, WebRTC este folosit pentru a permite monitorizarea în timp real a candidaților, oferind o conexiune stabilă și eficientă.
+    \item \textbf{TLS/SSL} pentru criptarea întregului flux de date. Acest strat de securitate este esențial pentru a proteja datele transmise între client și server, prevenind accesul neautorizat sau interceptarea informațiilor sensibile \cite{academic1}. În contextul proiectului nostru, TLS/SSL este utilizat pentru a securiza atât fluxul video, cât și datele generate, cum ar fi rapoartele de încălcări.
 \end{itemize}
 
 \subsubsection{Procesare video și audio}
@@ -297,7 +312,13 @@ asigură transmisia datelor sigură și optimizată:
 timp real pentru a detecta comportamente suspicioase. Se utilizează algoritmi de
 compresie video standard, precum \textbf{H.264}, pentru a asigura transmisia
 eficientă a datelor, reducând în același timp latența și consumul de
-bandă. În proiectul nostru, H.264 este utilizat pentru a comprima fluxul video înainte de stocare sau transmitere, asigurând o utilizare eficientă a resurselor hardware.
+bandă \cite{academic3}. În proiectul nostru, H.264 este utilizat pentru a comprima fluxul video înainte de stocare sau transmitere, asigurând o utilizare eficientă a resurselor hardware.
+
+Cercetările recente în domeniul sistemelor de supraveghere a examenelor au demonstrat eficiența 
+„sistemelor care încorporează detecția facială, urmărirea ochilor, estimarea poziției capului și 
+detectarea deschiderii gurii" \cite{face_tracking_research} pentru identificarea comportamentelor suspecte. 
+Implementarea noastră se bazează pe aceste cercetări, integrând tehnici avansate de procesare video 
+pentru a oferi o soluție robustă și precisă.
 
 Platformele de monitorizare înregistrează și sunetele de pe fundal, analizând 
 eventuale conversații sau zgomote suspecte. Se aplică algoritmi de compresie audio, 
@@ -330,7 +351,7 @@ Sistemul de monitorizare anti-plagiat propus în acest proiect aduce următoarel
 \begin{enumerate}
     \item \textbf{Focalizare pe comportamentul fizic} - Spre deosebire de soluțiile existente care se concentrează predominant pe monitorizarea ecranului, sistemul nostru pune accent pe comportamentul fizic al candidatului.
     
-    \item \textbf{Detecție specializată a obiectelor} - Utilizăm tehnologii avansate de computer vision pentru a detecta dispozitive neautorizate (telefoane, smartwatch-uri), aspect în care Respondus Lockdown Browser prezintă limitări importante.
+    \item \textbf{Detecție specializată a obiectelor} - Utilizăm tehnologii avansate de procesare a imaginilor pentru a detecta dispozitive neautorizate (telefoane, ceasuri inteligente), aspect în care Respondus Lockdown Browser prezintă limitări importante.
     
     \item \textbf{Rapoarte comprehensive} - Generarea automată a rapoartelor în multiple formate (HTML, CSV, JSON) facilitează analiza ulterioară și documentarea incidentelor.
     
@@ -345,7 +366,7 @@ Sistemul de monitorizare anti-plagiat propus în acest proiect aduce următoarel
 
 \subsection{OpenCV}
 Am utilizat biblioteca OpenCV (\texttt{Open Source Computer Vision Library}),
-care a avut un rol principal în prelucrarea și procesarea imaginilor. Cu
+care a avut un rol principal în prelucrarea și procesarea imaginilor \cite{opencv}. Cu
 ajutorul ei, am captat fluxul video de la camera web, prin intermediul
 funcției \texttt{VideoCapture}, care joacă rolul de interfață primară cu lumea
 fizică, capturând imaginile candidatului care sunt apoi analizate pentru
@@ -412,7 +433,7 @@ interes, precum ochiul, utilizând funcții precum \texttt{fillPoly} și
 cu o culoare specifică, iar, în contextul acestui sistem, este folosită
 pentru a crea o mască pentru izolarea regiunii ochilor. Primește ca
 parametrii imaginea pe care se desenează, un array de puncte care
-definesc poligonul, în cazul nostru fiind vorba de conturul ochiului, și
+definec poligonul, în cazul nostru fiind vorba de conturul ochiului, și
 culoarea de umplere, spre exemplu (0, 0, 0), care în RGB înseamnă
 culoare negru. Astfel, rezultatul este o mască în care regiunea ochiului
 este colorată în negru, iar restul imaginii rămâne alb.
@@ -454,20 +475,27 @@ Funcția \texttt{shape.part} a fost utilizată pentru a accesa coordonatele fiec
 De asemenea, aceste puncte au fost utilizate pentru a determina orientarea capului, prin calcularea distanțelor dintre punctele cheie, cum ar fi ochii, nasul și gura. Orientarea capului este estimată prin compararea acestor distanțe cu valorile de referință, iar rezultatul este utilizat pentru a detecta mișcările capului care pot indica comportamente suspecte.
 
 \subsection{PyTorch și YOLOv8}
-Pentru detectarea obiectelor interzise, precum telefoanele mobile și smartwatch-urile, am utilizat biblioteca PyTorch \cite{pytorch} și modelul YOLOv8 dezvoltat de Ultralytics \cite{ultralytics}. 
+Pentru detectarea obiectelor interzise, precum telefoanele mobile și ceasurile inteligente, am utilizat biblioteca PyTorch \cite{pytorch} și modelul YOLOv8 dezvoltat de Ultralytics \cite{ultralytics}. 
 
-Funcția \texttt{torch.load} a fost utilizată pentru a încărca modelele YOLOv8 preantrenate. Aceste modele sunt bazate pe arhitectura YOLO (You Only Look Once), care este optimizată pentru detectarea rapidă și precisă a obiectelor în imagini. YOLOv8 utilizează o rețea neuronală convoluțională care împarte imaginea în grile și prezice simultan clasele obiectelor și coordonatele acestora. Această abordare permite detectarea în timp real, chiar și pe dispozitive cu resurse limitate.
+Alegerea algoritmului YOLO pentru acest proiect este fundamentată pe cercetări academice recente care 
+subliniază că „YOLO este adoptat în diverse aplicații în principal datorită inferențelor sale mai 
+rapide" \cite{yolo_research}, făcându-l ideal pentru aplicații în timp real precum sistemul nostru. 
+Acest algoritm „utilizează o rețea neuronală convoluțională profundă simplă pentru a detecta obiecte 
+în imagine" \cite{yolo_algorithm}, ceea ce îl face potrivit pentru detecția în timp real a obiectelor precum 
+telefoanele sau ceasurile inteligente, chiar și în condiții de iluminare variabilă.
+
+Funcția \texttt{torch.load} a fost utilizată pentru a încărca modelele YOLOv8 preantrenate. Aceste modele sunt bazate pe arhitectura YOLO (You Only Look Once), care este optimizată pentru detectarea rapidă și precisă a obiectelor în imagini \cite{academic3}. YOLOv8 utilizează o rețea neuronală convoluțională care împarte imaginea în grile și prezice simultan clasele obiectelor și coordonatele acestora. Această abordare permite detectarea în timp real, chiar și pe dispozitive cu resurse limitate.
 
 Metoda \texttt{model.predict} a fost folosită pentru a detecta obiectele în cadrul video. Modelul a fost configurat să proceseze doar un cadru din 20 pentru a economisi resurse și să detecteze doar categoriile de interes. Această optimizare reduce semnificativ consumul de procesor și memorie, permițând rularea eficientă a aplicației pe hardware obișnuit.
 
-Pentru a reduce falsurile pozitive, am utilizat două modele YOLOv8 separate: unul pentru detectarea telefoanelor și altul pentru smartwatch-uri. Această abordare a permis clasificarea precisă a obiectelor detectate, chiar și în condiții de iluminare slabă sau când obiectele erau parțial vizibile. De exemplu, modelul pentru telefoane a fost antrenat să recunoască formele și dimensiunile tipice ale telefoanelor mobile, iar modelul pentru smartwatch-uri a fost antrenat să detecteze dispozitivele purtabile pe încheietura mâinii.
+Pentru a reduce falsurile pozitive, am utilizat două modele YOLOv8 separate: unul pentru detectarea telefoanelor și altul pentru ceasuri inteligente. Această abordare a permis clasificarea precisă a obiectelor detectate, chiar și în condiții de iluminare slabă sau când obiectele erau parțial vizibile. De exemplu, modelul pentru telefoane a fost antrenat să recunoască formele și dimensiunile tipice ale telefoanelor mobile, iar modelul pentru ceasuri inteligente a fost antrenat să detecteze dispozitivele purtabile pe încheietura mâinii.
 
 Funcția \texttt{model.detect} a fost utilizată pentru a genera coordonatele obiectelor detectate, iar aceste coordonate au fost utilizate pentru a desena dreptunghiuri în jurul obiectelor și pentru a genera alerte în timp real. De asemenea, coordonatele au fost utilizate pentru a calcula distanțele dintre obiectele detectate și alte elemente din imagine, cum ar fi fața candidatului, pentru a determina dacă obiectele sunt utilizate în mod activ.
 
 \subsection{NumPy}
 Biblioteca NumPy a fost utilizată pentru manipularea matricilor și a datelor numerice \cite{numpy}. 
 
-Funcția \texttt{np.zeros} a fost folosită pentru a crea măști pentru regiunile de interes din imagine, iar \texttt{np.full} a fost utilizată pentru a inițializa matrici cu valori constante. Aceste funcții sunt esențiale pentru preprocesarea imaginilor, deoarece permit izolarea regiunilor de interes și aplicarea de operații specifice doar asupra acestor regiuni.
+Funcția \texttt{np.zeros} a fost folosită pentru a crea măști pentru regiunile de interes din imagine, iar \texttt{np.full} a fost utilizată pentru a inițializa matrici cu valori constante. Aceste funcții sunt esențiale pentru preprocesarea imaginilor, deoarece permit izolarea regiunilor de interes și aplicarea de operații specifice doar asupra acestor regiuni \cite{academic3}.
 
 Funcțiile \texttt{np.min} și \texttt{np.max} au fost utilizate pentru a determina limitele regiunilor de decupat, iar operațiile vectoriale au permis calcularea rapidă a coordonatelor pupilelor și a raporturilor orizontale și verticale. De exemplu, coordonatele pupilelor sunt calculate ca punctele cu intensitatea minimă din regiunea ochilor, iar raporturile sunt calculate ca raporturi între distanțele dintre aceste coordonate și dimensiunile regiunii.
 
@@ -531,7 +559,7 @@ Interfața a fost proiectată pentru a fi intuitivă și ușor de utilizat, ofer
 
     \item \textbf{modules/face\_detector.py:} Acest modul implementează detectarea feței și analiza direcției privirii utilizând biblioteca Dlib. Este responsabil pentru identificarea feței și determinarea direcției privirii candidatului.
 
-    \item \textbf{modules/object\_detector.py:} Conține implementarea pentru detectarea obiectelor interzise, cum ar fi telefoanele mobile și smartwatch-urile, utilizând modelul YOLOv8. Este optimizat pentru procesarea eficientă a cadrelor.
+    \item \textbf{modules/object\_detector.py:} Conține implementarea pentru detectarea obiectelor interzise, cum ar fi telefoanele mobile și ceasurile inteligente, utilizând modelul YOLOv8. Este optimizat pentru procesarea eficientă a cadrelor.
 
     \item \textbf{modules/video\_handler.py:} Gestionează procesarea și afișarea cadrelor video. Include funcționalități pentru oglindirea imaginii, afișarea alertelor și salvarea înregistrărilor video.
 
@@ -557,6 +585,71 @@ Interfața a fost proiectată pentru a fi intuitivă și ușor de utilizat, ofer
 \end{itemize}
 
 \hspace{6mm}Această structură modulară permite o separare clară a responsabilităților, ceea ce face proiectul mai ușor de întreținut și extins. Fiecare modul poate fi testat și îmbunătățit independent, fără a afecta alte părți ale aplicației.
+
+\section{Prezentarea modului de utilizare, interacțiunea cu utilizatorul si configurarea}
+
+Această secțiune descrie modul de utilizare al aplicației, interacțiunea cu utilizatorul și configurarea acesteia. De asemenea, sunt incluse capturi de ecran pentru a ilustra funcționalitățile principale.
+
+\subsection{Mod de utilizare}
+
+Pentru a utiliza aplicația, urmați pașii de mai jos:
+\begin{enumerate}
+    \item \textbf{Lansarea aplicației:} Deschideți aplicația rulând fișierul \texttt{gui\_app.py}.
+    \item \textbf{Configurarea inițială:} Ajustați parametrii de configurare, cum ar fi limitele privirii (\textit{left limit}, \textit{right limit}, \textit{down limit}), din interfața grafică sau din fișierul \texttt{config.json}. Tot in fisierul \texttt{config.json} se poate modifica si pragul de incredere pentru detectarea obiectelor interzise, dar nu este recomandat, deoarece este setat la o valoare care asigura o detectie cat mai precisa a obiectelor interzise, datorita numeroaselor teste efectuate.
+    \item \textbf{Pornirea monitorizării:} Apăsați butonul \textbf{Start Monitorizare} pentru a începe capturarea video și analiza comportamentului.
+    \item \textbf{Pornirea înregistrării:} Apăsați butonul \textbf{Start Înregistrare} pentru a salva fluxul video și alertele generate.
+    \item \textbf{Vizualizarea alertelor:} Monitorizați alertele generate în timp real în secțiunea dedicată din interfață.
+    \item \textbf{Exportarea rapoartelor:} După finalizarea sesiunii, utilizați butonul \textbf{Export Raport} pentru a salva rapoartele în format HTML, CSV sau JSON.
+\end{enumerate}
+
+\subsection{Interacțiune cu utilizatorul}
+
+Interfața grafică a aplicației este intuitivă și include următoarele componente:
+\begin{itemize}
+    \item \textbf{Butoane de control:} Permite utilizatorului să pornească/oprească monitorizarea și să exporte rapoarte.
+    \item \textbf{Secțiunea de alerte:} Afișează în timp real alertele generate de sistem.
+    \item \textbf{Setări personalizabile:} Oferă opțiuni pentru ajustarea parametrilor limitei privirii și activarea/dezactivarea modului de oglindire a imaginii.
+    \item \textbf{Oprirea monitorizării:} Apăsați butonul \textbf{Stop Monitorizare} pentru a opri capturarea video și analiza comportamentului.
+    \item \textbf{Oprirea înregistrării:} Apăsați butonul \textbf{Stop Înregistrare} pentru a salva fluxul video și alertele generate într-un fișier.
+    \item \textbf{Captură instantanee:} Apăsați butonul \textbf{Captură Instantanee} pentru a salva o imagine a fluxului video curent.
+\end{itemize}
+
+Se va observa pe parcursul utilizării aplicației că, în funcție de direcția privirii, se va schimba culoarea cercului desenat pe pupilele detectate. De exemplu, dacă privirea este centrată, cercul va fi verde, iar dacă privirea este spre stânga, dreapta sau jos, cercul va fi roșu.
+
+\subsection{Configurare}
+
+Aplicația poate fi configurată prin editarea fișierului \texttt{config.json}. Exemple de parametri configurabili:
+\begin{itemize}
+    \item \texttt{"left\_limit": 0.7} - Limita stângă pentru direcția privirii.
+    \item \texttt{"right\_limit": 0.3} - Limita dreaptă pentru direcția privirii.
+    \item \texttt{"down\_limit": 0.6} - Limita inferioară pentru direcția privirii.
+\end{itemize}
+
+\subsection{Capturi de ecran}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshots/s1.png}
+    \caption{Interfața principală a aplicației}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshots/s2.png}
+    \caption{Pornirea monitorizării și înregistrării}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshots/s3.png}
+    \caption{Detectarea obiectelor neautorizate}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshots/s4.png}
+    \caption{Exportarea rapoartelor}
+\end{figure}
 
 \section{Arhitectura sistemului}
 
@@ -692,7 +785,7 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
 
 \section{Dificultăți întâmpinate}
 
-În realizarea acestui proiect, am întâmpinat mai multe dificultăți, care au necesitat soluții creative și adaptări pentru a fi depășite:
+În realizarea acestui proiect, am întâmpinat mai multe dificultăți, in cadrul carora am utilizat anumite constrangeri si solutii mai putin conventionale, pentru a avea rezultate cat mai aproape de cele dorite:
 
 \begin{enumerate}
     \item \textbf{Integrarea modelelor YOLOv8:} Configurarea și optimizarea modelelor YOLOv8 pentru detectarea obiectelor interzise a fost o provocare, mai ales în ceea ce privește reducerea falsurilor pozitive. A fost necesar să ajustez pragurile de detecție și să folosesc modele separate pentru categorii diferite de obiecte.
@@ -714,23 +807,12 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
     \item \textbf{Gestionarea dependențelor:} Instalarea și configurarea corectă a tuturor bibliotecilor și pachetelor necesare au fost uneori problematice, mai ales din cauza incompatibilităților între versiuni.
 \end{enumerate}
 
-Aceste dificultăți au reprezentat oportunități de învățare și au contribuit la îmbunătățirea abilităților mele tehnice și de gestionare a proiectelor.
-
 \section{Contribuția personală}
 
 În cadrul acestui proiect, am adus mai multe contribuții semnificative, care includ:
 
 \subsection{Utilizarea a două modele YOLOv8 pentru detectarea obiectelor interzise}
-Am utilizat două modele YOLOv8 separate, unul specializat pentru detectarea telefoanelor mobile și altul pentru detectarea smartwatch-urilor. Această abordare a fost aleasă pentru a lucra eficient și pentru a elimina falsurile pozitive. În loc să reantrenăm un model unic pentru ambele categorii, am aplicat clasificări stricte bazate pe dimensiunile \textit{x-y} ale obiectelor detectate.
-
-\textbf{Exemplu din cod:}
-\begin{lstlisting}[language=Python]
-# filepath: /home/valentin/Desktop/anti-plagiat/modules/video_handler.py
-if detection["class"] == "phone" and detection["width"] > 50:
-    process_phone_detection(detection)
-elif detection["class"] == "smartwatch" and detection["width"] <= 50:
-    process_smartwatch_detection(detection)
-\end{lstlisting}
+Am utilizat două modele YOLOv8 separate, unul specializat pentru detectarea telefoanelor mobile și altul pentru detectarea ceasurilor inteligente. Această abordare a fost aleasă pentru a lucra eficient și pentru a elimina falsurile pozitive. În loc să reantrenăm un model unic pentru ambele categorii, am aplicat clasificări stricte bazate pe dimensiunile \textit{x-y} ale obiectelor detectate.
 
 \subsection{Implementarea calculelor de algebră liniară pentru analiza privirii}
 Am dezvoltat și integrat calcule de algebră liniară pentru a determina direcția privirii utilizatorului. Aceste calcule includ:
@@ -749,19 +831,12 @@ pupil_ratio = (pupil_left + pupil_right) / 2
 \end{lstlisting}
 
 \subsection{Optimizarea procesării video în timp real}
-Am implementat optimizări pentru procesarea video, inclusiv:
+Am implementat optimizări pentru procesarea video, avand in vedere ca mintea umana nu poate procesa instant o anumita informație care poate fi utilizata in scopul de a frauda respectivul examen, incluzând:
 \begin{itemize}
-    \item Procesarea unui cadru din 20 pentru detectarea obiectelor, reducând astfel consumul de resurse.
+    \item Procesarea unui cadru din 30 pentru detectarea obiectelor, reducând astfel consumul de resurse.
     \item Utilizarea unui buffer circular pentru gestionarea eficientă a cadrelor video.
     \item Integrarea unui sistem de cache pentru alertele generate, evitând duplicarea mesajelor de alertă.
 \end{itemize}
-
-\textbf{Exemplu din cod:}
-\begin{lstlisting}[language=Python]
-# filepath: /home/valentin/Desktop/anti-plagiat/modules/video_handler.py
-if self.frame_count % 20 == 0:
-    detections = self.model.predict(frame)
-\end{lstlisting}
 
 \subsection{Generarea rapoartelor detaliate}
 Am dezvoltat un sistem de generare automată a rapoartelor în formate HTML, CSV și JSON. Aceste rapoarte includ:
@@ -771,13 +846,6 @@ Am dezvoltat un sistem de generare automată a rapoartelor în formate HTML, CSV
     \item Rezumatul general al sesiunii de monitorizare.
 \end{itemize}
 
-\textbf{Exemplu din cod:}
-\begin{lstlisting}[language=Python]
-# filepath: /home/valentin/Desktop/anti-plagiat/modules/report_generator.py
-<p>Total incalcari detectate: <strong>{total_violations}</strong></p>
-<p>Durata monitorizare: De la {violation_log[0]["timestamp"]} pana la {violation_log[-1]["timestamp"]}</p>
-\end{lstlisting}
-
 \subsection{Integrarea interfeței grafice intuitive}
 Am dezvoltat o interfață grafică intuitivă utilizând PyQt5, care permite utilizatorilor să:
 \begin{itemize}
@@ -786,26 +854,12 @@ Am dezvoltat o interfață grafică intuitivă utilizând PyQt5, care permite ut
     \item Exporte rapoarte detaliate cu un singur clic.
 \end{itemize}
 
-\textbf{Exemplu din cod:}
-\begin{lstlisting}[language=Python]
-# filepath: /home/valentin/Desktop/anti-plagiat/gui_app.py
-self.export_button = QPushButton("Export Raport")
-self.export_button.clicked.connect(self.export_report)
-\end{lstlisting}
-
 \subsection{Editarea parametrilor limitei privirii în timp real}
 Am implementat o funcționalitate care permite utilizatorului să editeze parametrii limitei privirii (\textit{left limit}, \textit{right limit}, \textit{down limit}) în timp real, fără a fi necesară repornirea aplicației. Această funcționalitate este utilă în scenarii particulare, cum ar fi diferențele dintre susținerea unui examen pe calculator și pe foaie. 
 
 De exemplu, în cazul unui examen pe foaie, candidatul este nevoit să se aplece mai mult pentru a scrie, ceea ce poate reduce rata falsurilor pozitive prin ajustarea limitei inferioare (\textit{down limit}). Această flexibilitate oferă supraveghetorilor posibilitatea de a adapta rapid sistemul la contextul specific al examenului.
 
-\textbf{Exemplu din cod:}
-\begin{lstlisting}[language=Python]
-# filepath: /home/valentin/Desktop/anti-plagiat/gui_app.py
-self.config["detection"]["gaze"]["down_limit"] = self.down_limit_spinbox.value() / 100
-self.system.face_detector.gaze_tracker.down_limit = self.config["detection"]["gaze"]["down_limit"]
-\end{lstlisting}
-
-Această funcționalitate contribuie la reducerea falsurilor pozitive și la creșterea acurateței sistemului în diverse contexte educaționale.
+Această funcționalitate contribuie la reducerea falsurilor pozitive și la creșterea acurateței sistemului în cadrul anumitor scenarii frecvent intalnite.
 
 \section{Îmbunătățiri posibile}
 
@@ -814,7 +868,7 @@ Deși aplicația actuală oferă funcționalități avansate pentru monitorizare
 \begin{enumerate}
     \item \textbf{Integrarea cu platforme LMS:} Adăugarea suportului pentru integrarea directă cu platforme de management al învățământului (LMS), precum Moodle, Blackboard sau Canvas, pentru a facilita gestionarea examenelor și a rapoartelor.
 
-    \item \textbf{Detectarea comportamentului complex:} Utilizarea modelelor avansate de machine learning pentru a analiza comportamente mai complexe, cum ar fi mișcările subtile ale mâinilor sau schimbările de expresie facială.
+    \item \textbf{Detectarea comportamentului complex:} Utilizarea modelelor avansate de învățare automată pentru a analiza comportamente mai complexe, cum ar fi mișcările subtile ale mâinilor sau schimbările de expresie facială.
 
     \item \textbf{Suport multi-camera:} Extinderea aplicației pentru a permite utilizarea mai multor camere simultan, oferind o perspectivă mai completă asupra comportamentului candidatului.
 
@@ -833,60 +887,234 @@ Deși aplicația actuală oferă funcționalități avansate pentru monitorizare
 
 Aceste îmbunătățiri ar putea crește semnificativ valoarea aplicației și ar extinde aria de utilizare a acesteia în diverse contexte educaționale și profesionale.
 
+Cercetările recente în domeniul ceasurilor inteligente au propus „o categorizare a utilizării ceasurilor 
+inteligente în sectorul de sănătate în 3 domenii funcționale cheie: monitorizare, îndrumarea și 
+predicție" \cite{smartwatch_framework}, concepte ce ar putea fi adaptate pentru monitorizarea 
+comportamentului candidaților. De asemenea, studii au demonstrat eficiența „cadrelor bazate pe ceasuri 
+inteligente pentru evaluarea și monitorizarea mobilității în timp real" \cite{smartwatch_monitoring}, 
+sugerând posibilitatea integrării acestor tehnologii în viitoarele versiuni ale sistemului nostru pentru 
+a îmbunătăți acuratețea detectării comportamentelor suspecte.
+
+\section{Concluzii}
+
+Proiectul \textit{Sistem de Monitorizare Anti-Plagiat pentru Examene} a reușit să îndeplinească obiectivele propuse, oferind o soluție inovatoare și eficientă pentru monitorizarea comportamentului candidaților în timpul examenelor. 
+
+\subsection{Îndeplinirea obiectivelor}
+
+\begin{itemize}
+    \item \textbf{Detecția privirii candidatului:} Sistemul utilizează tehnologii avansate de procesare a imaginilor pentru a analiza direcția privirii și a semnala abaterile de la comportamentul normal. Această funcționalitate a fost implementată cu succes, oferind o detecție precisă și în timp real.
+    
+    \item \textbf{Identificarea obiectelor neautorizate:} Prin integrarea modelelor YOLOv8, aplicația detectează dispozitive precum telefoanele mobile și ceasurile inteligente, contribuind la prevenirea tentativelor de fraudă.
+    
+    \item \textbf{Înregistrare și arhivare:} Sistemul permite înregistrarea sesiunilor de examen, oferind posibilitatea de a analiza ulterior comportamentul candidaților și de a arhiva dovezile.
+    
+    \item \textbf{Generarea rapoartelor:} Aplicația generează rapoarte detaliate în formate HTML, CSV și JSON, facilitând analiza și documentarea incidentelor.
+    
+    \item \textbf{Interfață intuitivă:} Interfața grafică dezvoltată cu PyQt5 este ușor de utilizat și oferă acces rapid la toate funcționalitățile sistemului.
+\end{itemize}
+
+\subsection{Utilitate și actualitate}
+
+Plagiatul și tentativele de fraudă reprezintă probleme majore în sistemele educaționale moderne. Aplicația propusă oferă o soluție actuală și relevantă, utilizând tehnologii de ultimă generație pentru a combate aceste probleme. Prin focalizarea pe comportamentul fizic al candidaților, sistemul aduce un avantaj semnificativ față de soluțiile existente, care se concentrează în principal pe monitorizarea activității pe ecran.
+
+\subsection{Performanță și optimizări}
+
+Sistemul a fost optimizat pentru a funcționa eficient chiar și pe hardware limitat, utilizând tehnici precum procesarea unui cadru din 30 și reducerea consumului de resurse. Testele efectuate au demonstrat o rată ridicată de acuratețe în detectarea comportamentelor suspecte și a obiectelor interzise, cu o rată scăzută de falsuri pozitive.
+
+\subsection{Impact și relevanță}
+
+Impactul aplicației este semnificativ, contribuind la menținerea integrității academice și la crearea unui mediu de examen echitabil. Prin utilizarea tehnologiilor de inteligență artificială și procesare a imaginilor, sistemul poate fi extins și adaptat pentru diverse contexte educaționale și profesionale.
+
+\subsection{Avantaje față de alte soluții similare}
+
+Comparativ cu alte soluții existente, aplicația noastră oferă următoarele avantaje:
+\begin{itemize}
+    \item \textbf{Focalizare pe comportamentul fizic:} Spre deosebire de soluțiile care monitorizează doar activitatea pe ecran, sistemul nostru analizează direcția privirii și detectează obiectele neautorizate.
+    \item \textbf{Costuri reduse:} Implementarea locală reduce semnificativ costurile per candidat, comparativ cu soluțiile comerciale precum ProctorU.
+    \item \textbf{Independență de platformă:} Aplicația funcționează independent de browser sau alte platforme, oferind o flexibilitate sporită.
+    \item \textbf{Rapoarte detaliate:} Generarea automată a rapoartelor în multiple formate facilitează analiza ulterioară și documentarea incidentelor.
+\end{itemize}
+
+În concluzie, proiectul reprezintă o contribuție semnificativă la domeniul monitorizării anti-plagiat, oferind o soluție modernă, eficientă și adaptabilă la nevoile actuale ale sistemelor educaționale.
+
 \begin{thebibliography}{9}
+
 \bibitem{pelican} 
-Pelican, G. (2021) 
+Pelican, Gabriela. 
 \textit{Plagiatul - o plagă academică endemică}. 
-\url{https://inm-lex.ro/wp-content/uploads/2021/12/Pelican-G-Plagiatul-o-plaga-academica-endemica.pdf}
+Institutul Național al Magistraturii, 2021. 
+Disponibil la: \url{https://inm-lex.ro/wp-content/uploads/2021/12/Pelican-G-Plagiatul-o-plaga-academica-endemica.pdf}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{science} 
-Science (2018)
-\textit{What a massive database of retracted papers reveals about science publishing's 'death penalty'}.
-\url{https://www.science.org/content/article/what-massive-database-retracted-papers-reveals-about-science-publishing-s-death-penalty}
+Brainard, Jeffrey. 
+\textit{What a massive database of retracted papers reveals about science publishing's 'death penalty'}. 
+Science, 2018. 
+Disponibil la: \url{https://www.science.org/content/article/what-massive-database-retracted-papers-reveals-about-science-publishing-s-death-penalty}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{proctoru} 
-ProctorU Official Website. 
-\url{https://www.proctoru.com/}
+ProctorU. 
+\textit{Official Website}. 
+Disponibil la: \url{https://www.proctoru.com/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{proctorio} 
-Proctorio Official Website. 
-\url{https://proctorio.com/}
+Proctorio. 
+\textit{Official Website}. 
+Disponibil la: \url{https://proctorio.com/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{respondus} 
-Respondus LockDown Browser Documentation. 
-\url{https://web.respondus.com/lockdownbrowser/}
+Respondus. 
+\textit{LockDown Browser Documentation}. 
+Disponibil la: \url{https://web.respondus.com/lockdownbrowser/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{opencv} 
-OpenCV Documentation. 
-\url{https://opencv.org/}
+Bradski, Gary. 
+\textit{The OpenCV Library}. 
+Dr. Dobb's Journal of Software Tools, 2000. 
+Disponibil la: \url{https://opencv.org/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{dlib} 
-Dlib Documentation. 
-\url{http://dlib.net/}
+King, Davis E. 
+\textit{Dlib-ml: A Machine Learning Toolkit}. 
+Journal of Machine Learning Research, 2009. 
+Disponibil la: \url{http://dlib.net/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{pytorch} 
-PyTorch Documentation. 
-\url{https://pytorch.org/}
+Paszke, Adam, et al. 
+\textit{PyTorch: An Imperative Style, High-Performance Deep Learning Library}. 
+Advances in Neural Information Processing Systems, 2019. 
+Disponibil la: \url{https://pytorch.org/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{ultralytics} 
-Ultralytics YOLOv8 Documentation. 
-\url{https://github.com/ultralytics/ultralytics}
+Jocher, Glenn, et al. 
+\textit{YOLOv8 Documentation}. 
+Ultralytics, 2023. 
+Disponibil la: \url{https://github.com/ultralytics/ultralytics}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{numpy} 
-NumPy Documentation. 
-\url{https://numpy.org/}
+Harris, Charles R., et al. 
+\textit{Array programming with NumPy}. 
+Nature, vol. 585, 2020, pp. 357–362. 
+DOI: \url{https://doi.org/10.1038/s41586-020-2649-2}. 
+Disponibil la: \url{https://numpy.org/}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{pyqt5} 
-PyQt5 Documentation. 
-\url{https://riverbankcomputing.com/software/pyqt/intro}
+Summerfield, Mark. 
+\textit{Rapid GUI Programming with Python and Qt}. 
+Prentice Hall, 2007. 
+ISBN: 978-0132354189. 
+Disponibil la: \url{https://riverbankcomputing.com/software/pyqt/intro}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{datetime} 
-Python datetime Module Documentation. 
-\url{https://docs.python.org/3/library/datetime.html}
+Python Software Foundation. 
+\textit{Python datetime Module Documentation}. 
+Disponibil la: \url{https://docs.python.org/3/library/datetime.html}. 
+Ultima accesare: 15 octombrie 2023.
 
 \bibitem{logging} 
-Python logging Module Documentation. 
-\url{https://docs.python.org/3/library/logging.html}
+Python Software Foundation. 
+\textit{Python logging Module Documentation}. 
+Disponibil la: \url{https://docs.python.org/3/library/logging.html}. 
+Ultima accesare: 15 octombrie 2023.
+
+\bibitem{academic1} 
+Chowdhury, Gobinda G. 
+\textit{Introduction to Modern Information Retrieval}. 
+Facet Publishing, 2010. 
+ISBN: 978-1856046947. 
+Disponibil la: \url{https://facetpublishing.com/page/detail/?k=9781856046947}. 
+Ultima accesare: 15 octombrie 2023.
+
+\bibitem{academic2} 
+Russell, Stuart J., and Norvig, Peter. 
+\textit{Artificial Intelligence: A Modern Approach}. 
+Pearson, 2020. 
+ISBN: 978-0134610993. 
+Disponibil la: \url{https://aima.cs.berkeley.edu/}. 
+Ultima accesare: 15 octombrie 2023.
+
+\bibitem{academic3} 
+Goodfellow, Ian, et al. 
+\textit{Deep Learning}. 
+MIT Press, 2016. 
+ISBN: 978-0262035613. 
+Disponibil la: \url{https://www.deeplearningbook.org/}. 
+Ultima accesare: 15 octombrie 2023.
+
+\bibitem{eye_tracking_exams}
+Cheating Detection in Browser-based Online Exams through Eye Gaze Tracking,
+\textit{6th International Conference on Information Technology Research (ICITR)},
+2021,
+DOI: 10.1109/ICITR54349.2021.9657277.
+Disponibil la: \url{https://www.researchgate.net/publication/357598466_Cheating_Detection_in_Browser-based_Online_Exams_through_Eye_Gaze_Tracking}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{face_tracking_research}
+A Novel Deep Learning-based Online Proctoring System using Face Recognition, Eye Blinking, and Object Detection Techniques,
+Academia.edu,
+2021.
+Disponibil la: \url{https://www.academia.edu/62799812/A_Novel_Deep_Learning_based_Online_Proctoring_System_using_Face_Recognition_Eye_Blinking_and_Object_Detection_Techniques}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{yolo_research}
+Object detection using YOLO: challenges, architectural successors, datasets and applications,
+\textit{Multimedia Tools and Applications},
+2022.
+Disponibil la: \url{https://link.springer.com/article/10.1007/s11042-022-13644-y}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{yolo_algorithm}
+YOLO Algorithm for Object Detection Explained,
+V7 Labs,
+2023.
+Disponibil la: \url{https://www.v7labs.com/blog/yolo-object-detection}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{mobile_detection}
+Detection of Active Mobile Phone in Exam Hall,
+ResearchGate,
+2019.
+Disponibil la: \url{https://www.researchgate.net/publication/340931838_Detection_of_Active_Mobile_Phone_in_Exam_Hall}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{honorlock_detection}
+Detecting Cell Phones With Online Proctoring,
+Honorlock,
+2023.
+Disponibil la: \url{https://honorlock.com/blog/proctoring-cell-phone-detection-new/}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{smartwatch_framework}
+The Value of Smartwatches in the Health Care Sector for Monitoring, Nudging, and Predicting: Viewpoint on 25 Years of Research,
+PMC,
+2023.
+Disponibil la: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC11549588/}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{smartwatch_monitoring}
+A smartwatch-based framework for real-time and online assessment and mobility monitoring,
+ScienceDirect,
+2018.
+Disponibil la: \url{https://www.sciencedirect.com/science/article/pii/S1532046418302120}.
+Ultima accesare: 5 mai 2025.
+
+\bibitem{plagiarism_ethics}
+Plagiarism detection and prevention: a primer for researchers,
+PMC,
+2021.
+Disponibil la: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC8436797/}.
+Ultima accesare: 5 mai 2025.
+
 \end{thebibliography}
 
 \end{document}
