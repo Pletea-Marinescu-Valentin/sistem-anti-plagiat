@@ -5,7 +5,7 @@ class ObjectDetector:
     def __init__(self, config):
         print("initializare detector obiecte yolov8...")
 
-        self.confidence_threshold = config.get("detection", {}).get("object", {}).get("confidence_threshold", 0.5)
+        self.confidence_threshold = config["detection"]["object"]["confidence_threshold"]
         self.objects_of_interest = config.get("detection", {}).get("object", {}).get("objects_of_interest", [])
 
         self.class_mapping = {
@@ -15,8 +15,8 @@ class ObjectDetector:
 
         try:
             # model optimizat: YOLOv8s
-            self.phone_model = YOLO("yolov8s.pt")     # pentru telefon
-            self.watch_model = YOLO("yolov8s.pt")     # pentru smartwatch
+            self.phone_model = YOLO("yolov8s.pt") # pentru telefon
+            self.watch_model = YOLO("yolov8s.pt") # pentru smartwatch
             self.device = "cpu"
             print("folosim CPU pentru detectie")
         except Exception as e:
@@ -49,11 +49,11 @@ class ObjectDetector:
             detected_objects = []
 
             # detectie telefon
-            phones = self._detect_with_model(self.phone_model, resized_frame, original_frame, class_ids=[67], label="telefon", filter_small_objects=True)
+            phones = self._detect_with_model(self.phone_model, resized_frame, original_frame, class_ids=[67], label="telefon")
             detected_objects.extend(phones)
 
             # detectie smartwatch
-            watches = self._detect_with_model(self.watch_model, resized_frame, original_frame, class_ids=[74], label="smartwatch", filter_small_objects=False)
+            watches = self._detect_with_model(self.watch_model, resized_frame, original_frame, class_ids=[74], label="smartwatch")
             detected_objects.extend(watches)
 
             self.last_detections = detected_objects
@@ -65,7 +65,7 @@ class ObjectDetector:
             print(f"eroare detectie yolov8: {e}")
             return [], original_frame.copy()
 
-    def _detect_with_model(self, model, resized_frame, original_frame, class_ids, label, filter_small_objects=False):
+    def _detect_with_model(self, model, resized_frame, original_frame, class_ids, label):
         results = model(resized_frame, conf=self.confidence_threshold, classes=class_ids, verbose=False)
         detections = []
 
@@ -89,8 +89,18 @@ class ObjectDetector:
             width = x2 - x1
             height = y2 - y1
 
-            # filtrare obiecte prea inguste (ex: stick negru) - doar pentru telefon
-            if filter_small_objects:
+            # filtrare pentru smartwatch
+            if label == "smartwatch":
+                aspect_ratio = width / (height + 1e-5)
+                max_width = 100  # in pixeli
+                max_height = 100
+                max_aspect = 1.2  # smartwatch-ul este aproape patrat
+
+                if width > max_width or height > max_height or aspect_ratio > max_aspect:
+                    continue  # ignoram obiectele prea mari sau cu aspect necorespunzator
+
+            # filtrare pentru telefon
+            if label == "telefon":
                 aspect_ratio = height / (width + 1e-5)
                 min_width = 40  # in pixeli
                 min_height = 60
