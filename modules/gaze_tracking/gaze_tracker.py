@@ -1,12 +1,13 @@
 from __future__ import division
 import cv2
 import dlib
+import json
 from .eye import Eye
 
 class GazeTracker(object):
     """aceasta clasa urmareste directia privirii utilizatorului si ofera informatii despre pozitia ochilor si a pupilelor"""
 
-    def __init__(self, mirror_image=True):
+    def __init__(self, mirror_image=True, config_path="config.json"):
         self.frame = None
         self.eye_left = None
         self.eye_right = None
@@ -35,6 +36,16 @@ class GazeTracker(object):
 
         # factor filtrare
         self.smoothing_factor = 0.3
+
+        # incarcare configuratie
+        self.config = self.load_config(config_path)
+        self.left_limit = self.config["detection"]["gaze"]["left_limit"]
+        self.right_limit = self.config["detection"]["gaze"]["right_limit"]
+        self.down_limit = self.config["detection"]["gaze"]["down_limit"]
+
+    def load_config(self, config_path):
+        with open(config_path, 'r') as f:
+            return json.load(f)
 
     @property
     def pupils_located(self):
@@ -161,29 +172,29 @@ class GazeTracker(object):
     def is_right(self):
         """verifica privire dreapta"""
         if hasattr(self, 'h_ratio'):
-            if self.h_ratio < 0.38:
+            if self.h_ratio < self.right_limit:
                 return True
         return False
 
     def is_left(self):
         """verifica privire stanga"""
         if hasattr(self, 'h_ratio'):
-            if self.h_ratio > 0.62:
+            if self.h_ratio > self.left_limit:
                 return True
         return False
 
     def is_down(self):
         """verifica privire jos"""
         if hasattr(self, 'v_ratio'):
-            if self.v_ratio > 0.55:
+            if self.v_ratio > self.down_limit:
                 return True
         return False
 
     def is_center(self):
         """verifica privire centru"""
         if hasattr(self, 'h_ratio') and hasattr(self, 'v_ratio'):
-            h_ok = self.h_ratio >= 0.38 and self.h_ratio <= 0.62
-            v_ok = self.v_ratio <= 0.55
+            h_ok = self.right_limit <= self.h_ratio <= self.left_limit
+            v_ok = self.v_ratio <= self.down_limit
             if h_ok and v_ok:
                 return True
         return False
