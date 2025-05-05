@@ -6,7 +6,7 @@ import os
 import numpy as np
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                            QLabel, QPushButton, QGroupBox, QCheckBox, QTextEdit, QMessageBox)
+                            QLabel, QPushButton, QGroupBox, QCheckBox, QTextEdit, QMessageBox, QSpinBox, QFormLayout)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
 from PyQt5.QtGui import QImage, QPixmap, QColor, QPalette
 from main import SistemAntiPlagiat
@@ -179,6 +179,33 @@ class AntiPlagiatGUI(QMainWindow):
         controls_layout.addWidget(system_group)
         controls_layout.addWidget(stats_group)
         controls_layout.addWidget(report_group)
+
+        # configurare limite privire
+        config_group = QGroupBox("Configurare Limite Privire")
+        config_layout = QFormLayout()
+
+        self.left_limit_spinbox = QSpinBox()
+        self.left_limit_spinbox.setRange(0, 100)
+        self.left_limit_spinbox.setValue(int(self.config["detection"]["gaze"]["left_limit"] * 100))
+
+        self.right_limit_spinbox = QSpinBox()
+        self.right_limit_spinbox.setRange(0, 100)
+        self.right_limit_spinbox.setValue(int(self.config["detection"]["gaze"]["right_limit"] * 100))
+
+        self.down_limit_spinbox = QSpinBox()
+        self.down_limit_spinbox.setRange(0, 100)
+        self.down_limit_spinbox.setValue(int(self.config["detection"]["gaze"]["down_limit"] * 100))
+
+        save_button = QPushButton("Salveaza Configuratia")
+        save_button.clicked.connect(self.save_config)
+
+        config_layout.addRow("Limita Stanga (%)", self.left_limit_spinbox)
+        config_layout.addRow("Limita Dreapta (%)", self.right_limit_spinbox)
+        config_layout.addRow("Limita Jos (%)", self.down_limit_spinbox)
+        config_layout.addWidget(save_button)
+        config_group.setLayout(config_layout)
+
+        controls_layout.addWidget(config_group)
 
         # adauga layout-urile la layout-ul principal
         main_layout.addWidget(self.video_display, 2)
@@ -403,6 +430,21 @@ class AntiPlagiatGUI(QMainWindow):
                                 f"Rapoartele au fost exportate cu succes in:\n{paths_text}")
         except Exception as e:
             QMessageBox.critical(self, "Eroare", f"Eroare la exportul raportului: {str(e)}")
+
+    def save_config(self):
+        self.config["detection"]["gaze"]["left_limit"] = self.left_limit_spinbox.value() / 100
+        self.config["detection"]["gaze"]["right_limit"] = self.right_limit_spinbox.value() / 100
+        self.config["detection"]["gaze"]["down_limit"] = self.down_limit_spinbox.value() / 100
+
+        with open("config.json", "w") as f:
+            json.dump(self.config, f, indent=4)
+
+        # Actualizare în timp real a componentelor relevante
+        self.system.face_detector.gaze_tracker.left_limit = self.config["detection"]["gaze"]["left_limit"]
+        self.system.face_detector.gaze_tracker.right_limit = self.config["detection"]["gaze"]["right_limit"]
+        self.system.face_detector.gaze_tracker.down_limit = self.config["detection"]["gaze"]["down_limit"]
+
+        QMessageBox.information(self, "Configurare Salvata", "Limitele au fost salvate și aplicate cu succes!")
 
 def main():
     app = QApplication(sys.argv)
