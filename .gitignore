@@ -39,9 +39,8 @@ Thumbs.db
 *.swp
 *~
 
-# fisiere ce trebuie descarcate manual
+# model yolov8 ce va fi generat automat la rularea aplicatiei
 yolov8s.pt
-shape_predictor_68_face_landmarks.dat
 
 # log file
 sistem_anti_plagiat.log
