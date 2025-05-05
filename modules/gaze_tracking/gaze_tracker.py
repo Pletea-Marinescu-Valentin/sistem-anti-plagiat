@@ -175,7 +175,8 @@ class GazeTracker(object):
         if self.eye_left.origin and self.eye_right.origin:
             eye_center_y = (self.eye_left.origin[1] + self.eye_left.center[1] +
                             self.eye_right.origin[1] + self.eye_right.center[1]) / 2
-            mouth_y = self.eye_left.origin[1] + self.eye_left.center[1] + 50  # aproximare pentru gura
+            # aproximare pentru gura
+            mouth_y = self.eye_left.origin[1] + self.eye_left.center[1] + 50
 
             # distanta ochi-gura
             face_height = abs(eye_center_y - mouth_y)
@@ -186,7 +187,7 @@ class GazeTracker(object):
             else:
                 eye_position_factor = 0.5
 
-            # ajustare ratio
+            # ajustare rata
             adjusted_ratio = pupil_ratio
 
             # cap inclinat in jos
