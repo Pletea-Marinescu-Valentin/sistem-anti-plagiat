@@ -5,7 +5,7 @@ class ObjectDetector:
     def __init__(self, config):
         print("initializare detector obiecte yolov8...")
 
-        self.confidence_threshold = config["detection"]["object"]["confidence_threshold"]
+        self.confidence_thresholds = config["detection"]["object"]["confidence_thresholds"]
         self.objects_of_interest = config.get("detection", {}).get("object", {}).get("objects_of_interest", [])
 
         self.class_mapping = {
@@ -66,7 +66,9 @@ class ObjectDetector:
             return [], original_frame.copy()
 
     def _detect_with_model(self, model, resized_frame, original_frame, class_ids, label):
-        results = model(resized_frame, conf=self.confidence_threshold, classes=class_ids, verbose=False)
+        # folosește pragul de încredere specificat pentru fiecare obiect
+        confidence_threshold = self.confidence_thresholds.get(label, 0.5)
+        results = model(resized_frame, conf=confidence_threshold, classes=class_ids, verbose=False)
         detections = []
 
         result = results[0]
@@ -76,7 +78,7 @@ class ObjectDetector:
         for box in result.boxes:
             confidence = float(box.conf)
 
-            if confidence < self.confidence_threshold:
+            if confidence < confidence_threshold:
                 continue
 
             # coordonate originale
