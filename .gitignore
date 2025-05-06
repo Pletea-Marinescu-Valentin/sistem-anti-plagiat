@@ -54,3 +54,7 @@ sistem_anti_plagiat.log
 *.out
 *.synctex.gz
 *.pdf
+*.bbl
+*.blg
+*.run.xml
+*.bcf
