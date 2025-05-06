@@ -16,6 +16,9 @@
 \usepackage{tikz}
 \usepackage{setspace} % Pentru distanța dintre rânduri
 \usepackage{times} % Pentru font Times New Roman
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{algorithmicx}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
 
@@ -401,6 +404,16 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
     \caption{Diagrama de clase a sistemului Anti-Plagiat}
 \end{figure}
 
+\textbf{Explicație:} Diagrama de clase prezintă structura modulară a aplicației și relațiile dintre componentele principale. Fiecare clasă reprezintă un modul Python, iar săgețile indică interacțiunile dintre acestea:
+\begin{itemize}
+    \item \texttt{main.py} este punctul de intrare al aplicației și inițializează toate componentele.
+    \item \texttt{AntiPlagiatGUI} gestionează interfața grafică și controlează componentele de procesare video și generare de rapoarte.
+    \item \texttt{VideoHandler} procesează fluxul video și interacționează cu modulele de analiză a privirii (\texttt{GazeTracker}) și detectare a obiectelor (\texttt{ObjectDetector}).
+    \item \texttt{GazeTracker} analizează direcția privirii și colaborează cu \texttt{ViolationMonitor} pentru a monitoriza încălcările.
+    \item \texttt{Eye} și \texttt{Pupil} sunt module specializate pentru analiza ochilor și detectarea pupilelor.
+    \item \texttt{ReportGenerator} generează alerte și rapoarte, care sunt exportate de \texttt{DataExporter}.
+\end{itemize}
+
 \subsection{Diagrama secvențială}
 
 \begin{figure}[H]
@@ -434,6 +447,15 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
         \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
     \end{figure}
 
+\textbf{Explicație:} Diagrama secvențială ilustrează fluxul de evenimente din momentul în care utilizatorul pornește monitorizarea:
+\begin{itemize}
+    \item Utilizatorul inițiază monitorizarea prin interfața grafică (\texttt{AntiPlagiatGUI}).
+    \item \texttt{VideoHandler} preia fluxul video și îl trimite către \texttt{GazeTracker} pentru analiza privirii și către \texttt{ObjectDetector} pentru detectarea obiectelor.
+    \item \texttt{ViolationMonitor} monitorizează încălcările detectate de \texttt{GazeTracker}.
+    \item \texttt{ReportGenerator} generează alerte și le trimite către interfața grafică pentru afișare.
+    \item Utilizatorul vizualizează rezultatele în timp real.
+\end{itemize}
+
 \subsection{Diagrama de activitate}
 
 \begin{figure}[H]
@@ -442,52 +464,105 @@ Pentru a înțelege mai bine structura și funcționalitatea sistemului, am gene
         node distance=1.5cm,
         startstop/.style={rectangle, rounded corners, draw=black, fill=red!30, text centered, minimum width=3cm},
         process/.style={rectangle, draw=black, fill=blue!30, text centered, minimum width=3cm},
-        decision/.style={rectangle, draw=black, fill=green!30, text centered, minimum width=3cm},
+        decision/.style={diamond, draw=black, fill=green!30, text centered, minimum width=4cm, minimum height=2cm},
         arrow/.style={-{Latex}, thick}
     ]
-        % Nodes
+        % Noduri
         \node[startstop] (start) {Start Monitorizare};
-        \node[process, below of=start] (capture) {Captură Video};
-        \node[process, below of=capture] (analyze) {Analiză Privire și Obiecte};
-        \node[decision, below of=analyze] (violation) {Încălcare Detectată?};
-        \node[process, right of=violation, xshift=4cm] (alert) {Generează Alertă};
-        \node[process, below of=violation, yshift=-1cm] (record) {Înregistrează Video};
-        \node[startstop, below of=record] (stop) {Stop Monitorizare};
+        \node[process, below of=start] (init) {Inițializare Camera};
+        \node[process, below of=init] (capture) {Captură Frame Video};
+        \node[process, below of=capture] (face) {Detecție Față și Pupile};
+        \node[process, below of=face, yshift=0.2cm] (analyze) {Verifică Direcția Privirii și Detectează Obiecte};
+        \node[decision, below of=analyze, yshift=-1.8cm] (violation) {Încălcare Detectată?};
+        \node[process, right of=violation, xshift=3.5cm] (alert) {Generează Alertă};
+        \node[process, below of=violation, yshift=-1.7cm] (save) {Salvează Frame};
+        \node[process, below of=save] (update) {Actualizează Interfața};
+        \node[startstop, below of=update] (stop) {Stop Monitorizare};
 
-        % Arrows
-        \draw[arrow] (start) -- (capture);
-        \draw[arrow] (capture) -- (analyze);
+        % Săgeți
+        \draw[arrow] (start) -- (init);
+        \draw[arrow] (init) -- (capture);
+        \draw[arrow] (capture) -- (face);
+        \draw[arrow] (face) -- (analyze);
         \draw[arrow] (analyze) -- (violation);
-        \draw[arrow] (violation.east) -- (alert.west) node[midway, above] {Da};
-        \draw[arrow] (violation.south) -- (record.north) node[midway, right] {Nu};
-        \draw[arrow] (record) -- (stop);
+        \draw[arrow] (violation) -- node[above] {Da} (alert);
+        \draw[arrow] (violation) -- node[right] {Nu} (save);
+        \draw[arrow] (alert) |- (save);
+        \draw[arrow] (save) -- (update);
+        \draw[arrow] (update) -- (stop);
+        
+        % Buclă de continuare
+        \draw[arrow] (update.west) -- ++(-2.5,0) |- (capture.west);
     \end{tikzpicture}
-    \caption{Diagrama de activitate pentru procesul de monitorizare}
+    \caption{Diagrama de activitate pentru sistemul Anti-Plagiat}
 \end{figure}
+
+\textbf{Explicație:} Diagrama de activitate prezintă fluxul operațional complet al sistemului, ilustrând cu acuratețe procesele implementate în codul sursă:
+\begin{itemize}
+    \item \textbf{Start Monitorizare:} Utilizatorul inițiază procesul de monitorizare prin interfața grafică.
+    \item \textbf{Inițializare Camera:} Sistemul inițializează camera web și configurează parametrii de captură.
+    \item \textbf{Captură Frame Video:} Aplicația capturează frame-uri video continuu pentru analiză.
+    \item \textbf{Detecție Față și Pupile:} Utilizând \texttt{FaceDetector} și \texttt{GazeTracker}, sistemul identifică fața candidatului și poziția pupilelor.
+    \item \textbf{Verificare Direcție și Detecție Obiecte:} Algoritmii specializați determină direcția privirii și identifică eventuale obiecte interzise.
+    \item \textbf{Încălcare Detectată:} În cazul identificării unei direcții suspecte a privirii sau a unor obiecte neautorizate, sistemul generează alerte.
+    \item \textbf{Salvare Frame:} Toate frame-urile prelucrate sunt înregistrate dacă funcția de înregistrare este activată.
+    \item \textbf{Actualizare Interfață:} GUI-ul este actualizat cu noile informații și statistici.
+    \item \textbf{Stop Monitorizare:} Utilizatorul oprește procesul, moment în care rapoartele pot fi generate.
+\end{itemize}
 
 \subsection{Diagrama de componente}
 
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
-        component/.style={rectangle, draw=black, fill=yellow!30, text centered, text width=3cm, minimum height=1cm},
-        relation/.style={-{Latex}, thick}
+        component/.style={rectangle, draw=black, fill=yellow!30, text centered, text width=3.5cm, minimum height=1.2cm, font=\sffamily\bfseries},
+        relation/.style={-{Latex}, thick, shorten >=2pt, shorten <=2pt},
+        node distance=3cm
     ]
-            \node[component] (gui) {Interfață Grafică};
-            \node[component, below=1.5cm of gui] (video) {Procesare Video};
-            \node[component, below=1.5cm of video] (gaze) {Analiză Privire};
-            \node[component, right=4cm of video] (report) {Generare Rapoarte};
-            \node[component, below=1.5cm of gaze] (storage) {Stocare Date};
+        % Componente cu mai mult spațiu între ele
+        \node[component] (gui) at (0,0) {AntiPlagiatGUI};
+        \node[component] (video) at (-4.5,-3) {VideoHandler};
+        \node[component] (face) at (4.5,-3) {FaceDetector};
+        \node[component] (gaze) at (-4.5,-6) {GazeTracker};
+        \node[component] (object) at (4.5,-6) {ObjectDetector};
+        \node[component] (eye) at (-4.5,-9) {Eye / Pupil};
+        \node[component] (data) at (4.5,-9) {DataExporter};
+        \node[component] (report) at (0,-12) {ReportGenerator / ViolationMonitor};
 
-            % Relations
-            \draw[relation] (gui) -- (video) node[midway, left] {Captură Video};
-            \draw[relation] (video) -- (gaze) node[midway, left] {Analiză Cadre};
-            \draw[relation] (video) -- (report) node[midway, above] {Date Alerte};
-            \draw[relation] (gaze) -- (report) node[midway, below, sloped, rotate=0] {Rezultate Analiză};
-            \draw[relation] (report) -- (storage) node[midway, right, sloped, rotate=0, yshift=-0.3cm] {Salvare Rapoarte};
+        % Relații cu etichete mai vizibile
+        \draw[relation] (gui) -- node[left, pos=0.3, text width=2cm, text centered, font=\sffamily] {Inițiază} (video);
+        \draw[relation] (gui) -- node[right, pos=0.3, text width=2cm, text centered, font=\sffamily] {Controlează} (face);
+        \draw[relation] (video) -- node[left, text width=2.5cm, text centered, font=\sffamily] {Analizează privirea} (gaze);
+        \draw[relation] (video) -- node[above, sloped, font=\sffamily] {Procesare imagini} (object);
+        \draw[relation] (gaze) -- node[left, font=\sffamily] {Detectează pupilele} (eye);
+        \draw[relation] (object) -- node[left, pos=0.3, font=\sffamily] {Monitorizează} (report);
+        \draw[relation] (gaze) -- node[left, pos=0.78, text width=2.5cm, text centered, font=\sffamily] {Transmite rezultate} (report);
+        \draw[relation] (report) -- node[above, sloped, font=\sffamily] {Exportă date} (data);
+        \draw[relation] (report) -| node[above, pos=0.9, font=\sffamily] {Raportare} (gui);
     \end{tikzpicture}
     \caption{Diagrama de componente a sistemului Anti-Plagiat}
 \end{figure}
+
+\textbf{Explicație:} Diagrama de componente prezintă structura modulară actualizată a sistemului, reflectând exact clasele existente și relațiile dintre acestea:
+\begin{itemize}
+    \item \textbf{AntiPlagiatGUI:} Interfața centrală care gestionează interacțiunea cu utilizatorul și coordonează celelalte componente. Implementată în fișierul \texttt{gui\_app.py}.
+    
+    \item \textbf{VideoHandler:} Gestionează captura video, procesarea frame-urilor și înregistrarea. Responsabil pentru afișarea și salvarea înregistrărilor.
+    
+    \item \textbf{FaceDetector:} Detectează fața candidatului și inițiază analiza direcției privirii prin intermediul \texttt{GazeTracker}.
+    
+    \item \textbf{GazeTracker:} Analizează direcția privirii candidatului prin calcularea raporturilor orizontale și verticale ale pupilelor.
+    
+    \item \textbf{ObjectDetector:} Utilizează modele YOLOv8 pentru a detecta obiecte interzise precum telefoane mobile și ceasuri inteligente.
+    
+    \item \textbf{Eye / Pupil:} Module specializate pentru izolarea regiunilor ochilor și detectarea pupilelor.
+    
+    \item \textbf{ReportGenerator / ViolationMonitor:} Monitorizează încălcările detectate și generează rapoarte detaliate.
+    
+    \item \textbf{DataExporter:} Exportă datele despre încălcări în formate precum HTML, CSV și JSON.
+\end{itemize}
+
+Această diagramă actualizată reprezintă cu acuratețe componentele existente în codul sursă și interacțiunile dintre acestea.
 
 \section{Implementarea propriu-zisă}
 
@@ -556,6 +631,9 @@ uniformizează valorile, făcând detectarea mai robustă la variații minore
     \caption{Valori RGB ale pixelilor din zona oculară}
     \label{fig:rgb_ochi}
 \end{figure}
+
+Imaginea de mai sus reprezintă o captură de ecran a valorilor RGB ale
+pixelilor din propria mea zona oculară, iar aceste rezultate au fost obtinute cu ajutorul rulării fisierului de testare \texttt{test\_camera.py}.
 
 
 Tot cu ajutorul lui OpenCV, am reușit să desenez elemente vizuale
@@ -636,7 +714,7 @@ Funcția \texttt{np.zeros} a fost folosită pentru a crea măști pentru regiuni
 
 Funcțiile \texttt{np.min} și \texttt{np.max} au fost utilizate pentru a determina limitele regiunilor de decupat, iar operațiile vectoriale au permis calcularea rapidă a coordonatelor pupilelor și a raporturilor orizontale și verticale. De exemplu, coordonatele pupilelor sunt calculate ca punctele cu intensitatea minimă din regiunea ochilor, iar raporturile sunt calculate ca raporturi între distanțele dintre aceste coordonate și dimensiunile regiunii.
 
-\subsection{Biblioteca datetime}
+\subsection{Datetime}
 Biblioteca \texttt{datetime}\cite{datetime} din Python a fost utilizată pentru gestionarea timpului și a marcajelor temporare în cadrul proiectului. Aceasta a fost esențială pentru sincronizarea evenimentelor, generarea rapoartelor și înregistrarea timpului de monitorizare.
 
 Funcția \texttt{datetime.now()} a fost utilizată pentru a obține timpul curent în momentul generării unui eveniment, cum ar fi detectarea unei încălcări sau salvarea unui raport. Marcajele temporare generate sunt utilizate pentru a lega evenimentele detectate de momentele exacte din fluxul video.
@@ -649,7 +727,7 @@ De asemenea, biblioteca \texttt{datetime} a fost utilizată pentru a genera nume
 
 Biblioteca \texttt{datetime} a fost astfel un instrument esențial pentru gestionarea timpului în toate aspectele proiectului, de la monitorizare în timp real până la generarea rapoartelor detaliate.
 
-\subsection{Biblioteca logging}
+\subsection{Logging}
 Biblioteca \texttt{logging}\cite{logging} din Python a fost utilizată pentru gestionarea mesajelor de jurnalizare (\textit{logging}) în cadrul proiectului. Aceasta a fost esențială pentru monitorizarea funcționării aplicației, diagnosticarea problemelor și păstrarea unui istoric al evenimentelor importante.
 
 Funcția \texttt{logging.basicConfig()} a fost utilizată pentru a configura formatul și nivelul de jurnalizare. În cadrul proiectului, mesajele de jurnalizare sunt salvate atât într-un fișier (\texttt{sistem\_anti\_plagiat.log}), cât și afișate în consolă. Acest lucru permite o monitorizare eficientă a aplicației în timp real, precum și o analiză ulterioară a problemelor.
@@ -793,7 +871,7 @@ Aplicația poate fi configurată prin editarea fișierului \texttt{config.json}.
 În cadrul acestui proiect, am adus mai multe contribuții semnificative, care includ:
 
 \subsection{Utilizarea a două modele YOLOv8 pentru detectarea obiectelor interzise}
-Am utilizat două modele YOLOv8 separate, unul specializat pentru detectarea telefoanelor mobile și altul pentru detectarea ceasurilor inteligente. Această abordare a fost aleasă pentru a lucra eficient și pentru a elimina falsurile pozitive. În loc să reantrenăm un model unic pentru ambele categorii, am aplicat clasificări stricte bazate pe dimensiunile \textit{x-y} ale obiectelor detectate. Precizez că fiecare model YOLOv8 are un prag de încredere diferit, a carei valoare a fost stabilită în urma anumitor teste efectuate, iar aceasta se găsește în fișierul principal de configurație \texttt{config.json}.
+Am utilizat două modele YOLOv8 separate, unul specializat pentru detectarea telefoanelor mobile și altul pentru detectarea ceasurilor inteligente. Această abordare a fost aleasă pentru a lucra eficient și pentru a elimina falsurile pozitive. În loc să reantrenăm un model unic pentru ambele categorii, am aplicat clasificări stricte bazate pe dimensiunile \textit{x-y} ale obiectelor detectate. Precizez că fiecare model YOLOv8 are un prag de încredere diferit, iar aceaste valoari au fost stabilite în urma anumitor teste efectuate si se găsesc în fișierul principal de configurație \texttt{config.json}. Astfel, \texttt{confidence\_threshold} este setat la 0.55 pentru telefoane și 0.4 pentru ceasuri inteligente. Aceste valori sunt esențiale pentru a asigura o detecție precisă și pentru a minimiza riscul de falsuri pozitive.
 
 \subsection{Implementarea calculelor de algebră liniară pentru analiza privirii}
 Am dezvoltat și integrat calcule de algebră liniară pentru a determina direcția privirii utilizatorului. Aceste calcule includ:
@@ -803,25 +881,113 @@ Am dezvoltat și integrat calcule de algebră liniară pentru a determina direc�
     \item Filtrarea și ajustarea valorilor pentru a elimina zgomotul și variațiile neașteptate.
 \end{itemize}
 
-\hspace*{-2cm}
-\begin{minipage}{0.48\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[height=7.5cm]{screenshots/s6.png}
-        \caption{Cod pentru calculul raportului orizontal.}
-        \label{fig:horizontal_ratio}
-    \end{figure}
-\end{minipage}\hfill
-\begin{minipage}{0.48\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[height=7.7cm]{screenshots/s7.png}
-        \caption{Cod pentru calculul raportului vertical.}
-        \label{fig:vertical_ratio}
-    \end{figure}
-\end{minipage}
+Raportul orizontal este esențial pentru a determina dacă respectivul candidat privește spre stânga sau spre dreapta. Acest algoritm calculează raportul bazat pe pozițiile pupilelor și include o componentă de ajustare pentru orientarea capului.
 
+\begin{algorithm}[H]
+    \caption{Calculul raportului orizontal (axa X - stanga/dreapta)}
+    \begin{algorithmic}[1]
+    \Procedure{CalculRaportOrizontal}{}
+        \If{$pupile\_gasite = false$}
+            \State \Return $0.5$ \Comment{Pupilele nu sunt detectate $\implies$ returnam valoare neutra}
+        \EndIf
+    
+        \State $poz\_pupila\_stanga \gets \frac{pupila\_stanga.x}{(centru\_ochi\_stanga.x \cdot 2 - 10)}$ \Comment{Normalizare pozitie pe X}
+        \State $poz\_pupila\_dreapta \gets \frac{pupila\_dreapta.x}{(centru\_ochi\_dreapta.x \cdot 2 - 10)}$
+        \State $raport\_pupile \gets \frac{poz\_pupila\_stanga + poz\_pupila\_dreapta}{2}$ \Comment{Media pozitiilor normalizate}
+    
+        \If{$origine\_stanga \neq null$ \textbf{si} $origine\_dreapta \neq null$}
+            \State $centru\_abs\_stanga \gets origine\_stanga.x + centru\_ochi\_stanga.x$
+            \State $centru\_abs\_dreapta \gets origine\_dreapta.x + centru\_ochi\_dreapta.x$
+            \State $distanta\_ochi \gets centru\_abs\_dreapta - centru\_abs\_stanga$
+    
+            \If{$cadru \neq null$}
+                \State $latime\_cadru \gets cadru.shape[1]$ \Comment{Latimea reala a imaginii}
+            \Else
+                \State $latime\_cadru \gets 640$ \Comment{Valoare implicita daca nu exista frame}
+            \EndIf
+    
+            \State $factor\_pozitie \gets \frac{distanta\_ochi}{latime\_cadru \cdot 0.3}$ \Comment{Evaluam pozitia relativa a capului}
+            \State $raport\_ajustat \gets raport\_pupile$ \Comment{Initial, raportul nu este modificat}
+    
+            \If{$factor\_pozitie < 0.8$}
+                \State $raport\_ajustat \gets \max(0.6, raport\_pupile)$ \Comment{Capul e intors spre stanga}
+            \ElsIf{$factor\_pozitie > 1.2$}
+                \State $raport\_ajustat \gets \min(0.4, raport\_pupile)$ \Comment{Capul e intors spre dreapta}
+            \EndIf
+    
+            \State \Return $raport\_ajustat$
+        \EndIf
+    
+        \State \Return $raport\_pupile$ \Comment{Nu avem date despre cap $\implies$ returnam direct media}
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    
 
+Raportul vertical este utilizat pentru a determina dacă privirea candidatului este orientată în jos. Acest algoritm calculează raportul bazat pe pozițiile verticale ale pupilelor și include o componentă de ajustare pentru înclinarea capului.
+
+\begin{algorithm}[H]
+    \caption{Calculul raportului vertical (axa Y - sus/jos)}
+    \begin{algorithmic}[1]
+    \Procedure{CalculRaportVertical}{}
+        \If{$pupile\_gasite = false$}
+            \State \Return $0.5$ \Comment{Nu putem estima directia $\implies$ valoare implicita}
+        \EndIf
+    
+        \State $poz\_pupila\_stanga \gets \frac{pupila\_stanga.y}{(centru\_ochi\_stanga.y \cdot 2 - 10)}$ \Comment{Normalizare pozitie pe Y}
+        \State $poz\_pupila\_dreapta \gets \frac{pupila\_dreapta.y}{(centru\_ochi\_dreapta.y \cdot 2 - 10)}$
+        \State $raport\_pupile \gets \frac{poz\_pupila\_stanga + poz\_pupila\_dreapta}{2}$ \Comment{Media pozitiilor normalizate}
+    
+        \If{$origine\_stanga \neq null$ \textbf{si} $origine\_dreapta \neq null$}
+            \State $centru\_ochi\_y \gets \frac{origine\_stanga.y + centru\_ochi\_stanga.y + origine\_dreapta.y + centru\_ochi\_dreapta.y}{2}$
+            \State $poz\_gura \gets origine\_stanga.y + centru\_ochi\_stanga.y + 50$ \Comment{Estimare gura}
+            \State $inaltime\_fata \gets |centru\_ochi\_y - poz\_gura|$ \Comment{Estimare inaltime fata}
+    
+            \If{$inaltime\_fata > 0$}
+                \State $factor\_pozitie \gets \frac{|origine\_stanga.y - centru\_ochi\_y|}{inaltime\_fata}$ \Comment{Inclinare cap (sus/jos)}
+            \Else
+                \State $factor\_pozitie \gets 0.5$ \Comment{Valoare implicita cand calculul nu este valid}
+            \EndIf
+    
+            \State $raport\_ajustat \gets raport\_pupile$
+    
+            \If{$factor\_pozitie > 0.6$}
+                \State $raport\_ajustat \gets \min(0.4, raport\_pupile)$ \Comment{Capul este aplecat}
+            \ElsIf{$factor\_pozitie < 0.4$}
+                \State $raport\_ajustat \gets \max(0.6, raport\_pupile)$ \Comment{Capul este ridicat}
+            \EndIf
+    
+            \State \Return $raport\_ajustat$
+        \EndIf
+    
+        \State \Return $raport\_pupile$ \Comment{Date incomplete $\implies$ returnam media initiala}
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+    
+
+Acești algoritmi lucrează împreună pentru a crea un sistem robust de detectare a direcției privirii. Rapoartele calculate sunt comparate cu praguri predefinite pentru a determina dacă candidatul privește în centru, stânga, dreapta sau jos, iar rezultatele acestei analize sunt utilizate pentru a genera alertele corespunzătoare.
+
+Pragurile implicite utilizate în implementarea actuală sunt:
+\begin{itemize}
+    \item $left\_limit = 0.62$ - Valoare peste care privirea este considerată orientată spre stânga
+    \item $right\_limit = 0.38$ - Valoare sub care privirea este considerată orientată spre dreapta
+    \item $down\_limit = 0.60$ - Valoare peste care privirea este considerată orientată în jos
+\end{itemize}
+
+Implementarea noastră oferă mai multe avantaje semnificative:
+
+\begin{enumerate}
+    \item \textbf{Robustețe la variații de iluminare} - Prin utilizarea metodei punctului minim pentru detectarea pupilelor, algoritmul este mai puțin sensibil la schimbările de iluminare.
+    
+    \item \textbf{Compensarea orientării capului} - Ajustările implementate pentru factorul de poziție a ochilor și factorul de înclinare a capului permit distingerea între o privire suspectă și o mișcare naturală a capului.
+    
+    \item \textbf{Normalizarea coordonatelor} - Convertirea coordonatelor absolute în rapoarte normalizate face algoritmul adaptabil la diferite rezoluții de cameră și distanțe față de ecran.
+    
+    \item \textbf{Filtrare bazată pe praguri optimizate} - Pragurile utilizate au fost determinate empiric pentru a oferi cel mai bun echilibru între rata de detecție și rata falsurilor pozitive.
+\end{enumerate}
+
+Acești algoritmi au fost testați în diverse condiții de iluminare, demonstrând o acuratețe ridicată în detectarea direcției privirii, contribuind astfel la eficiența sistemului anti-plagiat.
 
 \subsection{Optimizarea procesării video în timp real}
 Am implementat optimizări pentru procesarea video, avand in vedere ca mintea umana nu poate procesa instant o anumita informație care poate fi utilizata in scopul de a frauda respectivul examen, incluzând:
@@ -853,6 +1019,53 @@ Am implementat o funcționalitate care permite utilizatorului să editeze parame
 De exemplu, în cazul unui examen pe foaie, candidatul este nevoit să se aplece mai mult pentru a scrie, ceea ce poate reduce rata falsurilor pozitive prin ajustarea limitei inferioare (\textit{down limit}). Această flexibilitate oferă supraveghetorilor posibilitatea de a adapta rapid sistemul la contextul specific al examenului.
 
 Această funcționalitate contribuie la reducerea falsurilor pozitive și la creșterea acurateței sistemului în cadrul anumitor scenarii frecvent intalnite.
+
+\section{Îmbunătățiri posibile}
+
+Deși aplicația actuală oferă funcționalități avansate pentru monitorizarea anti-plagiat, există câteva aspecte care pot fi îmbunătățite sau extinse pentru a crește eficiența și utilitatea acesteia:
+
+\begin{enumerate}
+    \item \textbf{Integrarea cu platforme LMS:} Adăugarea suportului pentru integrarea directă cu platforme de management al învățământului (LMS), precum Moodle, Blackboard sau Canvas, pentru a facilita gestionarea examenelor și a rapoartelor.
+
+    \item \textbf{Suport multi-camera:} Extinderea aplicației pentru a permite utilizarea mai multor camere simultan, oferind o perspectivă mai completă asupra comportamentului candidatului.
+
+    \item \textbf{Monitorizare audio avansată:} Dezvoltarea unui modul de procesare audio mai sofisticat, care să detecteze conversațiile suspecte sau utilizarea dispozitivelor audio neautorizate.
+
+\end{enumerate}
+
+Aceste îmbunătățiri ar putea crește semnificativ valoarea aplicației și ar extinde aria de utilizare a acesteia în diverse contexte educaționale și profesionale.
+
+Cercetările recente în domeniul ceasurilor inteligente au propus „o categorizare a utilizării ceasurilor 
+inteligente în sectorul de sănătate în 3 domenii funcționale cheie: monitorizare, îndrumarea și 
+predicție"\cite{smartwatch_framework}, concepte ce ar putea fi adaptate pentru monitorizarea 
+comportamentului candidaților. De asemenea, studii au demonstrat eficiența „cadrelor bazate pe ceasuri 
+inteligente pentru evaluarea și monitorizarea mobilității în timp real"\cite{smartwatch_monitoring}, 
+sugerând posibilitatea integrării acestor tehnologii în viitoarele versiuni ale acestui sistemu pentru 
+a îmbunătăți acuratețea detectării comportamentelor suspecte.
+
+\section{Dificultăți întâmpinate}
+
+În realizarea acestui proiect, am întâmpinat mai multe dificultăți, in cadrul carora am utilizat anumite constrangeri si solutii mai putin conventionale, pentru a avea rezultate cat mai aproape de cele dorite:
+
+\begin{enumerate}
+    \item \textbf{Integrarea modelelor YOLOv8:} Configurarea și optimizarea modelelor YOLOv8 pentru detectarea obiectelor interzise a fost o provocare, mai ales în ceea ce privește reducerea falsurilor pozitive. A fost necesar să ajustez pragurile de detecție și să folosesc modele separate pentru categorii diferite de obiecte.
+
+    \item \textbf{Performanța pe hardware limitat:} Procesarea video în timp real a fost dificilă pe dispozitive cu resurse hardware limitate. Am implementat optimizări, cum ar fi procesarea unui cadru din 30 și utilizarea unui buffer circular, pentru a reduce consumul de resurse.
+
+    \item \textbf{Detectarea privirii în condiții de iluminare variabilă:} Detectarea precisă a direcției privirii a fost afectată de variațiile de iluminare. A fost necesar să aplic filtre și să ajusteze parametrii algoritmilor pentru a îmbunătăți robustețea.
+
+    \item \textbf{Sincronizarea datelor multimedia:} Corelarea precisă între fluxul video, audio și evenimentele detectate a fost o sarcină complexă. Am utilizat marcaje temporare sincronizate pentru a lega alertele generate de momentele exacte din fluxul video.
+
+    \item \textbf{Complexitatea interfeței grafice:} Dezvoltarea unei interfețe grafice intuitive și funcționale a fost o provocare, mai ales în ceea ce privește organizarea logică a componentelor și sincronizarea acestora cu procesele din fundal.
+
+    \item \textbf{Gestionarea falsurilor pozitive:} În timpul testării, am observat o rată ridicată de falsuri pozitive, mai ales în detectarea obiectelor. A fost necesar să ajustez algoritmii și să implementez filtre suplimentare pentru a îmbunătăți acuratețea.
+
+    \item \textbf{Documentarea și modularizarea codului:} Structurarea proiectului într-un mod modular și documentarea clară a fiecărui modul au necesitat timp suplimentar, dar au fost esențiale pentru întreținerea și extinderea ulterioară a aplicației.
+
+    \item \textbf{Testarea și validarea:} Testarea aplicației în scenarii reale a fost dificilă, mai ales în simularea condițiilor variate de utilizare, cum ar fi diferite unghiuri ale camerei, iluminare slabă sau zgomot de fundal.
+
+    \item \textbf{Gestionarea dependențelor:} Instalarea și configurarea corectă a tuturor bibliotecilor și pachetelor necesare au fost uneori problematice, mai ales din cauza incompatibilităților între versiuni.
+\end{enumerate}
 
 \section{Concluzii}
 
@@ -905,63 +1118,6 @@ Această compatibilitate multiplatformă face ca aplicația să fie accesibilă 
 
 În concluzie, proiectul reprezintă o contribuție semnificativă la domeniul monitorizării anti-plagiat, oferind o soluție modernă, eficientă și adaptabilă la nevoile actuale ale sistemelor educaționale.
 
-\section{Îmbunătățiri posibile}
-
-Deși aplicația actuală oferă funcționalități avansate pentru monitorizarea anti-plagiat, există câteva aspecte care pot fi îmbunătățite sau extinse pentru a crește eficiența și utilitatea acesteia:
-
-\begin{enumerate}
-    \item \textbf{Integrarea cu platforme LMS:} Adăugarea suportului pentru integrarea directă cu platforme de management al învățământului (LMS), precum Moodle, Blackboard sau Canvas, pentru a facilita gestionarea examenelor și a rapoartelor.
-
-    \item \textbf{Detectarea comportamentului complex:} Utilizarea modelelor avansate de învățare automată pentru a analiza comportamente mai complexe, cum ar fi mișcările subtile ale mâinilor sau schimbările de expresie facială.
-
-    \item \textbf{Suport multi-camera:} Extinderea aplicației pentru a permite utilizarea mai multor camere simultan, oferind o perspectivă mai completă asupra comportamentului candidatului.
-
-    \item \textbf{Reducerea falsurilor pozitive:} Îmbunătățirea algoritmilor de detecție pentru a reduce rata falsurilor pozitive, prin utilizarea unor modele mai bine antrenate sau prin combinarea mai multor surse de date.
-
-    \item \textbf{Monitorizare audio avansată:} Dezvoltarea unui modul de procesare audio mai sofisticat, care să detecteze conversațiile suspecte sau utilizarea dispozitivelor audio neautorizate.
-
-    \item \textbf{Suport pentru dispozitive mobile:} Crearea unei versiuni a aplicației care să funcționeze pe dispozitive mobile, pentru a extinde utilizarea acesteia în medii mai diverse.
-
-    \item \textbf{Personalizarea interfeței grafice:} Adăugarea opțiunilor de personalizare a interfeței grafice, cum ar fi temele de culoare sau configurarea widget-urilor, pentru a îmbunătăți experiența utilizatorului.
-
-    \item \textbf{Analiză post-eveniment:} Dezvoltarea unui modul avansat de analiză post-eveniment, care să permită revizuirea detaliată a sesiunilor de monitorizare, cu funcționalități precum căutarea pe baza marcajelor temporare sau generarea de grafice.
-
-    \item \textbf{Optimizări hardware:} Implementarea unor optimizări suplimentare pentru a reduce consumul de resurse pe dispozitive cu hardware limitat, cum ar fi utilizarea procesării GPU sau a modelelor mai ușoare.
-\end{enumerate}
-
-Aceste îmbunătățiri ar putea crește semnificativ valoarea aplicației și ar extinde aria de utilizare a acesteia în diverse contexte educaționale și profesionale.
-
-Cercetările recente în domeniul ceasurilor inteligente au propus „o categorizare a utilizării ceasurilor 
-inteligente în sectorul de sănătate în 3 domenii funcționale cheie: monitorizare, îndrumarea și 
-predicție"\cite{smartwatch_framework}, concepte ce ar putea fi adaptate pentru monitorizarea 
-comportamentului candidaților. De asemenea, studii au demonstrat eficiența „cadrelor bazate pe ceasuri 
-inteligente pentru evaluarea și monitorizarea mobilității în timp real"\cite{smartwatch_monitoring}, 
-sugerând posibilitatea integrării acestor tehnologii în viitoarele versiuni ale acestui sistemu pentru 
-a îmbunătăți acuratețea detectării comportamentelor suspecte.
-
-\section{Dificultăți întâmpinate}
-
-În realizarea acestui proiect, am întâmpinat mai multe dificultăți, in cadrul carora am utilizat anumite constrangeri si solutii mai putin conventionale, pentru a avea rezultate cat mai aproape de cele dorite:
-
-\begin{enumerate}
-    \item \textbf{Integrarea modelelor YOLOv8:} Configurarea și optimizarea modelelor YOLOv8 pentru detectarea obiectelor interzise a fost o provocare, mai ales în ceea ce privește reducerea falsurilor pozitive. A fost necesar să ajustez pragurile de detecție și să folosesc modele separate pentru categorii diferite de obiecte.
-
-    \item \textbf{Performanța pe hardware limitat:} Procesarea video în timp real a fost dificilă pe dispozitive cu resurse hardware limitate. Am implementat optimizări, cum ar fi procesarea unui cadru din 20 și utilizarea unui buffer circular, pentru a reduce consumul de resurse.
-
-    \item \textbf{Detectarea privirii în condiții de iluminare variabilă:} Detectarea precisă a direcției privirii a fost afectată de variațiile de iluminare. A fost necesar să aplic filtre și să ajusteze parametrii algoritmilor pentru a îmbunătăți robustețea.
-
-    \item \textbf{Sincronizarea datelor multimedia:} Corelarea precisă între fluxul video, audio și evenimentele detectate a fost o sarcină complexă. Am utilizat marcaje temporare sincronizate pentru a lega alertele generate de momentele exacte din fluxul video.
-
-    \item \textbf{Complexitatea interfeței grafice:} Dezvoltarea unei interfețe grafice intuitive și funcționale a fost o provocare, mai ales în ceea ce privește organizarea logică a componentelor și sincronizarea acestora cu procesele din fundal.
-
-    \item \textbf{Gestionarea falsurilor pozitive:} În timpul testării, am observat o rată ridicată de falsuri pozitive, mai ales în detectarea obiectelor. A fost necesar să ajustez algoritmii și să implementez filtre suplimentare pentru a îmbunătăți acuratețea.
-
-    \item \textbf{Documentarea și modularizarea codului:} Structurarea proiectului într-un mod modular și documentarea clară a fiecărui modul au necesitat timp suplimentar, dar au fost esențiale pentru întreținerea și extinderea ulterioară a aplicației.
-
-    \item \textbf{Testarea și validarea:} Testarea aplicației în scenarii reale a fost dificilă, mai ales în simularea condițiilor variate de utilizare, cum ar fi diferite unghiuri ale camerei, iluminare slabă sau zgomot de fundal.
-
-    \item \textbf{Gestionarea dependențelor:} Instalarea și configurarea corectă a tuturor bibliotecilor și pachetelor necesare au fost uneori problematice, mai ales din cauza incompatibilităților între versiuni.
-\end{enumerate}
 
 \begin{thebibliography}{9}
 \addcontentsline{toc}{section}{Bibliografie}
