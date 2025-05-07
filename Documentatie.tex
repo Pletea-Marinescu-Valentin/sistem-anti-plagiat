@@ -167,6 +167,8 @@ asemenea, ocupă locul secund în topul țărilor cu cel mai mare număr de
 articole retrase raportat la totalul articolelor publicate, în urma
 descoperirii plagierii.
 
+\newpage
+
 \subsection{Obiectivele proiectului}
 
 Acest proiect își propune să ofere un sistem inovator pentru monitorizarea examenelor, cu următoarele obiective specifice:
@@ -259,6 +261,8 @@ ecranului candidatului, cât și pe comportamentul acestuia.
 \caption{Analiza comparativă a sistemului ProctorU}
 \end{table}
 
+\newpage
+
 Platforma înregistrează fiecare secundă, se asigură că nu există alte tab-uri
 deschise, cu excepția aceluia în care se susține respectivul examen,
 nu permite anumite combinații de taste din tastatură pentru funcții precum 
@@ -339,31 +343,21 @@ asigură transmisia datelor sigură și optimizată:
 \begin{itemize}
     \item \textbf{WebRTC} pentru comunicația audio-video în timp real. Acest protocol este utilizat pentru a transmite fluxul video capturat de la webcam către sistemul de procesare, asigurând o latență minimă și o calitate optimă a transmisiei\cite{sredojev2015webrtc}. În proiectul nostru, WebRTC este folosit pentru a permite monitorizarea în timp real a candidaților, oferind o conexiune stabilă și eficientă.
     \item \textbf{TLS/SSL} pentru criptarea întregului flux de date. Acest strat de securitate este esențial pentru a proteja datele transmise între client și server, prevenind accesul neautorizat sau interceptarea informațiilor sensibile\cite{yang2018tls}. În contextul proiectului nostru, TLS/SSL este utilizat pentru a securiza atât fluxul video, cât și datele generate, cum ar fi rapoartele de încălcări.
+
+    Cu toate ca versiunea actuală a proiectului nostru se bazează pe procesare locală fără componente de comunicație în rețea, implementarea acestor tehnologii ar reprezenta o direcție valoroasă de dezvoltare viitoare, permițând monitorizarea la distanță a candidaților.
 \end{itemize}
 
 \subsubsection{Procesare video}
-În ceea ce privește procesarea video, fluxul capturat de la webcam este procesat în
-timp real pentru a detecta comportamente suspicioase. Se utilizează algoritmi de
-compresie video standard, precum \textbf{H.264}, pentru a asigura transmisia
-eficientă a datelor, reducând în același timp latența și consumul de
-bandă\cite{goodfellow2016deep}. În proiectul nostru, H.264 este utilizat pentru a comprima fluxul video înainte de stocare sau transmitere, asigurând o utilizare eficientă a resurselor hardware.
+În ceea ce privește procesarea video, fluxul capturat de la webcam este procesat în timp real pentru a detecta comportamente suspicioase. Pentru salvarea înregistrărilor, sistemul nostru utilizează formate standard precum MP4, care incorporează codecul H.264, asigurând o eficiență bună în utilizarea spațiului de stocare\cite{goodfellow2016deep}.
 
-Cercetările recente în domeniul sistemelor de supraveghere a examenelor au demonstrat eficiența 
-„sistemelor care încorporează detecția facială, urmărirea ochilor, estimarea poziției capului și 
-detectarea deschiderii gurii"\cite{alem2021novel} pentru identificarea comportamentelor suspecte. 
-Implementarea noastră se bazează pe aceste cercetări, integrând tehnici avansate de procesare video 
-pentru a oferi o soluție robustă și precisă.
+Cercetările recente în domeniul sistemelor de supraveghere a examenelor au demonstrat eficiența detecției faciale și a urmăririi ochilor pentru identificarea comportamentelor suspecte\cite{alem2021novel}. Implementarea noastră se bazează pe aceste cercetări, integrând biblioteci precum \texttt{dlib} și \texttt{OpenCV} pentru a detecta poziția feței și direcția privirii, oferind astfel o soluție robustă pentru identificarea comportamentelor suspicioase.
 
-Platformele de monitorizare înregistrează și sunetele de pe fundal, analizând 
-eventuale conversații sau zgomote suspecte. Se aplică algoritmi de compresie audio, 
-precum \textbf{AAC} sau \textbf{Opus}, pentru transmiterea fluxului audio în timp real. În proiectul nostru, aceste algoritmi sunt folosiți pentru a înregistra și analiza sunetele de fundal, oferind informații suplimentare despre posibilele încălcări.
-
+Acest sistem se concentrează în principal pe analiza vizuală, detectând atât direcția privirii candidatului cât și prezența obiectelor neautorizate precum telefoanele mobile și ceasurile inteligente, elemente care reprezintă cele mai frecvente mijloace de fraudare în examene.
 \subsubsection{Watermarking}
 În soluțiile de tip Lockdown Browser se aplică watermark-uri vizibile sau invizibile asupra conținutului afișat pe ecran, cu scopul de a preveni capturarea neautorizată a informațiilor de examen. În proiectul nostru, watermark-urile sunt folosite pentru a marca fluxul video înregistrat cu informații precum data și ora reală, dar și valorile H și V, care indică in ce limite se afla direcția privirii candidatului. Acest tip de marcaj contribuie la asigurarea autenticității și integrității datelor înregistrate.
 
-\subsubsection{Sincronizarea datelor multimedia}
-Pentru a asigura o corelare precisă între fluxul video, audio și evenimentele detectate, proiectul nostru utilizează marcaje temporare sincronizate. Acestea sunt generate în momentul capturării fiecărui cadru video sau pachet audio și sunt utilizate pentru a lega alertele generate de sistem cu momentul exact al încălcării. Această abordare permite o analiză detaliată și o verificare ulterioară eficientă.
-
+\subsubsection{Sincronizarea evenimentelor}
+Pentru a asigura o corelare precisă între cadrele video și evenimentele detectate, proiectul nostru utilizează marcaje temporare. Acestea sunt generate în momentul capturării fiecărui cadru video și sunt utilizate pentru a lega alertele generate de sistem cu momentul exact al încălcării. Această abordare permite consultarea ulterioară a înregistrărilor video și verificarea eficientă a rapoartelor generate, oferind astfel dovezi concrete pentru evaluarea comportamentului candidatului în timpul examenului.
 \subsubsection{Optimizări pentru resurse limitate}
 Pentru a permite rularea eficientă a sistemului pe dispozitive cu resurse imitate, in acest sistem au fost implementate mai multe optimizări:
 \begin{itemize}
@@ -374,19 +368,23 @@ Pentru a permite rularea eficientă a sistemului pe dispozitive cu resurse imita
 
 \subsection{Avantajele soluției propuse față de cele existente}
 
-Sistemul de monitorizare anti-plagiat propus în acest proiect aduce următoarele avantaje față de soluțiile existente:
+Sistemul de monitorizare anti-plagiat dezvoltat în cadrul acestui proiect oferă numeroase beneficii comparative față de alternativele disponibile în prezent pe piață:
 
 \begin{enumerate}
-    \item \textbf{Focalizare pe comportamentul fizic} - Spre deosebire de soluțiile existente care se concentrează predominant pe monitorizarea ecranului, sistemul nostru pune accent pe comportamentul fizic al candidatului.
+    \item \textbf{Monitorizare completă a comportamentului fizic} - În timp ce majoritatea soluțiilor comerciale (precum Proctorio sau Respondus) se limitează la supravegherea activității de pe ecranul calculatorului, sistemul nostru observă mișcările și gesturile candidatului. Această abordare permite detectarea unor tactici de fraudare care altfel ar trece neobservate, cum ar fi consultarea notițelor fizice sau comunicarea cu alte persoane prin gesturi. Sistemul analizează direcția privirii, orientarea capului și alte indicii fizice care pot semnala intenții frauduloase.
     
-    \item \textbf{Detecție specializată a obiectelor} - Utilizăm tehnologii avansate de procesare a imaginilor pentru a detecta dispozitive neautorizate (telefoane, ceasuri inteligente), aspect în care Respondus Lockdown Browser prezintă limitări importante.
+    \item \textbf{Identificarea precisă a dispozitivelor electronice neautorizate} - Prin implementarea algoritmilor YOLOv8 și a tehnicilor moderne de recunoaștere a obiectelor, aplicația noastră poate identifica cu acuratețe ridicată telefoane mobile, ceasuri inteligente și alte dispozitive folosite frecvent pentru înșelăciune. Această capabilitate depășește semnificativ funcționalitățile oferite de Respondus Lockdown Browser, care nu poate detecta utilizarea dispozitivelor secundare, și chiar și ale ProctorU, care se bazează în mare măsură pe supraveghetori umani pentru această sarcină.
     
-    \item \textbf{Rapoarte comprehensive} - Generarea automată a rapoartelor în multiple formate (HTML, CSV, JSON) facilitează analiza ulterioară și documentarea incidentelor.
+    \item \textbf{Sistem avansat de raportare și documentare} - Aplicația generează automat rapoarte detaliate în formate versatile (HTML pentru vizualizare ușoară, CSV pentru analiză în Excel și JSON pentru integrare cu alte sisteme). Aceste rapoarte includ capturi de ecran cu momentele suspicioase, marcaje temporale precise și descrieri clare ale incidentelor, oferind evaluatorilor toate informațiile necesare pentru a lua decizii documentate. Sistemul păstrează astfel un istoric complet al sesiunii de examinare, permițând verificarea ulterioară și reducând disputele legate de posibilele sancțiuni.
     
-    \item \textbf{Fără dependență de browser} - Spre deosebire de Proctorio care funcționează doar pe Google Chrome, aplicația noastră este independentă de browser.
+    \item \textbf{Independență tehnologică și flexibilitate} - Spre deosebire de Proctorio, care funcționează exclusiv ca extensie pentru Google Chrome, soluția noastră rulează ca aplicație independentă, eliminând restricțiile legate de browser. Acest lucru simplifică procesul de instalare și configurare, și permite utilizarea pe o gamă mai largă de dispozitive și sisteme de operare. Flexibilitatea sporită face ca soluția noastră să fie mai ușor de adaptat la cerințele specifice ale diferitelor instituții de învățământ.
     
-    \item \textbf{Costuri reduse} - Implementarea locală reduce semnificativ costurile per candidat comparativ cu soluțiile precum ProctorU.
+    \item \textbf{Eficiență economică semnificativă} - Prin implementarea locală și eliminarea necesității de a plăti pentru servicii externe de supraveghere, sistemul nostru reduce dramatic costurile per candidat. Soluțiile comerciale precum ProctorU pot costa între 15-25 USD per examen per student, în timp ce soluția noastră necesită doar investiția inițială în infrastructură, fără costuri recurente per examen. Pentru instituțiile cu un număr mare de studenți, această diferență reprezintă economii substanțiale, făcând monitorizarea anti-plagiat accesibilă inclusiv pentru organizațiile cu bugete limitate.
+    
+    \item \textbf{Confidențialitate sporită a datelor studenților} - Prin procesarea locală a informațiilor, sistemul nostru elimină riscurile asociate cu transmiterea datelor către servere externe. Acest aspect este deosebit de important în contextul reglementărilor stricte privind protecția datelor personale, oferind instituțiilor control complet asupra informațiilor sensibile colectate în timpul examenelor.
 \end{enumerate}
+
+Combinația acestor avantaje face ca sistemul nostru să reprezinte o soluție inovatoare și eficientă pentru asigurarea integrității academice, adaptată nevoilor actuale ale instituțiilor de învățământ.
 
 \section{Arhitectura sistemului anti-plagiat}
 
@@ -493,22 +491,25 @@ Această organizare reflectă principiul separării responsabilităților, fieca
         \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
     \end{figure}
 
-Diagrama secvențială ilustrează fluxul de control și de date în timpul procesului de monitorizare, arătând exact ordinea în care componentele interacționează. Totul incepe când utilizatorul apasă butonul de pornire a monitorizării din interfața grafică, reprezentat prin săgeata de la \texttt{Utilizator} la \texttt{AntiPlagiatGUI}.
 
-Interfața transmite comanda de procesare a cadrului video către \texttt{SistemAntiPlagiat}, care orchestrează întregul proces de analiză. Observăm cum \texttt{SistemAntiPlagiat} devine punctul central de coordonare, distribuind sarcinile către multiple componente specializate. Prima săgeată merge către \texttt{VideoHandler} pentru captarea cadrului video, operație fundamentală de la care pornesc toate analizele ulterioare.
+Diagrama secvențială ilustrează fluxul de control și de date în timpul procesului de monitorizare, prezentând ordinea temporală exactă în care componentele interacționează. Procesul începe când utilizatorul declanșează monitorizarea prin interfața grafică, reprezentat prin săgeata de la \texttt{Utilizator} la \texttt{AntiPlagiatGUI}.
 
-Apoi, \texttt{SistemAntiPlagiat} apelează \texttt{FaceDetector} pentru a determina direcția privirii. Detectorul facial delegă această responsabilitate către \texttt{GazeTracker}, care implementează algoritmii specializați de analiză a privirii. Această succesiune de apeluri reflectă exact structura metodei \texttt{process\_frame()} din clasa \texttt{SistemAntiPlagiat}, unde se apelează \texttt{face\_detector.detect\_direction()}.
+Interfața transmite comanda de procesare a cadrului video către \texttt{SistemAntiPlagiat}, care orchestrează întregul proces de analiză. \texttt{SistemAntiPlagiat} devine nodul central de coordonare, distribuind sarcinile către componente specializate. Prima comandă este direcționată către \texttt{VideoHandler} pentru captarea cadrului video, operație fundamentală care furnizează datele primare pentru analizele ulterioare.
 
-În paralel, sistemul utilizează \texttt{ObjectDetector} pentru identificarea obiectelor neautorizate în cadrul video. Rezultatele ambelor analize sunt transmise către \texttt{ViolationMonitor} pentru evaluare, care corespund apelului \texttt{violation\_monitor.check\_violations(direction, objects)}.
+În etapa următoare, \texttt{SistemAntiPlagiat} apelează \texttt{FaceDetector} pentru determinarea direcției privirii. Detectorul facial delegă această responsabilitate către \texttt{GazeTracker}, care implementează algoritmii specializați pentru analiza privirii. Această succesiune de apeluri de funcții reflectă exact structura metodei \texttt{process\_frame()} din implementarea clasei \texttt{SistemAntiPlagiat}, unde se efectuează apelul funcției \texttt{face\_detector.detect\_direction()}.
 
-Când se detectează încălcări, \texttt{ViolationMonitor} generează alerte prin \texttt{ReportGenerator}, care transmite informațiile înapoi către interfața grafică pentru afișare. Săgeata punctată finală către utilizator reprezintă prezentarea vizuală a rezultatelor, închizând ciclul de feedback.
+Simultan, sistemul utilizează \texttt{ObjectDetector} pentru identificarea eventualelor obiecte neautorizate prezente în cadrul video. Rezultatele obținute din ambele analize (detecția direcției privirii și identificarea obiectelor) sunt transmise către \texttt{ViolationMonitor} pentru evaluare. Această transmitere corespunde apelului \texttt{violation\_monitor.check\_violations(direction, objects)} din implementarea reală.
+
+În cazul detectării unei încălcări, \texttt{ViolationMonitor} generează automat alerte prin intermediul modulului \texttt{ReportGenerator}, care transmite informațiile înapoi către interfața grafică pentru afișare. Săgeata punctată finală de la GUI la utilizator (reprezentată cu linie întreruptă) simbolizează feedback-ul vizual oferit utilizatorului prin actualizarea interfeței grafice cu informațiile relevante, reprezentând astfel partea finală a ciclului de procesare și informare.
+
+Această succesiune de evenimente are loc pentru fiecare cadru procesat, creând astfel un flux continuu de monitorizare în timp real, care permite identificarea promptă a comportamentelor suspicioase. Diagrama evidențiază arhitectura modulară a sistemului și modul eficient în care componentele colaborează pentru a furniza o soluție completă de monitorizare anti-plagiat.
 
 \subsection{Diagrama de activitate}
 
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
-        scale=1,
+        scale=0.9,
         transform shape,
         node distance=1.5cm,
         startstop/.style={rectangle, rounded corners, draw=black, fill=red!30, text centered, minimum width=2.8cm, font=\sffamily\small},
