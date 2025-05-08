@@ -32,8 +32,8 @@
     a4paper,
     top=2.5cm,
     bottom=2.5cm,
-    left=1.5cm,
-    right=1.5cm
+    left=2.5cm,
+    right=2.5cm
 }
 
 \hypersetup{
@@ -70,13 +70,6 @@
 
 \lstset{style=mystyle}
 
-% Configurare pagină
-\pagestyle{fancy}
-\fancyhf{}
-\setlength{\headheight}{14.5pt} % Ajustare înălțime antet
-\renewcommand{\headrulewidth}{0pt} % Eliminare linie antet
-\renewcommand{\footrulewidth}{0pt} % Eliminare linie subsol
-\cfoot{\thepage}
 
 % Configurare text
 \setstretch{1.5} % Distanța dintre rânduri
@@ -105,7 +98,7 @@
     
     \vspace{3cm}
     
-    {\Large\bfseries\centering Sesiunea de Comunicări Şiinţifice Studenţeşti}
+    {\Large\bfseries\centering Sesiunea de Comunicări Ştiinţifice Studenţeşti}
 
     {\large\bfseries\centering Ediţia 2025}
 
@@ -240,7 +233,7 @@ ecranului candidatului, cât și pe comportamentul acestuia.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|p{8.5cm}|p{8.5cm}|}
+\begin{tabular}{|p{7.5cm}|p{7.5cm}|}
 \hline
 \textbf{Puncte forte} & \textbf{Limitări} \\
 \hline
@@ -277,7 +270,7 @@ tentative de fraudă, fără a mai avea nevoie de asistență umană.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|p{8.5cm}|p{8.5cm}|}
+\begin{tabular}{|p{7.5cm}|p{7.5cm}|}
 \hline
 \textbf{Puncte forte} & \textbf{Limitări} \\
 \hline
@@ -314,7 +307,7 @@ Blackboard, Moodle, Schoology și Brightspace.
 
 \begin{table}[H] % Changed from [h] to [H] to force table placement
     \centering
-    \begin{tabular}{|p{8.5cm}|p{8.5cm}|}
+    \begin{tabular}{|p{7.5cm}|p{7.5cm}|}
     \hline
     \textbf{Puncte forte} & \textbf{Limitări} \\
     \hline
@@ -401,30 +394,42 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat patru diagr
 
 \begin{figure}[H]
     \centering
+    \hspace{-2.7cm} % Added horizontal shift here before the tikzpicture
     \begin{tikzpicture}[
         scale=0.7,
         transform shape,
-        class/.style={rectangle, draw=black, rounded corners, text centered, text width=3.8cm, minimum height=0.9cm, font=\sffamily\small},
-        smallclass/.style={rectangle, draw=black, rounded corners, text centered, text width=2.8cm, minimum height=0.7cm, font=\sffamily\small},
+        class/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize},
+        smallclass/.style={rectangle, draw=black, rounded corners, text centered, text width=3.6cm, minimum height=1.8cm, font=\sffamily\footnotesize},
         relation/.style={-{Latex}, thick},
         shortrelation/.style={-{Latex}, thick, shorten >=2mm, shorten <=4mm},
-        aggregation/.style={-{Diamond[open]}, thick},
-        composition/.style={-{Diamond}, thick},
-        dependency/.style={dashed, -{Latex}, thick}
-    ]
-        % Classes
-        \node[class] (main) {main.py\\\textit{Punctul de intrare}};
-        \node[class, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}};
-        \node[class, below=1.3cm of sistem, xshift=-4.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}};
-        \node[class, right=2.2cm of sistem] (video) {VideoHandler\\\textit{Procesare video}};
-        \node[class, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}};
-        \node[class, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}};
-        \node[class, below=1.3cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}};
-        \node[class, below left=0.6cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}};
-        \node[smallclass, below right=1.3cm and 0.8cm of gaze] (eye) {Eye\\\textit{Analiză ochi}};
-        \node[class, below right=1.3cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}};
-        \node[class, below right=1.3cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}};
-        \node[class, below=1.3cm of report] (exporter) {DataExporter\\\textit{Export date}};
+        aggregation/.style={->, thick},
+        composition/.style={->, thick},
+        dependency/.style={dashed, ->, thick}
+        ]
+        % Classes with attributes and methods
+        \node[class] (main) {main.py\\\textit{Punctul de intrare}\\\rule{3.5cm}{0.4pt}\\+main()};
+        
+        \node[class, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}\\\rule{3.5cm}{0.4pt}\\-config\\-video\_handler\\\rule{3.5cm}{0.4pt}\\+init()\\+start\_monitoring()\\+stop\_monitoring()};
+        
+        \node[class, below=1.8cm of sistem, xshift=-5.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}\\\rule{3.5cm}{0.4pt}\\-window\\-controls\\-timer\\\rule{3.5cm}{0.4pt}\\+init\_ui()\\+toggle\_monitoring()\\+export\_report()};
+        
+        \node[class, right=2.5cm of sistem] (video) {VideoHandler\\\textit{Procesare video}\\\rule{3.5cm}{0.4pt}\\-camera\\-frame\_buffer\\\rule{3.5cm}{0.4pt}\\+capture\_frame()\\+process\_frame()\\+save\_video()};
+        
+        \node[class, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}\\\rule{3.5cm}{0.4pt}\\-models\\-threshold\\\rule{3.5cm}{0.4pt}\\+detect\_objects()\\+load\_model()};
+        
+        \node[class, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}\\\rule{3.5cm}{0.4pt}\\-detector\\-predictor\\\rule{3.5cm}{0.4pt}\\+detect\_faces()\\+get\_landmarks()\\+analyze\_direction()};
+        
+        \node[class, below=1.6cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}\\\rule{3.5cm}{0.4pt}\\-eye\_left\\-eye\_right\\\rule{3.5cm}{0.4pt}\\+analyze()\\+horizontal\_ratio()\\+vertical\_ratio()};
+        
+        \node[smallclass, below left=1.2cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}\\\rule{2.8cm}{0.4pt}\\-violations\\-thresholds\\\rule{2.8cm}{0.4pt}\\+check\_violations()\\+log\_violation()};
+        
+        \node[smallclass, below right=1.3cm and 1.3cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-landmarks\\\rule{2.8cm}{0.4pt}\\+isolate()\\+get\_pupil()};
+        
+        \node[class, below =1.4cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\-size\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
+        
+        \node[class, below right=-3.6cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-violations\\-timestamps\\\rule{3.5cm}{0.4pt}\\+generate\_html()\\+generate\_csv()};
+        
+        \node[class, below=1.5cm of report] (exporter) {DataExporter\\\textit{Export date}\\\rule{3.5cm}{0.4pt}\\-data\\-format\\\rule{3.5cm}{0.4pt}\\+export\_to\_csv()\\+export\_to\_json()};
 
         % Relations
         \draw[relation] (main) -- (sistem) node[midway, left, font=\sffamily\scriptsize] {Creează};
@@ -432,15 +437,15 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat patru diagr
         \draw[relation] (sistem) -- (video) node[midway, above, sloped, font=\sffamily\scriptsize] {Inițializează};
         \draw[relation] (sistem) -- (face) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
         \draw[relation] (sistem) -- (object) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (sistem) -- (violation) node[midway, left, xshift=-0.8cm, font=\sffamily\scriptsize] {Inițializează};
+        \draw[relation] (sistem.west) -- ++(-6,0) |- (violation.west) node[near start, left, font=\sffamily\scriptsize] {Inițializează};
         \draw[relation] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Creează};
         \draw[relation] (gaze) -- (eye) node[midway, above, sloped, font=\sffamily\scriptsize] {Analizează};
         \draw[relation] (eye) -- (pupil) node[midway, left, font=\sffamily\scriptsize] {Detectează};
         \draw[relation] (violation) -- (report) node[midway, above, sloped, font=\sffamily\scriptsize] {Generează};
         \draw[relation] (report) -- (exporter) node[midway, left, font=\sffamily\scriptsize] {Exportă date};
-    \end{tikzpicture}
-    \caption{Diagrama de clase a sistemului Anti-Plagiat}
-\end{figure}
+        \end{tikzpicture}
+        \caption{Diagrama de clase a sistemului Anti-Plagiat}
+    \end{figure}
 
 Diagrama de clase evidențiază organizarea ierarhică a modulelor sistemului anti-plagiat și relațiile funcționale dintre acestea. Punctul de intrare \texttt{main.py} creează instanța clasei \texttt{SistemAntiPlagiat}, care ocupă poziția centrală în arhitectură, coordonând toate celelalte componente. Săgeata de la \texttt{main.py} către \texttt{SistemAntiPlagiat} reprezintă această inițializare fundamentală de la care pornește întregul sistem.
 
@@ -456,60 +461,91 @@ Această organizare reflectă principiul separării responsabilităților, fieca
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[
-        scale=0.8,
-        transform shape,
-        actor/.style={draw, ellipse, minimum height=0.9cm, minimum width=1.8cm, font=\sffamily\small},
-        process/.style={draw, rectangle, minimum height=0.9cm, minimum width=2.2cm, font=\sffamily\small},
-        arrow/.style={-{Latex}, thick, shorten >=2mm, shorten <=2mm},
-        dashedarrow/.style={dashed, -{Latex}, thick, shorten >=2mm, shorten <=2mm},
-        node distance=2cm
-        ]
-        % Nodes
-        \node[actor] (user) {Utilizator};
-        \node[process, right=2cm of user] (gui) {AntiPlagiatGUI};
-        \node[process, right=2cm of gui] (sistem) {SistemAntiPlagiat};
-        \node[process, right=2cm of sistem] (video) {VideoHandler};
-        \node[process, below=1.5cm of sistem, xshift=-1.2cm] (face) {FaceDetector};
-        \node[process, below=1.5cm of face] (gaze) {GazeTracker};
-        \node[process, below=1.5cm of video] (object) {ObjectDetector};
-        \node[process, below=1.5cm of gaze, xshift=2cm] (violation) {ViolationMonitor};
-        \node[process, below=1.5cm of violation, xshift=-2.5cm] (report) {ReportGenerator};
+        \begin{tikzpicture}[
+                scale=0.7, % Reduced scale from 0.9 to 0.7
+                transform shape,
+                participant/.style={rectangle, draw=black, fill=blue!30, text centered, minimum width=2.2cm, minimum height=0.7cm, font=\sffamily\small},
+                activation/.style={rectangle, draw=black, fill=gray!30, minimum width=0.25cm},
+                lifeline/.style={dashed},
+                message/.style={-{Latex}, thick},
+                return/.style={-{Latex[length=2mm]}, dashed, thick},
+                note/.style={rectangle, draw=black, fill=yellow!30, text width=2.2cm, text centered, font=\sffamily\scriptsize}
+                ]
+                % Participanți - aliniere pe orizontală cu spațiere redusă
+                \node[participant] (gui) at (0,0) {AntiPlagiatGUI};
+                \node[participant] (sistem) at (3,0) {SistemAntiPlagiat}; % Reduced from 3.5
+                \node[participant] (video) at (6,0) {VideoHandler}; % Reduced from 7
+                \node[participant] (face) at (9,0) {FaceDetector}; % Reduced from 10.5
+                \node[participant] (object) at (12,0) {ObjectDetector}; % Reduced from 14
+                \node[participant] (violation) at (15,0) {ViolationMonitor}; % Reduced from 17.5
+                
+                % Linii de viață
+                \draw[lifeline, gray] (gui.south) -- +(0,-10); % Reduced from -12
+                \draw[lifeline, gray] (sistem.south) -- +(0,-10);
+                \draw[lifeline, gray] (video.south) -- +(0,-10);
+                \draw[lifeline, gray] (face.south) -- +(0,-10);
+                \draw[lifeline, gray] (object.south) -- +(0,-10);
+                \draw[lifeline, gray] (violation.south) -- +(0,-10);
+                
+                % Bare de activare inițiale
+                \node[activation, fill=gray!20] (gui_act1) at (0,-2) [minimum height=1cm] {}; % Reduced height
+                \node[activation, fill=gray!20] (sistem_act1) at (3,-2) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (video_act1) at (6,-2) [minimum height=0.8cm] {};
+                \node[activation, fill=gray!20] (face_act1) at (9,-2) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (object_act1) at (12,-2) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (violation_act1) at (15,-2) [minimum height=1cm] {};
+                
+                % Mesaje inițiale
+                \draw[message] (gui_act1) -- node[above, font=\sffamily\scriptsize] {start\_monitoring()} (sistem_act1);
+                \draw[message] (sistem_act1) -- node[above, font=\sffamily\scriptsize] {initialize\_camera()} (video_act1);
+                \draw[message] (video_act1) -- node[above, font=\sffamily\scriptsize] {detect\_faces()} (face_act1);
+                \draw[message] (face_act1) -- node[above, font=\sffamily\scriptsize] {detect\_objects()} (object_act1);
+                \draw[message] (object_act1) -- node[above, font=\sffamily\scriptsize] {check\_violations()} (violation_act1);
+                
+                % Buclă de procesare
+                \draw[thick] (5.5,-4) rectangle (15.5,-8); % Reduced size
+                \node[font=\sffamily\scriptsize] at (6,-3.8) {loop [while monitoring]};
+                
+                % Activări în buclă
+                \node[activation, fill=gray!20] (video_act2) at (6,-5.5) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (face_act2) at (9,-5.5) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (object_act2) at (12,-5.5) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (violation_act2) at (15,-5.5) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (gui_act2) at (0,-5.5) [minimum height=1cm] {};
 
-        % Arrows
-        \draw[arrow] (user) -- (gui) node[midway, above, yshift=0.4cm, font=\sffamily\scriptsize] {Pornește monitorizarea};
-        \draw[arrow] (gui) -- (sistem) node[midway, above, yshift=0.4cm, font=\sffamily\scriptsize] {Procesează frame};
-        \draw[arrow] (sistem) -- (video) node[midway, above, yshift=0.4cm, font=\sffamily\scriptsize] {Captură video};
-        \draw[arrow] (sistem) -- (face) node[midway, left, font=\sffamily\scriptsize] {Detectează direcția};
-        \draw[arrow] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Analizează privirea};
-        \draw[arrow] (sistem) -- (object) node[midway, right, xshift=0.5cm, font=\sffamily\scriptsize] {Detectează obiecte};
-        \draw[arrow] (sistem) -- (violation) node[midway, right, xshift=0.3cm, yshift=-0.5cm, font=\sffamily\scriptsize] {Verifică încălcări};
-        \draw[arrow] (violation) -- (report) node[midway, right, font=\sffamily\scriptsize] {Generează alerte};
-        \draw[arrow] (report) -- (gui) node[midway, left, xshift=-0.2cm, yshift=0.5cm, font=\sffamily\scriptsize] {Afișează alerte};
-        \draw[dashedarrow] (gui) -- (user) node[midway, below, yshift=-0.4cm, font=\sffamily\scriptsize] {Afișează rezultate};
-        \end{tikzpicture}
-        \caption{Diagrama de secvență pentru procesul de detectare a încălcărilor}
-    \end{figure}
+                % Mesaje în buclă
+                \draw[message] (video_act2.north east) -- node[above, font=\sffamily\scriptsize] {frame\_captured()} (face_act2.north west);
+                \draw[message] (face_act2.north east) -- node[above, font=\sffamily\scriptsize] {analyze\_gaze()} (object_act2.north west);
+                \draw[message] (object_act2.north east) -- node[above, font=\sffamily\scriptsize] {detect\_objects()} (violation_act2.north west);
+                \draw[return] (violation_act2.south west) -- node[above, font=\sffamily\scriptsize] {update\_ui()} (gui_act2.south);   % Secvența de stop
+                \node[activation, fill=gray!20] (gui_act3) at (0,-9) [minimum height=1cm] {};
+                \node[activation, fill=gray!20] (sistem_act2) at (3,-9) [minimum height=1cm] {};
+                \draw[message] (gui_act3.north east) -- node[above, font=\sffamily\scriptsize] {stop\_monitoring()} (sistem_act2.north west);
+                \draw[return] (sistem_act2.south west) -- node[below, font=\sffamily\scriptsize] {monitoring\_stopped()} (gui_act3.south east);
+                
+                % Note explicative - reduse și repoziționate
+                \node[note] at (-1.2,-2) {Inițiere};
+                \node[note] at (16.2,-5.5) {Verificare};
+                \node[note] at (-1.2,-5.5) {Update UI};
+                \node[note] at (-1.2,-9) {Stop};
+                
+                \end{tikzpicture}
+                \caption{Diagrama secvențială a sistemului Anti-Plagiat}
+        \end{figure}
 
+        Diagrama secvențială ilustrează interacțiunea temporală dintre componentele principale ale sistemului anti-plagiat. Secvența începe când utilizatorul inițiază monitorizarea prin interfața \texttt{AntiPlagiatGUI}, care transmite comanda către \texttt{SistemAntiPlagiat}. Acesta, la rândul său, inițializează camera prin \texttt{VideoHandler} și pornește procesele de detecție facială, detectare obiecte și monitorizare a încălcărilor.
 
-Diagrama secvențială ilustrează fluxul de control și de date în timpul procesului de monitorizare, prezentând ordinea temporală exactă în care componentele interacționează. Procesul începe când utilizatorul declanșează monitorizarea prin interfața grafică, reprezentat prin săgeata de la \texttt{Utilizator} la \texttt{AntiPlagiatGUI}.
+        Bucla principală de procesare, evidențiată în diagramă, arată cum \texttt{VideoHandler} capturează cadre video care sunt apoi analizate de \texttt{FaceDetector} pentru poziția feței și direcția privirii, urmată de \texttt{ObjectDetector} pentru identificarea obiectelor interzise. \texttt{ViolationMonitor} primește rezultatele ambelor analize și determină dacă există încălcări, iar interfața grafică este actualizată corespunzător cu noile informații.
 
-Interfața transmite comanda de procesare a cadrului video către \texttt{SistemAntiPlagiat}, care orchestrează întregul proces de analiză. \texttt{SistemAntiPlagiat} devine nodul central de coordonare, distribuind sarcinile către componente specializate. Prima comandă este direcționată către \texttt{VideoHandler} pentru captarea cadrului video, operație fundamentală care furnizează datele primare pentru analizele ulterioare.
+        Secvența se încheie cu oprirea monitorizării, când utilizatorul trimite comanda de stop prin interfață, iar sistemul confirmă încheierea procesului de monitorizare. Această succesiune de mesaje și activări ilustrează fluxul complet de control și date în sistem, de la inițiere până la încheiere, evidențiind modul în care toate componentele colaborează pentru a realiza monitorizarea în timp real a candidatului.
 
-În etapa următoare, \texttt{SistemAntiPlagiat} apelează \texttt{FaceDetector} pentru determinarea direcției privirii. Detectorul facial delegă această responsabilitate către \texttt{GazeTracker}, care implementează algoritmii specializați pentru analiza privirii. Această succesiune de apeluri de funcții reflectă exact structura metodei \texttt{process\_frame()} din implementarea clasei \texttt{SistemAntiPlagiat}, unde se efectuează apelul funcției \texttt{face\_detector.detect\_direction()}.
-
-Simultan, sistemul utilizează \texttt{ObjectDetector} pentru identificarea eventualelor obiecte neautorizate prezente în cadrul video. Rezultatele obținute din ambele analize (detecția direcției privirii și identificarea obiectelor) sunt transmise către \texttt{ViolationMonitor} pentru evaluare. Această transmitere corespunde apelului \texttt{violation\_monitor.check\_violations(direction, objects)} din implementarea reală.
-
-În cazul detectării unei încălcări, \texttt{ViolationMonitor} generează automat alerte prin intermediul modulului \texttt{ReportGenerator}, care transmite informațiile înapoi către interfața grafică pentru afișare. Săgeata punctată finală de la GUI la utilizator (reprezentată cu linie întreruptă) simbolizează feedback-ul vizual oferit utilizatorului prin actualizarea interfeței grafice cu informațiile relevante, reprezentând astfel partea finală a ciclului de procesare și informare.
-
-Această succesiune de evenimente are loc pentru fiecare cadru procesat, creând astfel un flux continuu de monitorizare în timp real, care permite identificarea promptă a comportamentelor suspicioase. Diagrama evidențiază arhitectura modulară a sistemului și modul eficient în care componentele colaborează pentru a furniza o soluție completă de monitorizare anti-plagiat.
 
 \subsection{Diagrama de activitate}
 
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
-        scale=0.9,
+        scale=0.8,
         transform shape,
         node distance=1.5cm,
         startstop/.style={rectangle, rounded corners, draw=black, fill=red!30, text centered, minimum width=2.8cm, font=\sffamily\small},
@@ -754,7 +790,7 @@ Pentru a reduce falsurile pozitive, am utilizat două modele YOLOv8 separate: un
 Funcția \texttt{model.detect} a fost utilizată pentru a genera coordonatele obiectelor detectate, iar aceste coordonate au fost utilizate pentru a desena dreptunghiuri în jurul obiectelor și pentru a genera alerte în timp real. De asemenea, coordonatele au fost utilizate pentru a calcula distanțele dintre obiectele detectate și alte elemente din imagine, cum ar fi fața candidatului, pentru a determina dacă obiectele sunt utilizate în mod activ.
 
 \subsection{NumPy}
-Biblioteca NumPy a fost utilizată pentru manipularea matricilor și a datelor numerice\cite{harris2020array}. 
+Biblioteca NumPy a fost utilizată pentru manipularea matricelor și a datelor numerice\cite{harris2020array}. 
 
 Funcția \texttt{np.zeros} a fost folosită pentru a crea măști pentru regiunile de interes din imagine, iar \texttt{np.full} a fost utilizată pentru a inițializa matrici cu valori constante. Aceste funcții sunt esențiale pentru preprocesarea imaginilor, deoarece permit izolarea regiunilor de interes și aplicarea de operații specifice doar asupra acestor regiuni\cite{goodfellow2016deep}.
 
@@ -1005,7 +1041,7 @@ Raportul vertical este utilizat pentru a determina dacă privirea candidatului e
     
             \State\Return$raport\_ajustat$
         \EndIf
-    
+
         \State\Return$raport\_pupile$ \Comment{Date incomplete $\implies$ returnam media initiala}
     \EndProcedure
     \end{algorithmic}
