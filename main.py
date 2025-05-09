@@ -64,6 +64,9 @@ class SistemAntiPlagiat:
             if self.video_writer is not None:
                 self.video_writer.write(display_frame)
 
+        # Salveaza ultimul frame procesat pentru capturi
+        self.last_processed_frame = frame.copy()
+
         return display_frame
 
     def get_recent_violations(self):
@@ -101,21 +104,32 @@ class SistemAntiPlagiat:
     def capture_snapshot(self):
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            snapshot_path = os.path.join(self.config.get("snapshots", {}).get("save_path", "./snapshots"),
-                                        f"snapshot_{timestamp}.jpg")
-
-            cap = cv2.VideoCapture(0)
-            if not cap.isOpened():
-                logger.error("Nu s-a putut accesa camera")
-                return None
-
-            ret, frame = cap.read()
-            cap.release()
-
-            if ret:
-                cv2.imwrite(snapshot_path, frame)
+            
+            # garantie ca directorul exista
+            snapshot_dir = self.config.get("snapshots", {}).get("save_path", "./snapshots")
+            os.makedirs(snapshot_dir, exist_ok=True)
+            
+            snapshot_path = os.path.join(snapshot_dir, f"snapshot_{timestamp}.jpg")
+            
+            # Verifica dacă monitorizarea este activa
+            if hasattr(self, 'last_processed_frame') and self.last_processed_frame is not None:
+                # Foloseste ultimul frame procesat în loc să deschidă camera din nou
+                cv2.imwrite(snapshot_path, self.last_processed_frame)
                 return snapshot_path
-            return None
+            else:
+                # Deschide camera doar dacă nu avem un frame existent
+                cap = cv2.VideoCapture(0)
+                if not cap.isOpened():
+                    logger.error("Nu s-a putut accesa camera")
+                    return None
+
+                ret, frame = cap.read()
+                cap.release()
+
+                if ret:
+                    cv2.imwrite(snapshot_path, frame)
+                    return snapshot_path
+                return None
         except Exception as e:
             logger.exception(f"Eroare la capturare: {e}")
             return None
