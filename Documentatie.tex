@@ -115,7 +115,7 @@
     {\large\bfseries Îndrumător ştiinţific: Conf. dr. ing. Ștefan Alexandru MOCANU\par}
 \end{titlepage}
 
-% Cuprins
+\hypersetup{linkcolor=black}
 \tableofcontents
 \newpage
 
@@ -370,26 +370,25 @@ Sistemul de monitorizare anti-plagiat dezvoltat în cadrul acestui proiect ofer�
     
     \item \textbf{Sistem avansat de raportare și documentare} - Aplicația generează automat rapoarte detaliate în formate versatile (HTML pentru vizualizare ușoară, CSV pentru analiză în Excel și JSON pentru integrare cu alte sisteme). Aceste rapoarte includ capturi de ecran cu momentele suspicioase, marcaje temporale precise și descrieri clare ale incidentelor, oferind evaluatorilor toate informațiile necesare pentru a lua decizii documentate. Sistemul păstrează astfel un istoric complet al sesiunii de examinare, permițând verificarea ulterioară și reducând disputele legate de posibilele sancțiuni.
     
-    \item \textbf{Independență tehnologică și flexibilitate} - Spre deosebire de Proctorio, care funcționează exclusiv ca extensie pentru Google Chrome, soluția noastră rulează ca aplicație independentă, eliminând restricțiile legate de browser. Acest lucru simplifică procesul de instalare și configurare, și permite utilizarea pe o gamă mai largă de dispozitive și sisteme de operare. Flexibilitatea sporită face ca soluția noastră să fie mai ușor de adaptat la cerințele specifice ale diferitelor instituții de învățământ.
+    \item \textbf{Independență tehnologică și flexibilitate în implementare} - Acest sistem funcționează ca aplicație independentă, fără a fi constrâns de limitările specifice browserelor web sau platformelor online. Această arhitectură autonomă elimină dependențele externe și simplifică procesul de instalare și configurare la nivel instituțional. Natura sa independentă permite utilizarea pe o gamă largă de dispozitive și sisteme de operare, oferind instituțiilor educaționale libertatea de a implementa soluția fără a fi nevoite să adopte tehnologii sau servicii adiționale. Flexibilitatea sistemului facilitează adaptarea rapidă la cerințele specifice ale diferitelor tipuri de examene și contexte academice.
     
-    \item \textbf{Eficiență economică semnificativă} - Prin implementarea locală și eliminarea necesității de a plăti pentru servicii externe de supraveghere, sistemul nostru reduce dramatic costurile per candidat. Soluțiile comerciale precum ProctorU pot costa între 15-25 USD per examen per student, în timp ce soluția noastră necesită doar investiția inițială în infrastructură, fără costuri recurente per examen. Pentru instituțiile cu un număr mare de studenți, această diferență reprezintă economii substanțiale, făcând monitorizarea anti-plagiat accesibilă inclusiv pentru organizațiile cu bugete limitate.
+    \item \textbf{Eficiență economică și scalabilitate} - Implementarea locală a sistemului oferă avantaje semnificative din perspectiva costurilor pe termen lung. În timp ce multe soluții comerciale existente operează pe baza unui model de tarifare per student per examen, care poate deveni prohibitiv pentru instituțiile cu număr mare de studenți sau examene frecvente, aceasta propunere de sistem anit-plagiat necesită doar investiția inițială în infrastructura hardware existentă. Acest model scalabil permite instituțiilor educaționale să monitorizeze un număr nelimitat de examene fără costuri suplimentare, reducând costul efectiv per student cu fiecare sesiune organizată, iar această abordare face tehnologia de monitorizare anti-plagiat accesibilă inclusiv pentru instituțiile cu resurse financiare limitate.
     
-    \item \textbf{Confidențialitate sporită a datelor studenților} - Prin procesarea locală a informațiilor, sistemul nostru elimină riscurile asociate cu transmiterea datelor către servere externe. Acest aspect este deosebit de important în contextul reglementărilor stricte privind protecția datelor personale, oferind instituțiilor control complet asupra informațiilor sensibile colectate în timpul examenelor.
+    \item \textbf{Confidențialitate sporită a datelor studenților} - Prin procesarea locală a informațiilor, acest prototip elimină riscurile asociate cu transmiterea datelor către servere externe. Acest aspect este deosebit de important în contextul reglementărilor stricte privind protecția datelor personale, oferind instituțiilor control complet asupra informațiilor sensibile colectate în timpul examenelor.
 \end{enumerate}
 
-Combinația acestor avantaje face ca sistemul nostru să reprezinte o soluție inovatoare și eficientă pentru asigurarea integrității academice, adaptată nevoilor actuale ale instituțiilor de învățământ.
+Combinația acestor avantaje face acest prototip de sistem anti-plagiat să reprezinte o soluție inovatoare și eficientă pentru asigurarea integrității academice, adaptată nevoilor actuale ale instituțiilor de învățământ.
 
 \section{Arhitectura sistemului anti-plagiat}
 
 Sistemul anti-plagiat dezvoltat reprezintă o soluție software complexă destinată monitorizării candidaților în timpul examenelor, cu scopul de a detecta și preveni comportamentele frauduloase. Arhitectura sistemului a fost concepută conform principiilor moderne de inginerie software, punând accent pe modularitate, extensibilitate și separarea clară a responsabilităților.
 
-La baza dezvoltării sistemului stă paradigma orientată pe obiecte, care a permis structurarea aplicației în componente interconectate, fiecare având un rol bine definit în procesul de monitorizare. Această abordare facilitează nu doar dezvoltarea și testarea independentă a modulelor, ci și extinderea ulterioară a funcționalităților prin adăugarea de noi componente.
+Baza dezvoltării sistemului este reprezenta de programarea orientată pe obiecte, care a permis structurarea aplicației în componente interconectate, fiecare având un rol bine definit în procesul de monitorizare. Această abordare facilitează nu doar dezvoltarea și testarea independentă a modulelor, ci și extinderea ulterioară a funcționalităților prin adăugarea de noi componente.
 
-Sistemul utilizează procesarea video în timp real, analizând direcția privirii candidaților și detectând obiecte neautorizate precum telefoane mobile sau ceasuri inteligente. Această analiză complexă este realizată prin integrarea algoritmilor de computer vision și a modelelor de învățare automată, implementate într-o arhitectură stratificată care separă funcționalitățile de bază de cele specializate.
+Sistemul prelucrează imaginile video pe măsură ce sunt captate, urmărind încotro se uită candidații și identificând obiecte nepermise cum ar fi telefoanele mobile și ceasurile inteligente. Această urmărire se bazează pe programe informatice care pot „vedea" și „înțelege" imaginile, organizate într-o structură pe niveluri care ține separate funcțiile simple de cele mai avansate.
 
-Pentru a ilustra structura și funcționarea sistemului, am elaborat patru diagrame UML complementare: diagrama de clase, diagrama secvențială, diagrama de activitate și diagrama de componente. Aceste reprezentări oferă perspective diferite asupra arhitecturii, de la organizarea statică a claselor până la fluxurile dinamice de control și date.
+Pentru a ilustra structura și funcționarea sistemului, am elaborat trei diagrame UML complementare: diagrama de clase, diagrama secvențială si diagrama de activitate. Aceste reprezentări oferă perspective diferite asupra arhitecturii, de la organizarea statică a claselor până la fluxurile dinamice de control și date.
 
-În secțiunile următoare, fiecare diagramă este prezentată și explicată în detaliu, evidențiind rolul componentelor individuale și modul în care acestea interacționează pentru a realiza funcționalitatea globală a sistemului. Această documentare detaliată facilitează atât înțelegerea implementării curente, cât și dezvoltarea ulterioară a aplicației.
 \subsection{Diagrama de clase}
 
 \begin{figure}[H]
@@ -409,27 +408,27 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat patru diagr
         % Classes with attributes and methods
         \node[class] (main) {main.py\\\textit{Punctul de intrare}\\\rule{3.5cm}{0.4pt}\\+main()};
         
-        \node[class, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}\\\rule{3.5cm}{0.4pt}\\-config\\-video\_handler\\\rule{3.5cm}{0.4pt}\\+init()\\+start\_monitoring()\\+stop\_monitoring()};
+        \node[class, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}\\\rule{3.5cm}{0.4pt}\\-face\_detector\\-object\_detector\\-violation\_monitor\\\rule{3.5cm}{0.4pt}\\+\_\_init\_\_()\\+process\_frame()\\+toggle\_monitoring()};
         
-        \node[class, below=1.8cm of sistem, xshift=-5.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}\\\rule{3.5cm}{0.4pt}\\-window\\-controls\\-timer\\\rule{3.5cm}{0.4pt}\\+init\_ui()\\+toggle\_monitoring()\\+export\_report()};
+        \node[class, below=1.8cm of sistem, xshift=-5.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}\\\rule{3.5cm}{0.4pt}\\-sistem\_anti\_plagiat\\-timer\\-mirror\_mode\\\rule{3.5cm}{0.4pt}\\+setup\_ui()\\+toggle\_monitoring()\\+export\_report()};
         
-        \node[class, right=2.5cm of sistem] (video) {VideoHandler\\\textit{Procesare video}\\\rule{3.5cm}{0.4pt}\\-camera\\-frame\_buffer\\\rule{3.5cm}{0.4pt}\\+capture\_frame()\\+process\_frame()\\+save\_video()};
+        \node[class, right=2.5cm of sistem] (video) {VideoProcessingThread\\\textit{Procesare video}\\\rule{3.5cm}{0.4pt}\\-cap\\-running\\-frame\_buffer\\\rule{3.5cm}{0.4pt}\\+run()\\+stop()\\+get\_frame()};
         
-        \node[class, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}\\\rule{3.5cm}{0.4pt}\\-models\\-threshold\\\rule{3.5cm}{0.4pt}\\+detect\_objects()\\+load\_model()};
+        \node[class, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}\\\rule{3.5cm}{0.4pt}\\-phone\_model\\-watch\_model\\-confidence\_threshold\\\rule{3.5cm}{0.4pt}\\+detect\_objects()\\+load\_models()};
         
-        \node[class, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}\\\rule{3.5cm}{0.4pt}\\-detector\\-predictor\\\rule{3.5cm}{0.4pt}\\+detect\_faces()\\+get\_landmarks()\\+analyze\_direction()};
+        \node[class, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}\\\rule{3.5cm}{0.4pt}\\-detector\\-predictor\\-gaze\\\rule{3.5cm}{0.4pt}\\+find\_faces()\\+detect\_direction()\\+analyze\_gaze()};
         
-        \node[class, below=1.6cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}\\\rule{3.5cm}{0.4pt}\\-eye\_left\\-eye\_right\\\rule{3.5cm}{0.4pt}\\+analyze()\\+horizontal\_ratio()\\+vertical\_ratio()};
+        \node[class, below=1.6cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}\\\rule{3.5cm}{0.4pt}\\-eye\_left\\-eye\_right\\-pupils\_located\\\rule{3.5cm}{0.4pt}\\+refresh()\\+horizontal\_ratio()\\+vertical\_ratio()};
         
-        \node[smallclass, below left=1.2cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}\\\rule{2.8cm}{0.4pt}\\-violations\\-thresholds\\\rule{2.8cm}{0.4pt}\\+check\_violations()\\+log\_violation()};
+        \node[smallclass, below left=1.2cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}\\\rule{2.8cm}{0.4pt}\\-violations\\-gaze\_limits\\\rule{2.8cm}{0.4pt}\\+check\_violations()\\+log\_violation()\\+update\_limits()};
         
-        \node[smallclass, below right=1.3cm and 1.3cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-landmarks\\\rule{2.8cm}{0.4pt}\\+isolate()\\+get\_pupil()};
+        \node[smallclass, below right=1.3cm and 1.3cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-landmarks\\-threshold\\\rule{2.8cm}{0.4pt}\\+isolate()\\+get\_pupil\_coords()};
         
-        \node[class, below =1.4cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\-size\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
+        \node[class, below =1.4cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\-pupil\_coords\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
         
-        \node[class, below right=-3.6cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-violations\\-timestamps\\\rule{3.5cm}{0.4pt}\\+generate\_html()\\+generate\_csv()};
+        \node[class, below right=-3.5cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-violations\\-export\_path\\\rule{3.5cm}{0.4pt}\\+generate\_html()};
         
-        \node[class, below=1.5cm of report] (exporter) {DataExporter\\\textit{Export date}\\\rule{3.5cm}{0.4pt}\\-data\\-format\\\rule{3.5cm}{0.4pt}\\+export\_to\_csv()\\+export\_to\_json()};
+        \node[class, below=1.5cm of report] (exporter) {DataExporter\\\textit{Export date}\\\rule{3.5cm}{0.4pt}\\-data\\-format\\\rule{3.5cm}{0.4pt}\\+export\_csv()\\+export\_json()};
 
         % Relations
         \draw[relation] (main) -- (sistem) node[midway, left, font=\sffamily\scriptsize] {Creează};
@@ -438,16 +437,16 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat patru diagr
         \draw[relation] (sistem) -- (face) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
         \draw[relation] (sistem) -- (object) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
         \draw[relation] (sistem.west) -- ++(-6,0) |- (violation.west) node[near start, left, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Creează};
+        \draw[relation] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Utilizează};
         \draw[relation] (gaze) -- (eye) node[midway, above, sloped, font=\sffamily\scriptsize] {Analizează};
         \draw[relation] (eye) -- (pupil) node[midway, left, font=\sffamily\scriptsize] {Detectează};
         \draw[relation] (violation) -- (report) node[midway, above, sloped, font=\sffamily\scriptsize] {Generează};
-        \draw[relation] (report) -- (exporter) node[midway, left, font=\sffamily\scriptsize] {Exportă date};
+        \draw[relation] (report) -- (exporter) node[midway, left, font=\sffamily\scriptsize] {Utilizează};
         \end{tikzpicture}
         \caption{Diagrama de clase a sistemului Anti-Plagiat}
     \end{figure}
 
-Diagrama de clase evidențiază organizarea ierarhică a modulelor sistemului anti-plagiat și relațiile funcționale dintre acestea. Punctul de intrare \texttt{main.py} creează instanța clasei \texttt{SistemAntiPlagiat}, care ocupă poziția centrală în arhitectură, coordonând toate celelalte componente. Săgeata de la \texttt{main.py} către \texttt{SistemAntiPlagiat} reprezintă această inițializare fundamentală de la care pornește întregul sistem.
+Diagrama de clase evidențiază organizarea ierarhică a modulelor sistemului anti-plagiat și relațiile dintre acestea. Punctul de intrare \texttt{main.py} creează instanța clasei \texttt{SistemAntiPlagiat}, care ocupă poziția centrală în arhitectură, coordonând toate celelalte componente. Săgeata de la \texttt{main.py} către \texttt{SistemAntiPlagiat} reprezintă această inițializare fundamentală de la care pornește întregul sistem.
 
 \texttt{SistemAntiPlagiat} inițializează patru componente esențiale, reprezentate prin săgețile divergente: \texttt{AntiPlagiatGUI} pentru interfața grafică, \texttt{VideoHandler} pentru procesarea video, \texttt{FaceDetector} pentru analiza facială și \texttt{ObjectDetector} pentru identificarea obiectelor. Această structură reflectă metodele din constructorul clasei \texttt{SistemAntiPlagiat}, unde sunt create instanțele acestor obiecte.
 
@@ -462,7 +461,7 @@ Această organizare reflectă principiul separării responsabilităților, fieca
 \begin{figure}[H]
     \centering
         \begin{tikzpicture}[
-                scale=0.7, % Reduced scale from 0.9 to 0.7
+                scale=0.8, % Reduced scale from 0.9 to 0.7
                 transform shape,
                 participant/.style={rectangle, draw=black, fill=blue!30, text centered, minimum width=2.2cm, minimum height=0.7cm, font=\sffamily\small},
                 activation/.style={rectangle, draw=black, fill=gray!30, minimum width=0.25cm},
@@ -490,21 +489,21 @@ Această organizare reflectă principiul separării responsabilităților, fieca
                 % Bare de activare inițiale
                 \node[activation, fill=gray!20] (gui_act1) at (0,-2) [minimum height=1cm] {}; % Reduced height
                 \node[activation, fill=gray!20] (sistem_act1) at (3,-2) [minimum height=1cm] {};
-                \node[activation, fill=gray!20] (video_act1) at (6,-2) [minimum height=0.8cm] {};
+                \node[activation, fill=gray!20] (video_act1) at (6,-2) [minimum height=1cm] {};
                 \node[activation, fill=gray!20] (face_act1) at (9,-2) [minimum height=1cm] {};
                 \node[activation, fill=gray!20] (object_act1) at (12,-2) [minimum height=1cm] {};
                 \node[activation, fill=gray!20] (violation_act1) at (15,-2) [minimum height=1cm] {};
                 
                 % Mesaje inițiale
-                \draw[message] (gui_act1) -- node[above, font=\sffamily\scriptsize] {start\_monitoring()} (sistem_act1);
-                \draw[message] (sistem_act1) -- node[above, font=\sffamily\scriptsize] {initialize\_camera()} (video_act1);
-                \draw[message] (video_act1) -- node[above, font=\sffamily\scriptsize] {detect\_faces()} (face_act1);
-                \draw[message] (face_act1) -- node[above, font=\sffamily\scriptsize] {detect\_objects()} (object_act1);
-                \draw[message] (object_act1) -- node[above, font=\sffamily\scriptsize] {check\_violations()} (violation_act1);
+                \draw[message] (gui_act1) -- node[above, font=\sffamily\scriptsize] {Pornire monitorizare} (sistem_act1);
+                \draw[message] (sistem_act1) -- node[above, font=\sffamily\scriptsize] {Inițializare camera} (video_act1);
+                \draw[message] (video_act1) -- node[above, font=\sffamily\scriptsize] {Detectare fața} (face_act1);
+                \draw[message] (face_act1) -- node[above, font=\sffamily\scriptsize] {Detectare obiecte} (object_act1);
+                \draw[message] (object_act1) -- node[above, font=\sffamily\scriptsize] {Verificare încălcări} (violation_act1);
                 
                 % Buclă de procesare
                 \draw[thick] (5.5,-4) rectangle (15.5,-8); % Reduced size
-                \node[font=\sffamily\scriptsize] at (6,-3.8) {loop [while monitoring]};
+                \node[font=\sffamily\scriptsize] at (6,-3.8) {loop [în timpul monitorizării]};
                 
                 % Activări în buclă
                 \node[activation, fill=gray!20] (video_act2) at (6,-5.5) [minimum height=1cm] {};
@@ -514,19 +513,19 @@ Această organizare reflectă principiul separării responsabilităților, fieca
                 \node[activation, fill=gray!20] (gui_act2) at (0,-5.5) [minimum height=1cm] {};
 
                 % Mesaje în buclă
-                \draw[message] (video_act2.north east) -- node[above, font=\sffamily\scriptsize] {frame\_captured()} (face_act2.north west);
-                \draw[message] (face_act2.north east) -- node[above, font=\sffamily\scriptsize] {analyze\_gaze()} (object_act2.north west);
-                \draw[message] (object_act2.north east) -- node[above, font=\sffamily\scriptsize] {detect\_objects()} (violation_act2.north west);
-                \draw[return] (violation_act2.south west) -- node[above, font=\sffamily\scriptsize] {update\_ui()} (gui_act2.south);   % Secvența de stop
+                \draw[message] (video_act2.north east) -- node[above, font=\sffamily\scriptsize] {Transmite cadru video} (face_act2.north west);
+                \draw[message] (face_act2.north east) -- node[above, font=\sffamily\scriptsize] {Analizare privire} (object_act2.north west);
+                \draw[message] (object_act2.north east) -- node[above, font=\sffamily\scriptsize] {Detectare obiecte} (violation_act2.north west);
+                \draw[return] (violation_act2.south west) -- node[above, font=\sffamily\scriptsize] {Actualizare interfața} (gui_act2.south);   % Secvența de stop
                 \node[activation, fill=gray!20] (gui_act3) at (0,-9) [minimum height=1cm] {};
                 \node[activation, fill=gray!20] (sistem_act2) at (3,-9) [minimum height=1cm] {};
-                \draw[message] (gui_act3.north east) -- node[above, font=\sffamily\scriptsize] {stop\_monitoring()} (sistem_act2.north west);
-                \draw[return] (sistem_act2.south west) -- node[below, font=\sffamily\scriptsize] {monitoring\_stopped()} (gui_act3.south east);
+                \draw[message] (gui_act3.north east) -- node[above, font=\sffamily\scriptsize] {Oprește monitorizarea} (sistem_act2.north west);
+                \draw[return] (sistem_act2.south west) -- node[below, font=\sffamily\scriptsize] {Confirmă oprirea} (gui_act3.south east);
                 
                 % Note explicative - reduse și repoziționate
                 \node[note] at (-1.2,-2) {Inițiere};
                 \node[note] at (16.2,-5.5) {Verificare};
-                \node[note] at (-1.2,-5.5) {Update UI};
+                \node[note] at (-1.2,-5.5) {Interfață Utilizator};
                 \node[note] at (-1.2,-9) {Stop};
                 
                 \end{tikzpicture}
@@ -592,60 +591,6 @@ Procesul continuă cu \texttt{Captură Frame Video}, unde \texttt{VideoProcessin
 La punctul de decizie \texttt{Încălcare Detectată?}, fluxul se ramifică în funcție de rezultatul analizei anterioare. Dacă se identifică o încălcare precum, privire suspectă sau detectare obiect neautorizat, sistemul execută \texttt{Generează Alertă}, creându-se astfel o înregistrare detaliată a incidentului, utilizand metoda \texttt{violation\_monitor.log\_violation()}. Indiferent de rezultatul verificării, execuția continuă cu \texttt{Salvează Frame}, stocând cadrul procesat în înregistrarea video.
 
 Activitatea \texttt{Actualizează Interfața} reîmprospătează display-ul cu informații actualizate și frame-ul procesat, implementat prin semnalul \texttt{frame\_ready} din PyQt5. Din acest punct, procesul poate fie să revină la \texttt{Captură Frame Video} pentru o nouă iterație (săgeata de revenire din stânga), fie să avanseze către \texttt{Stop Monitorizare} când utilizatorul oprește explicit procesul.
-
-\subsection{Diagrama de componente}
-
-\begin{figure}[H]
-    \centering
-    \begin{tikzpicture}[
-        scale=0.9,
-        transform shape,
-        component/.style={rectangle, draw=black, fill=yellow!30, text centered, text width=3.2cm, minimum height=1cm, font=\sffamily\small\bfseries},
-        relation/.style={-{Latex}, thick, shorten >=2pt, shorten <=2pt},
-        node distance=2.5cm
-    ]
-        % Componente cu mai mult spațiu între ele
-        \node[component] (gui) at (0,0) {AntiPlagiatGUI};
-        \node[component] (sistem) at (0,-2.5) {SistemAntiPlagiat};
-        \node[component] (video) at (-6.0,-5) {VideoHandler};
-        \node[component] (face) at (0,-5) {FaceDetector};
-        \node[component] (object) at (6.0,-5) {ObjectDetector};
-        \node[component] (gaze) at (-5.0,-7.5) {GazeTracker};
-        \node[component] (violation) at (0,-7.5) {ViolationMonitor};
-        \node[component] (eye) at (-5.0,-10) {Eye / Pupil};
-        \node[component] (report) at (0,-10) {ReportGenerator};
-        \node[component] (data) at (6.0,-10) {DataExporter};
-
-        % Relații cu etichete - Reconstruite pentru a evita suprapunerile
-        \draw[relation] (gui) -- node[left, pos=0.5, text width=1.8cm, text centered, font=\sffamily\scriptsize] {Inițiază} (sistem);
-        
-        \draw[relation] (sistem) -- node[left, pos=0.5, text width=1.8cm, text centered, font=\sffamily\scriptsize] {Creează} (video);
-        \draw[relation] (sistem) -- node[right, pos=0.5, text width=1.8cm, text centered, font=\sffamily\scriptsize] {Inițiază} (face);
-        \draw[relation] (sistem) -- node[right, pos=0.5, text width=1.8cm, text centered, font=\sffamily\scriptsize] {Creează} (object);
-        
-        % Ajustare pentru sageata sistem->violation, trasa pe o alta ruta
-        \draw[relation] (sistem.west) -- ++(-0.6,0) |- node[left, pos=0.25, xshift=0.2cm, text width=2cm, text centered, font=\sffamily\scriptsize] {Monitorizează} (violation.west);
-        
-        \draw[relation] (face) -- node[left, text width=2cm, text centered, font=\sffamily\scriptsize] {Utilizează} (gaze);
-        \draw[relation] (gaze) -- node[left, font=\sffamily\scriptsize] {Analizează} (eye);
-        \draw[relation] (violation) -- node[left, font=\sffamily\scriptsize] {Generează} (report);
-        \draw[relation] (report) -- node[above, sloped, font=\sffamily\scriptsize] {Exportă date} (data);
-        
-        % Ajustare pentru sageata violation->gui, trasa pe o alta ruta mai clara
-        \draw[relation] (violation.east) -- ++(1,0) -- ++(0,9) -| node[above, pos=0.8, font=\sffamily\scriptsize] {Raportare} (gui);
-    \end{tikzpicture}
-    \caption{Diagrama de componente a sistemului Anti-Plagiat}
-\end{figure}
-
-Diagrama de componente oferă o viziune arhitecturală completă a sistemului, evidențiind organizarea modulară și fluxul de date. Componenta \texttt{AntiPlagiatGUI} este plasată în partea superioară, reprezentând interfața cu utilizatorul. Săgeata descendentă către \texttt{SistemAntiPlagiat} marchează relația de inițiere între aceste componente, reflectând cod din clasa \texttt{AntiPlagiatGUI} unde se creează instanța sistemului principal.
-
-\texttt{SistemAntiPlagiat} ocupă poziția centrală în arhitectură, având legături către trei componente esențiale: \texttt{VideoHandler} pentru procesarea video, \texttt{FaceDetector} pentru analiza facială și \texttt{ObjectDetector} pentru detectarea obiectelor. Aceste săgeți reprezintă implementarea constructorului clasei principale, \texttt{SistemAntiPlagiat}, unde sunt inițializate aceste componente. A patra săgeată către \texttt{ViolationMonitor} ilustrează rolul sistemului în coordonarea monitorizării încălcărilor.
-
-Observăm cum \texttt{FaceDetector} utilizează \texttt{GazeTracker} pentru analiza specializată a direcției privirii, reflectând implementarea din \texttt{face\_detector.py} unde se creează și se folosește instanța \texttt{gaze\_tracker}. Similar, \texttt{GazeTracker} are o săgeată către \texttt{Eye / Pupil}, reprezentând delegarea procesării detaliate a regiunii oculare.
-
-Componenta \texttt{ViolationMonitor} generează rapoarte prin intermediul \texttt{ReportGenerator}, care la rândul său utilizează \texttt{DataExporter} pentru salvarea datelor în diverse formate. Săgeata de revenire de la \texttt{ViolationMonitor} către \texttt{AntiPlagiatGUI} închide circuitul de feedback, reprezentând modul în care alertele sunt transmise înapoi către interfața utilizator.
-
-Această organizare reflectă arhitectura reală a codului sursă, evidențiind separarea clară a responsabilităților și fluxul de date între componente. Structura ierarhică facilitează atât înțelegerea sistemului în ansamblu, cât și localizarea precisă a funcționalităților specifice în implementare.
 
 \section{Implementarea propriu-zisă}
 
@@ -776,7 +721,7 @@ Pentru detectarea obiectelor interzise, precum telefoanele mobile și ceasurile 
 
 Alegerea algoritmului YOLO pentru acest proiect este fundamentată pe cercetări academice recente care 
 subliniază că „YOLO este adoptat în diverse aplicații în principal datorită inferențelor sale mai 
-rapide"\cite{wang2022object}, făcându-l ideal pentru aplicații în timp real precum sistemul nostru. 
+rapide"\cite{wang2022object}, făcându-l ideal pentru aplicații în timp real precum acest prototip. 
 Acest algoritm „utilizează o rețea neuronală convoluțională profundă simplă pentru a detecta obiecte 
 în imagine"\cite{v7labs2023yolo}, ceea ce îl face potrivit pentru detecția în timp real a obiectelor precum 
 telefoanele sau ceasurile inteligente, chiar și în condiții de iluminare variabilă.
@@ -926,20 +871,26 @@ Aplicația poate fi configurată prin editarea fișierului \texttt{config.json}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{screenshots/s1.png}
+    \includegraphics[width=0.6\textwidth]{screenshots/s1.png}
     \caption{Interfața principală a aplicației}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{screenshots/s2.png}
+    \includegraphics[width=0.6\textwidth]{screenshots/s2.png}
     \caption{Pornirea monitorizării și înregistrării}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{screenshots/s3.png}
-    \caption{Detectarea obiectelor neautorizate}
+    \caption{Detectare telefon}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{screenshots/s10.png}
+    \caption{Detectare ceas inteligent}
 \end{figure}
 
 \begin{figure}[H]
@@ -1087,6 +1038,12 @@ Am dezvoltat un sistem de generare automată a rapoartelor în formate HTML, CSV
     \item Rezumatul general al sesiunii de monitorizare.
 \end{itemize}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{screenshots/s11.png}
+    \caption{Exemplu raport generat în format HTML} 
+\end{figure}
+
 \subsection{Integrarea interfeței grafice intuitive}
 Am dezvoltat o interfață grafică intuitivă utilizând PyQt5, care permite utilizatorilor să:
 \begin{itemize}
@@ -1160,7 +1117,7 @@ Impactul aplicației este semnificativ, contribuind la menținerea integrități
 
 Comparativ cu alte soluții existente, aplicația noastră oferă următoarele avantaje:
 \begin{itemize}
-    \item \textbf{Focalizare pe comportamentul fizic:} Spre deosebire de soluțiile care monitorizează doar activitatea pe ecran, sistemul nostru analizează direcția privirii și detectează obiectele neautorizate.
+    \item \textbf{Focalizare pe comportamentul fizic:} Spre deosebire de soluțiile care monitorizează doar activitatea pe ecran, acest sistem analizează direcția privirii și detectează obiectele neautorizate.
     \item \textbf{Costuri reduse:} Implementarea locală reduce semnificativ costurile per candidat, comparativ cu soluțiile comerciale precum ProctorU.
     \item \textbf{Independență de platformă:} Aplicația funcționează independent de browser sau alte platforme, oferind o flexibilitate sporită.
     \item \textbf{Rapoarte detaliate:} Generarea automată a rapoartelor în multiple formate facilitează analiza ulterioară și documentarea incidentelor.
