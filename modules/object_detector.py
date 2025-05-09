@@ -16,7 +16,10 @@ class ObjectDetector:
 
         try:
             # verifica daca exista GPU
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            else:
+                self.device = "cpu"
             print(f"folosim {self.device.upper()} pentru detectie")
 
             self.phone_model = YOLO("yolov8s.pt")
@@ -74,7 +77,6 @@ class ObjectDetector:
             return [], original_frame.copy()
 
     def _detect_with_model(self, model, resized_frame, original_frame, class_ids, label):
-        # folosește pragul de încredere specificat pentru fiecare obiect
         confidence_threshold = self.confidence_thresholds.get(label, 0.5)
         results = model(resized_frame, conf=confidence_threshold, classes=class_ids, verbose=False)
         detections = []
@@ -98,11 +100,15 @@ class ObjectDetector:
 
             width = x2 - x1
             height = y2 - y1
-
+            
+            current_label = label
+            if label == "telefon" and width < 80 and height < 95:
+                current_label = "smartwatch"
+            
             # filtrare pentru smartwatch
-            if label == "smartwatch":
-                aspect_ratio = width / (height + 1e-5)
-                max_width = 100  # in pixeli
+            if current_label == "smartwatch":
+                aspect_ratio = width / (height + 1e-5) # valoare mica pentru a evita diviziunea cu zero
+                max_width = 80  # in pixeli
                 max_height = 100
                 max_aspect = 1.2  # smartwatch-ul este aproape patrat
 
@@ -110,7 +116,7 @@ class ObjectDetector:
                     continue  # ignoram obiectele prea mari sau cu aspect necorespunzator
 
             # filtrare pentru telefon
-            if label == "telefon":
+            if current_label == "telefon":
                 aspect_ratio = height / (width + 1e-5)
                 min_width = 40  # in pixeli
                 min_height = 60
@@ -119,11 +125,11 @@ class ObjectDetector:
                 if width < min_width or height < min_height or aspect_ratio < min_aspect:
                     continue  # ignoram obiectele mici sau prea late
 
-            detections.append((label, confidence))
+            detections.append((current_label, confidence))
 
             # desenare bbox
             cv2.rectangle(original_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            text = f"{label}: {confidence:.2f}"
+            text = f"{current_label}: {confidence:.2f}"
             cv2.putText(original_frame, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         return detections
