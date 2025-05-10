@@ -424,7 +424,7 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat trei diagra
         
         \node[smallclass, below right=1.3cm and 1.3cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-landmarks\\-threshold\\\rule{2.8cm}{0.4pt}\\+isolate()\\+get\_pupil\_coords()};
         
-        \node[class, below =1.4cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\-pupil\_coords\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
+        \node[class, below =1.1cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
         
         \node[class, below right=-3.5cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-violations\\-export\_path\\\rule{3.5cm}{0.4pt}\\+generate\_html()};
         
@@ -503,7 +503,7 @@ Această organizare reflectă principiul separării responsabilităților, fieca
                 
                 % Buclă de procesare
                 \draw[thick] (5.5,-4) rectangle (15.5,-8); % Reduced size
-                \node[font=\sffamily\scriptsize] at (6,-3.8) {loop [în timpul monitorizării]};
+                \node[font=\sffamily\scriptsize] at (6,-3.8) {buclă [în timpul monitorizării]};
                 
                 % Activări în buclă
                 \node[activation, fill=gray!20] (video_act2) at (6,-5.5) [minimum height=1cm] {};
@@ -546,51 +546,122 @@ Această organizare reflectă principiul separării responsabilităților, fieca
     \begin{tikzpicture}[
         scale=0.8,
         transform shape,
-        node distance=1.5cm,
-        startstop/.style={rectangle, rounded corners, draw=black, fill=red!30, text centered, minimum width=2.8cm, font=\sffamily\small},
-        process/.style={rectangle, draw=black, fill=blue!30, text centered, minimum width=2.8cm, font=\sffamily\small},
-        decision/.style={diamond, draw=black, fill=green!30, text centered, minimum width=3.5cm, minimum height=1.8cm, font=\sffamily\small},
-        arrow/.style={-{Latex}, thick}
+        node distance=1.2cm,
+        % Node styles
+        start/.style={circle, fill=black, minimum width=0.6cm},
+        end/.style={circle, draw=black, thick, fill=white, minimum width=0.6cm},
+        process/.style={rectangle, draw=black, fill=blue!30, minimum width=3cm, 
+                        minimum height=1cm, text centered, rounded corners},
+        decision/.style={diamond, draw=black, fill=yellow!20, text centered, 
+                        minimum width=2cm, minimum height=0.8cm, inner sep=0pt},
+        arrow/.style={thick, ->, >=stealth}
     ]
-        % Noduri
-        \node[startstop] (start) {Start Monitorizare};
-        \node[process, below of=start] (init) {Inițializare Camera};
-        \node[process, below of=init] (capture) {Captură Frame Video};
-        \node[process, below of=capture] (face) {Detecție Față și Pupile};
-        \node[process, below of=face, yshift=0.2cm] (analyze) {Verifică Direcția Privirii și Detectează Obiecte};
-        \node[decision, below of=analyze, yshift=-1.5cm] (violation) {Încălcare Detectată?};
-        \node[process, right of=violation, xshift=3.2cm] (alert) {Generează Alertă};
-        \node[process, below of=violation, yshift=-1.5cm] (save) {Salvează Frame};
-        \node[process, below of=save] (update) {Actualizează Interfața};
-        \node[startstop, below of=update] (stop) {Stop Monitorizare};
-
-        % Săgeți
-        \draw[arrow] (start) -- (init);
-        \draw[arrow] (init) -- (capture);
-        \draw[arrow] (capture) -- (face);
-        \draw[arrow] (face) -- (analyze);
-        \draw[arrow] (analyze) -- (violation);
-        \draw[arrow] (violation) -- node[above, font=\sffamily\scriptsize] {Da} (alert);
-        \draw[arrow] (violation) -- node[right, font=\sffamily\scriptsize] {Nu} (save);
-        \draw[arrow] (alert) |- (save);
-        \draw[arrow] (save) -- (update);
-        \draw[arrow] (update) -- (stop);
+        % Initial point and nodes
+        \node[start] (initpoint) {};
+        \node[process, below of=initpoint] (start) {Start Monitorizare};
+        \node[process, below of=start, yshift=-0.2cm] (init) {Inițializare Camera};
         
-        % Buclă de continuare
-        \draw[arrow] (update.west) -- ++(-2.2,0) |- (capture.west);
+        % New decision nodes for camera and frame validation
+        \node[decision, below of=init, yshift=-0.9cm] (cameracheck) {Disponibilă?};
+        \node[process, right of=cameracheck, xshift=3.5cm] (errorcamera) {Afișează Eroare Camera};
+        
+        \node[process, below of=cameracheck, yshift=-0.9cm] (capture) {Captură Cadru};
+        \node[decision, below of=capture, yshift=-0.8cm] (framecheck) {Cadru valid?};
+        \node[process, right of=framecheck, xshift=3.5cm] (errorframe) {Sare Peste Cadru};
+        
+        % Continue with original flow
+        \node[process, below of=framecheck, yshift=-0.9cm] (face) {Detectare Față};
+        
+        % Split into two separate processes
+        \node[process, below of=face, yshift=-0.1cm] (gazecheck) {Verifică Direcția Privirii};
+        \node[process, right of=gazecheck, xshift=4.0cm] (objectcheck) {Detectează Obiecte Neautorizate};
+        
+        % Separate decision nodes
+        \node[decision, below of=gazecheck, yshift=-0.9cm] (gazeviolation) {Suspectă?};
+        \node[decision, below of=objectcheck, yshift=-0.9cm] (objectviolation) {Detectat?};
+        
+        % Separate alerts
+        \node[process, below of=gazeviolation, xshift=-2.5cm, yshift=-0.9cm] (gazealert) {Alertă Privire};
+        \node[process, below of=objectviolation, xshift=2.5cm, yshift=-0.9cm] (objectalert) {Alertă Obiect};
+        
+        % Continue flow
+        \node[process, below of=gazeviolation, yshift=-2.5cm, xshift = 2.5cm] (save) {Salvează Cadru};
+        \node[process, below of=save, yshift = -0.3cm] (update) {Actualizează Interfața};
+        \node[decision, below of=update, yshift=-0.65cm] (continue) {Continuă?};
+        \node[process, below of=continue, yshift=-0.8cm] (cleanup) {Eliberează Resurse};
+        \node[process, below of=cleanup, yshift=-0.3cm] (stop) {Stop Monitorizare};
+        
+        % Draw end node with explicit inner black circle
+        \node[end, below of=stop, yshift=-0.1cm] (endnode) {};
+        \filldraw[black] (endnode.center) circle (0.2cm);
+        
+        % Arrows for initial flow
+        \draw[arrow] (initpoint) -- (start);
+        \draw[arrow] (start) -- (init);
+        \draw[arrow] (init) -- (cameracheck);
+        
+        % Camera check paths
+        \draw[arrow] (cameracheck) -- node[right, xshift=-0.2cm, yshift=+0.2cm, font=\sffamily\scriptsize] {Nu} (errorcamera);
+        \draw[arrow] (cameracheck) -- node[left, font=\sffamily\scriptsize] {Da} (capture);
+        \draw[arrow] (errorcamera.east) -- ++(3.5,0) |- (cleanup.east);
+        
+        % Frame check paths
+        \draw[arrow] (capture) -- (framecheck);
+        \draw[arrow] (framecheck) -- node[right, xshift=-0.2cm, yshift=+0.2cm, font=\sffamily\scriptsize] {Nu} (errorframe);
+        \draw[arrow] (framecheck) -- node[left, font=\sffamily\scriptsize] {Da} (face);
+        \draw[arrow] (framecheck) -- node[right, font=\sffamily\scriptsize] {Da} (objectcheck);
+        \draw[arrow] (errorframe.east) -- ++(3.4,0) |- (continue.east);
+        
+        % Split path to two processes
+        \draw[arrow] (face) -- (gazecheck);  
+        
+        % Decision paths
+        \draw[arrow] (gazecheck) -- (gazeviolation);
+        \draw[arrow] (objectcheck) -- (objectviolation);
+        
+        \draw[arrow] (gazeviolation) -- node[left, font=\sffamily\scriptsize] {Da} (gazealert);
+        \draw[arrow] (objectviolation) -- node[right, font=\sffamily\scriptsize] {Da} (objectalert);
+        
+        % Join paths back
+        \draw[arrow] (gazeviolation) -- node[right, font=\sffamily\scriptsize] {Nu} (save);
+        \draw[arrow] (objectviolation) --node[left, font=\sffamily\scriptsize] {Nu} (save);
+        \draw[arrow] (gazealert) |- (save);
+        \draw[arrow] (objectalert) |- (save);
+        
+        % Continue flow
+        \draw[arrow] (save) -- (update);
+        \draw[arrow] (update) -- (continue);
+        \draw[arrow] (continue) -- node[right, font=\sffamily\scriptsize] {Nu} (cleanup);
+        \draw[arrow] (cleanup) -- (stop);
+        \draw[arrow] (stop) -- (endnode);
+        
+        % Loop back to capture
+        \draw[arrow] (continue) -- node[left, xshift=-3.1cm, yshift=7.5cm, font=\sffamily\scriptsize] {Da} ++(-7,0) |- (capture.west);
     \end{tikzpicture}
-    \caption{Diagrama de activitate pentru sistemul Anti-Plagiat}
+    \caption{Diagrama de activitate a sistemului Anti-Plagiat}
 \end{figure}
 
-Diagrama de activitate prezintă fluxul operațional al sistemului, evidențiind pașii procesării și punctele de decizie. Din starea inițială \texttt{Start Monitorizare}, activată când utilizatorul apasă butonul corespunzător, sistemul trece la \texttt{Inițializare Camera}, unde configurează parametrii de captură și verifică disponibilitatea camerei web. Această tranzițe corespunde apelului metodei \texttt{toggle\_monitoring()} din clasa principală \texttt{AntiPlagiatGUI}.
+Diagrama de activitate prezintă fluxul operațional al sistemului, evidențiind pașii procesării și punctele de decizie. Din starea inițială \texttt{Start Monitorizare}, activată când utilizatorul apasă butonul corespunzător, sistemul trece la \texttt{Inițializare Camera}, unde configurează parametrii de captură și verifică disponibilitatea camerei web. Această tranziție corespunde apelului metodei \texttt{toggle\_monitoring()} din clasa principală \texttt{AntiPlagiatGUI}.
 
-Procesul continuă cu \texttt{Captură Frame Video}, unde \texttt{VideoProcessingThread} preia cadre de la camera web prin apelul \texttt{cap.read()}. Aceste cadre sunt transmise către \texttt{Detecție Față și Pupile}, reprezentând operațiile efectuate de \texttt{FaceDetector} pentru localizarea feței și a pupilelor. 
+După inițializare, sistemul verifică dacă respectiva cameră este disponibilă prin punctul de decizie \texttt{Disponibilă?}. În cazul unei erori, sistemul afișează un mesaj de eroare prin procesul \texttt{Afișează Eroare Camera} și avansează direct la eliberarea resurselor. Această verificare este implementată în metoda \texttt{VideoProcessingThread.run()}, unde se testează conexiunea la camera web.
 
-În pasul \texttt{Verifică Direcția Privirii și Detectează Obiecte}, sistemul analizează poziția pupilelor pentru a determina direcția privirii și aplică modelele YOLOv8 pentru identificarea obiectelor neautorizate. Aceste operații corespund apelurilor metodelor \texttt{face\_detector.detect\_direction()} și \texttt{object\_detector.detect\_objects()} din codul sursă.
+Dacă aceasta este funcțională, procesul continuă cu \texttt{Captură Cadru}, unde se preiau cadre de la camera web. Sistemul validează apoi fiecare cadru capturat prin decizia \texttt{Cadru valid?}, care verifică dacă imaginea a fost obținută corect. Cadrele invalide sunt gestionate prin procesul \texttt{Sare Peste Cadru}, care le ignoră și continuă fluxul. Această verificare este implementată prin condiția \texttt{if ret and frame is not None} din modulul de procesare video.
 
-La punctul de decizie \texttt{Încălcare Detectată?}, fluxul se ramifică în funcție de rezultatul analizei anterioare. Dacă se identifică o încălcare precum, privire suspectă sau detectare obiect neautorizat, sistemul execută \texttt{Generează Alertă}, creându-se astfel o înregistrare detaliată a incidentului, utilizand metoda \texttt{violation\_monitor.log\_violation()}. Indiferent de rezultatul verificării, execuția continuă cu \texttt{Salvează Frame}, stocând cadrul procesat în înregistrarea video.
+După validarea cadrului, analiza se ramifică în două fluxuri paralele independente:
 
-Activitatea \texttt{Actualizează Interfața} reîmprospătează display-ul cu informații actualizate și frame-ul procesat, implementat prin semnalul \texttt{frame\_ready} din PyQt5. Din acest punct, procesul poate fie să revină la \texttt{Captură Frame Video} pentru o nouă iterație (săgeata de revenire din stânga), fie să avanseze către \texttt{Stop Monitorizare} când utilizatorul oprește explicit procesul.
+1. În primul flux, sistemul execută \texttt{Detectare Față}, unde \texttt{FaceDetector} localizează fața candidatului în imagine, urmată de \texttt{Verifică Direcția Privirii}, care analizează poziția reală a pupilelor pentru a determina în ce direcție privește candidatul, utilizând metoda \texttt{face\_detector.detect\_direction()}. La punctul de decizie \texttt{Suspectă?}, se evaluează dacă direcția privirii indică un comportament suspect (privire laterală sau în jos).
+
+2. În paralel, în al doilea flux, \texttt{Detectează Obiecte Neautorizate} folosește modelele YOLOv8 pentru a scana imaginea și identifica telefoane sau ceasuri inteligente prin metoda \texttt{object\_detector.detect\_objects()}. Decizia \texttt{Detectat?} verifică prezența acestor obiecte interzise.
+
+Aceste două fluxuri operează complet independent, procesând același cadru valid dar analizând aspecte diferite - unul concentrându-se pe comportamentul candidatului și altul pe mediul înconjurător. Această paralelizare reflectă arhitectura modulară a sistemului, unde \texttt{FaceDetector} și \texttt{ObjectDetector} funcționează ca module separate.
+
+Fiecare flux poate genera alerte specifice când detectează potențiale încălcări: \texttt{Alertă Privire} pentru priviri suspecte și \texttt{Alertă Obiect} pentru obiecte neautorizate. Acestea sunt implementate prin apelul metodei \texttt{violation\_monitor.log\_violation()}, care înregistrează detaliile fiecărei încălcări.
+
+Fluxurile converg apoi la activitatea \texttt{Salvează Cadru}, unde sistemul stochează imaginea procesată, urmată de \texttt{Actualizează Interfața}, care reîmprospătează display-ul cu datele analizate. Această actualizare este realizată prin semnalul \texttt{frame\_ready} din PyQt5, care declanșează actualizarea interfeței grafice.
+
+La punctul de decizie \texttt{Continuă?}, sistemul evaluează dacă monitorizarea trebuie să continue. În caz afirmativ, procesul revine la \texttt{Captură Cadru} pentru o nouă iterație. În caz negativ, sistemul trece la \texttt{Eliberează Resurse}, unde se închid conexiunile la cameră și se eliberează memoria, urmată de \texttt{Stop Monitorizare}, când procesul se încheie oficial.
+
+Această arhitectură robustă, cu procesare paralelă, permite sistemului să analizeze simultan diferite aspecte ale situației de examinare, crescând eficiența și precizia în detectarea tentativelor de fraudă, chiar și când una dintre metodele de analiză (detecția feței sau a obiectelor) ar putea întâmpina dificultăți temporare.
 
 \section{Implementarea propriu-zisă}
 
@@ -744,7 +815,7 @@ Funcțiile \texttt{np.min} și \texttt{np.max} au fost utilizate pentru a determ
 \subsection{Datetime}
 Biblioteca \texttt{datetime}\cite{pythondatetime} din Python a fost utilizată pentru gestionarea timpului și a marcajelor temporare în cadrul proiectului. Aceasta a fost esențială pentru sincronizarea evenimentelor, generarea rapoartelor și înregistrarea timpului de monitorizare.
 
-Funcția \texttt{datetime.now()} a fost utilizată pentru a obține timpul curent în momentul generării unui eveniment, cum ar fi detectarea unei încălcări sau salvarea unui raport. Marcajele temporare generate sunt utilizate pentru a lega evenimentele detectate de momentele exacte din fluxul video.
+Funcția \texttt{datetime.now()} a fost folosită pentru a obține timpul curent în momentul generării unui eveniment, cum ar fi detectarea unei nereguli si salvarea unui raport. Marcajele temporare create sunt utilizate pentru a lega evenimentele detectate de momentele exacte din fluxul video.
 
 De exemplu, în cadrul clasei \texttt{ViolationMonitor}, funcția \texttt{datetime.now().strftime()} a fost utilizată pentru a formata marcajele temporare într-un format ușor de citit, cum ar fi \texttt{YYYY-MM-DD HH:MM:SS}. Acestea sunt incluse în rapoartele generate și sunt utilizate pentru a analiza comportamentul candidatului în timp.
 
@@ -1001,14 +1072,7 @@ Raportul vertical este utilizat pentru a determina dacă privirea candidatului e
 
 Acești algoritmi lucrează împreună pentru a crea un sistem robust de detectare a direcției privirii. Rapoartele calculate sunt comparate cu praguri predefinite pentru a determina dacă candidatul privește în centru, stânga, dreapta sau jos, iar rezultatele acestei analize sunt utilizate pentru a genera alertele corespunzătoare.
 
-Pragurile implicite utilizate în implementarea actuală sunt:
-\begin{itemize}
-    \item $left\_limit = 0.62$ - Valoare peste care privirea este considerată orientată spre stânga
-    \item $right\_limit = 0.38$ - Valoare sub care privirea este considerată orientată spre dreapta
-    \item $down\_limit = 0.60$ - Valoare peste care privirea este considerată orientată în jos
-\end{itemize}
-
-Implementarea noastră oferă mai multe avantaje semnificative:
+Această implementare oferă mai multe avantaje semnificative:
 
 \begin{enumerate}
     \item \textbf{Robustețe la variații de iluminare} - Prin utilizarea metodei punctului minim pentru detectarea pupilelor, algoritmul este mai puțin sensibil la schimbările de iluminare.
