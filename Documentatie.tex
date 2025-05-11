@@ -393,58 +393,73 @@ Pentru a ilustra structura și funcționarea sistemului, am elaborat trei diagra
 
 \begin{figure}[H]
     \centering
-    \hspace{-2.7cm} % Added horizontal shift here before the tikzpicture
-    \begin{tikzpicture}[
-        scale=0.7,
-        transform shape,
-        class/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize},
-        smallclass/.style={rectangle, draw=black, rounded corners, text centered, text width=3.6cm, minimum height=1.8cm, font=\sffamily\footnotesize},
-        relation/.style={-{Latex}, thick},
-        shortrelation/.style={-{Latex}, thick, shorten >=2mm, shorten <=4mm},
-        aggregation/.style={->, thick},
-        composition/.style={->, thick},
-        dependency/.style={dashed, ->, thick}
-        ]
-        % Classes with attributes and methods
-        \node[class] (main) {main.py\\\textit{Punctul de intrare}\\\rule{3.5cm}{0.4pt}\\+main()};
-        
-        \node[class, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}\\\rule{3.5cm}{0.4pt}\\-face\_detector\\-object\_detector\\-violation\_monitor\\\rule{3.5cm}{0.4pt}\\+\_\_init\_\_()\\+process\_frame()\\+toggle\_monitoring()};
-        
-        \node[class, below=1.8cm of sistem, xshift=-5.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}\\\rule{3.5cm}{0.4pt}\\-sistem\_anti\_plagiat\\-timer\\-mirror\_mode\\\rule{3.5cm}{0.4pt}\\+setup\_ui()\\+toggle\_monitoring()\\+export\_report()};
-        
-        \node[class, right=2.5cm of sistem] (video) {VideoProcessingThread\\\textit{Procesare video}\\\rule{3.5cm}{0.4pt}\\-cap\\-running\\-frame\_buffer\\\rule{3.5cm}{0.4pt}\\+run()\\+stop()\\+get\_frame()};
-        
-        \node[class, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}\\\rule{3.5cm}{0.4pt}\\-phone\_model\\-watch\_model\\-confidence\_threshold\\\rule{3.5cm}{0.4pt}\\+detect\_objects()\\+load\_models()};
-        
-        \node[class, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}\\\rule{3.5cm}{0.4pt}\\-detector\\-predictor\\-gaze\\\rule{3.5cm}{0.4pt}\\+find\_faces()\\+detect\_direction()\\+analyze\_gaze()};
-        
-        \node[class, below=1.6cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}\\\rule{3.5cm}{0.4pt}\\-eye\_left\\-eye\_right\\-pupils\_located\\\rule{3.5cm}{0.4pt}\\+refresh()\\+horizontal\_ratio()\\+vertical\_ratio()};
-        
-        \node[smallclass, below left=1.2cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}\\\rule{2.8cm}{0.4pt}\\-violations\\-gaze\_limits\\\rule{2.8cm}{0.4pt}\\+check\_violations()\\+log\_violation()\\+update\_limits()};
-        
-        \node[smallclass, below right=1.3cm and 1.3cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-landmarks\\-threshold\\\rule{2.8cm}{0.4pt}\\+isolate()\\+get\_pupil\_coords()};
-        
-        \node[class, below =1.1cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\\rule{3.5cm}{0.4pt}\\+detect()\\+get\_position()};
-        
-        \node[class, below right=-3.5cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-violations\\-export\_path\\\rule{3.5cm}{0.4pt}\\+generate\_html()};
-        
-        \node[class, below=1.5cm of report] (exporter) {DataExporter\\\textit{Export date}\\\rule{3.5cm}{0.4pt}\\-data\\-format\\\rule{3.5cm}{0.4pt}\\+export\_csv()\\+export\_json()};
+        \hspace{-2.7cm} % Added horizontal shift here before the tikzpicture
+        \begin{tikzpicture}[
+            scale=0.65,
+            transform shape,
+            class/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize, fill=blue!10},
+            smallclass/.style={rectangle, draw=black, rounded corners, text centered, text width=3.6cm, minimum height=1.8cm, font=\sffamily\footnotesize, fill=blue!10},
+            mainclass/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize, fill=blue!25},
+            uiclass/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize, fill=yellow!20},
+            detectorclass/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize, fill=green!15},
+            smalldetectorclass/.style={rectangle, draw=black, rounded corners, text centered, text width=3.6cm, minimum height=1.8cm, font=\sffamily\footnotesize, fill=green!15},
+            utilityclass/.style={rectangle, draw=black, rounded corners, text centered, text width=4.5cm, minimum height=2.2cm, font=\sffamily\footnotesize, fill=gray!15},
+            relation/.style={->, thick},
+            shortrelation/.style={->, thick, shorten >=2mm, shorten <=4mm},
+            aggregation/.style={->, thick},
+            composition/.style={->, thick},
+            dependency/.style={dashed, ->, thick}
+            ]
+            % Classes with attributes and methods
+            \node[mainclass] (main) {main.py\\\textit{Punctul de intrare}\\\rule{3.5cm}{0.4pt}\\+main()};
+            
+            \node[mainclass, below=1.5cm of main] (sistem) {SistemAntiPlagiat\\\textit{Coordonator principal}\\\rule{3.5cm}{0.4pt}\\-face\_detector\\-object\_detector\\-violation\_monitor\\-video\_handler\\-timestamp\\\rule{3.5cm}{0.4pt}\\+\_\_init\_\_()\\+process\_frame()\\+start\_recording()\\+stop\_recording()};
+            
+            \node[uiclass, below=1.8cm of sistem, xshift=-5.5cm] (gui) {AntiPlagiatGUI\\\textit{Interfață grafică}\\\rule{3.5cm}{0.4pt}\\-config\\-system\\-video\_thread\\-recording\\-monitoring\\\rule{3.5cm}{0.4pt}\\+initialize\_system()\\+setup\_ui()\\+toggle\_monitoring()\\+toggle\_recording()};
+            
+            \node[detectorclass, right=2.5cm of sistem] (video) {VideoHandler\\\textit{Procesare video}\\\rule{3.5cm}{0.4pt}\\-current\_alert\\-alert\_start\_time\\-video\_writer\\-mirror\_image\\-timestamp\\\rule{3.5cm}{0.4pt}\\+initialize\_video\_writer()\\+prepare\_frame\_for\_display()\\+write\_frame()\\+release()};
+            
+            \node[detectorclass, below right=2.5cm and -4.7cm of video] (object) {ObjectDetector\\\textit{Detectare obiecte}\\\rule{3.5cm}{0.4pt}\\-confidence\_thresholds\\-objects\_of\_interest\\-class\_mapping\\-phone\_model\\-watch\_model\\\rule{3.5cm}{0.4pt}\\+detect\_objects()\\+\_detect\_with\_yolo()\\+\_detect\_with\_model()};
+            
+            \node[detectorclass, below=2.5cm of sistem] (face) {FaceDetector\\\textit{Detectare față}\\\rule{3.5cm}{0.4pt}\\-mirror\_image\\-gaze\_tracker\\-last\_valid\_direction\\\rule{3.5cm}{0.4pt}\\+pupils\_located()\\+horizontal\_ratio()\\+vertical\_ratio()\\+is\_right()\\+is\_left()\\+is\_center()\\+is\_down()\\+detect\_direction()};
+            
+            \node[detectorclass, below=1.6cm of face] (gaze) {GazeTracker\\\textit{Analiză privire}\\\rule{3.5cm}{0.4pt}\\-frame\\-eye\_left\\-eye\_right\\-mirror\_image\\-\_face\_detector\\-\_predictor\\\rule{3.5cm}{0.4pt}\\+pupils\_located()\\+\_analyze()\\+refresh()\\+horizontal\_ratio()\\+vertical\_ratio()\\+determine\_direction()};
+            
+            \node[smalldetectorclass, below left=-9.6cm and 1.3cm of gaze] (violation) {ViolationMonitor\\\textit{Monitorizare încălcări}\\\rule{2.8cm}{0.4pt}\\-violation\_log\\-direction\_messages\\-last\_log\_time\\-min\_log\_interval\\\rule{2.8cm}{0.4pt}\\+check\_violations()\\+log\_violation()\\+get\_logs()};
+            
+            \node[smalldetectorclass, right=1.3cm and 2.2cm of gaze] (eye) {Eye\\\textit{Analiză ochi}\\\rule{2.8cm}{0.4pt}\\-frame\\-origin\\-center\\-pupil\\-landmark\_points\\-blinking\\\rule{2.8cm}{0.4pt}\\+\_middle\_point()\\+\_isolate()\\+\_blinking\_ratio()\\+\_analyze()};
+            
+            \node[detectorclass, below =1.1cm of eye] (pupil) {Pupil\\\textit{Analiză pupile}\\\rule{3.5cm}{0.4pt}\\-x\\-y\\\rule{3.5cm}{0.4pt}\\+detect\_iris()\\+\_\_init\_\_()};
+            
+            \node[utilityclass, below =1.9cm and 1.8cm of violation] (report) {ReportGenerator\\\textit{Generare rapoarte}\\\rule{3.5cm}{0.4pt}\\-timestamp\\-save\_path\\\rule{3.5cm}{0.4pt}\\+generate\_html\_report()};
+            
+            \node[utilityclass, below=1.5cm of report] (exporter) {DataExporter\\\textit{Export date}\\\rule{3.5cm}{0.4pt}\\-config\\-export\_path\\-formats\\\rule{3.5cm}{0.4pt}\\+export\_data()\\+\_export\_to\_csv()\\+\_export\_to\_json()};
 
-        % Relations
-        \draw[relation] (main) -- (sistem) node[midway, left, font=\sffamily\scriptsize] {Creează};
-        \draw[relation] (sistem) -- (gui) node[midway, above, sloped, font=\sffamily\scriptsize] {Controlează};
-        \draw[relation] (sistem) -- (video) node[midway, above, sloped, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (sistem) -- (face) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (sistem) -- (object) node[midway, right, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (sistem.west) -- ++(-6,0) |- (violation.west) node[near start, left, font=\sffamily\scriptsize] {Inițializează};
-        \draw[relation] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Utilizează};
-        \draw[relation] (gaze) -- (eye) node[midway, above, sloped, font=\sffamily\scriptsize] {Analizează};
-        \draw[relation] (eye) -- (pupil) node[midway, left, font=\sffamily\scriptsize] {Detectează};
-        \draw[relation] (violation) -- (report) node[midway, above, sloped, font=\sffamily\scriptsize] {Generează};
-        \draw[relation] (report) -- (exporter) node[midway, left, font=\sffamily\scriptsize] {Utilizează};
-        \end{tikzpicture}
-        \caption{Diagrama de clase a sistemului Anti-Plagiat}
-    \end{figure}
+            % Relations with multiplicities
+            \draw[relation] (main) -- (sistem) node[midway, left, font=\sffamily\scriptsize] {Creează} node[near start, right, font=\sffamily\scriptsize] {1} node[near end, right, font=\sffamily\scriptsize] {1};
+            
+            \draw[relation] (sistem) -- (gui) node[midway, above, sloped, font=\sffamily\scriptsize] {Controlează} node[near start, below, sloped, font=\sffamily\scriptsize] {1} node[near end, below, sloped, font=\sffamily\scriptsize] {1};
+            
+            \draw[composition] (sistem) -- (video) node[midway, above, sloped, font=\sffamily\scriptsize] {Inițializează} node[near start, below, sloped, font=\sffamily\scriptsize] {1} node[near end, below, sloped, font=\sffamily\scriptsize] {1};
+            
+            \draw[composition] (sistem) -- (face) node[midway, right, font=\sffamily\scriptsize] {Inițializează} node[near start, left, font=\sffamily\scriptsize] {1} node[near end, left, font=\sffamily\scriptsize] {1};
+            
+            \draw[composition] (sistem) -- (object) node[midway, right, font=\sffamily\scriptsize] {Inițializează} node[near start, left, font=\sffamily\scriptsize] {1} node[near end, left, font=\sffamily\scriptsize] {1};
+            
+            \draw[composition] (sistem.west) -- ++(-6,0) |- (violation.west) node[near start, left, font=\sffamily\scriptsize] {Inițializează} node[pos=0.2, below, font=\sffamily\scriptsize] {1} node[near end, below, font=\sffamily\scriptsize] {1};
+            
+            \draw[composition] (face) -- (gaze) node[midway, left, font=\sffamily\scriptsize] {Utilizează} node[near start, right, font=\sffamily\scriptsize] {1} node[near end, right, font=\sffamily\scriptsize] {1};
+            
+            \draw[relation] (gaze) -- (eye) node[midway, above, sloped, font=\sffamily\scriptsize] {Analizează} node[near start, below, sloped, font=\sffamily\scriptsize] {1} node[near end, below, sloped, font=\sffamily\scriptsize] {2};
+            
+            \draw[composition] (eye) -- (pupil) node[midway, left, font=\sffamily\scriptsize] {Detectează} node[near start, right, font=\sffamily\scriptsize] {1} node[near end, right, font=\sffamily\scriptsize] {1};
+            
+            \draw[dependency] (violation) -- (report) node[midway, left, font=\sffamily\scriptsize] {Generează} node[near start, below, sloped, font=\sffamily\scriptsize] {1} node[near end, below, sloped, font=\sffamily\scriptsize] {1..*};
+            
+            \draw[relation] (report) -- (exporter) node[midway, left, font=\sffamily\scriptsize] {Utilizează} node[near start, right, font=\sffamily\scriptsize] {1} node[near end, right, font=\sffamily\scriptsize] {1};
+            \end{tikzpicture}
+            \caption{Diagrama de clase a sistemului Anti-Plagiat cu cardinalitate relațională}
+        \end{figure}
 
 Diagrama de clase evidențiază organizarea ierarhică a modulelor sistemului anti-plagiat și relațiile dintre acestea. Punctul de intrare \texttt{main.py} creează instanța clasei \texttt{SistemAntiPlagiat}, care ocupă poziția centrală în arhitectură, coordonând toate celelalte componente. Săgeata de la \texttt{main.py} către \texttt{SistemAntiPlagiat} reprezintă această inițializare fundamentală de la care pornește întregul sistem.
 
