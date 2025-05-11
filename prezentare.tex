@@ -1,0 +1,879 @@
+\documentclass[aspectratio=169,9pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{fontawesome5}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{textpos}
+
+% Definirea culorilor principale
+\definecolor{mainblue}{HTML}{2563EB}
+\definecolor{darkblue}{HTML}{1E40AF}
+\definecolor{lightblue}{HTML}{DBEAFE}
+\definecolor{lighterblue}{HTML}{E6F0FF}
+\definecolor{green}{HTML}{22C55E}
+\definecolor{lightgreen}{HTML}{DCFCE7}
+\definecolor{red}{HTML}{EF4444}
+\definecolor{lightred}{HTML}{FEF2F2}
+\definecolor{yellow}{HTML}{FBC02D}
+\definecolor{lightyellow}{HTML}{FFFDE7}
+\definecolor{gray}{HTML}{666666}
+\definecolor{lightgray}{HTML}{F3F4F6}
+
+% Configurare tema
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamercolor{structure}{fg=mainblue}
+\setbeamercolor{title}{fg=white,bg=mainblue}
+\setbeamercolor{frametitle}{fg=mainblue,bg=white}
+\setbeamercolor{section in head/foot}{bg=mainblue,fg=white}
+\setbeamercolor{author in head/foot}{bg=darkblue,fg=white}
+\setbeamercolor{date in head/foot}{bg=darkblue,fg=white}
+\setbeamercolor{item}{fg=mainblue}
+\setbeamercolor{block title}{fg=white,bg=mainblue}
+\setbeamercolor{block body}{bg=lightblue}
+
+% Redefinirea aspectului checkbox-urilor pentru lista de verificare
+% Removing the old definition since we'll use itemize instead
+% \newcommand{\checkitem}[1]{%
+%   \begin{tabular}{@{}p{0.05\textwidth}@{}p{0.88\textwidth}@{}}
+%     {\color{green}\faCheck} & #1 \\
+%   \end{tabular}
+% }
+
+% Definirea blocurilor specializate
+\newenvironment{cardblock}[1]{%
+    \begin{block}{#1}
+}{%
+    \end{block}
+}
+
+\newenvironment{highlightblock}[1]{%
+    \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+        \begin{beamercolorbox}[rounded=true,sep=0.5em]{block title}
+            \usebeamerfont{block title}#1
+        \end{beamercolorbox}
+        \usebeamerfont{block body}
+        \begin{minipage}{\textwidth}
+}{%
+        \end{minipage}
+    \end{beamercolorbox}
+}
+
+\newenvironment{noteblock}{%
+    \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+        \usebeamerfont{block body}
+        \begin{minipage}{\textwidth}
+        \color{gray}\itshape
+}{%
+        \end{minipage}
+    \end{beamercolorbox}
+}
+
+\newenvironment{codeblock}{%
+    \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+        \usebeamerfont{block body}
+        \begin{minipage}{\textwidth}
+        \ttfamily
+}{%
+        \end{minipage}
+    \end{beamercolorbox}
+}
+
+% Informații titlu
+\title{Sistem de Monitorizare Anti-Plagiat pentru Examene}
+\author{Pletea-Marinescu Valentin}
+\date{}
+
+\begin{document}
+
+% Slide 1: Titlu
+\begin{frame}
+    \begin{tikzpicture}[remember picture,overlay]
+        \fill[top color=mainblue, bottom color=darkblue] (current page.north west) rectangle (current page.south east);
+    \end{tikzpicture}
+    
+    % GitHub link în colț
+    \begin{textblock}{4.05}(11.02,-2.6)
+        \begin{beamercolorbox}[rounded=true,shadow=false,sep=0.1em]{block body}
+            \href{https://github.com/Pletea-Marinescu-Valentin}{\color{black}\faGithub\ Pletea-Marinescu-Valentin}
+        \end{beamercolorbox}
+    \end{textblock}
+    
+    \begin{center}
+        \vspace{1cm}
+        {\Huge\color{white}\textbf{Sistem de Monitorizare Anti-Plagiat pentru Examene}}
+        
+        \vspace{1cm}
+        \begin{tikzpicture}
+            \draw[white, line width=2pt] (0,0) -- (3,0);
+        \end{tikzpicture}
+        
+        \vspace{0.5cm}
+        {\large\color{white}Pletea-Marinescu Valentin}
+        
+        \vspace{0.3cm}
+        {\color{white}Facultatea de Automatică și Calculatoare, anul 3, 332AB}
+    \end{center}
+\end{frame}
+
+% Slide 2: Contextul și Relevanța
+\begin{frame}{Contextul și Relevanța}
+        \begin{columns}
+        \column{0.6\textwidth}
+                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                        \item[\textcolor{green}{\faCheck}] Plagiatul: problemă gravă în sistemul educațional, accentuată de dezvoltarea AI
+                        \item[\textcolor{green}{\faCheck}] România: rată ridicată de plagiat (26.1\%) - aproape dublă față de media europeană
+                        \item[\textcolor{green}{\faCheck}] Necesitatea unui sistem eficient de monitorizare pentru asigurarea integrității academice
+                        \item[\textcolor{green}{\faCheck}] Sistemul propus se concentrează pe comportamentul candidatului, nu doar pe monitorizarea ecranului
+                \end{itemize}
+
+        \column{0.4\textwidth}
+                \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                \centering
+                {\Large\color{mainblue} \faChartBar}
+                
+                \vspace{0.3cm}
+                {\Large\color{mainblue}\textbf{26.1\%}}
+                
+                \color{gray}Rata plagiatelor identificate în România
+                
+                \vspace{0.3cm}
+                vs.
+                
+                \vspace{0.3cm}
+                {\Large\color{green}\textbf{$\sim$13\%}}
+                
+                \color{gray}Media europeană
+                \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+% Slide 3: Obiectivele Proiectului
+\begin{frame}{Obiectivele Proiectului}
+        \vspace{-0.6cm}
+        \begin{columns}[T]
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faEye}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Detectarea direcției privirii}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Identificarea situațiilor când privirea este orientată în direcții suspecte
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.4cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faChartBar}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Generarea rapoartelor}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Rapoarte detaliate în formate HTML, CSV și JSON
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faMobile}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Identificarea obiectelor}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Detectarea telefoanelor și ceasurilor inteligente neautorizate
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.3cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faCog}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Interfață intuitivă}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Interfață grafică ușor de utilizat pentru supraveghetori
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faVideo}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Înregistrare și arhivare}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Capturarea și salvarea sesiunilor video pentru analiză ulterioară
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.4cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faSearch}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Monitorizare în timp real}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Alertarea imediată a comportamentelor suspecte
+                                \end{center}
+                        \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+% Slide 4: Avantajele Abordării
+\begin{frame}{Avantajele Abordării}
+        \vspace{-0.6cm}
+        \begin{columns}[T]
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faUser}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Focalizare pe comportament}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Sistemul este centrat pe comportamentul real al candidatului
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.4cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faCoins}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Cost redus}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Alternativă economică la soluțiile comerciale costisitoare
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faBolt}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Detectare în timp real}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Identificare imediată a comportamentelor suspecte
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.4cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faRandom}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Flexibilitate}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Adaptabil pentru diverse tipuri de examene și scenarii
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faClipboardList}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Dovezi concrete}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Furnizează înregistrări și rapoarte pentru analiză ulterioară
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.4cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=1em]{block body}
+                                \begin{center}
+                                        {\fontsize{24}{24}\selectfont\textcolor{mainblue}{\faGraduationCap}}
+                                        \vspace{0.2cm}
+                                        
+                                        \textbf{Integritate academică}
+                                        \vspace{0.1cm}
+                                        
+                                        \small Contribuie la menținerea unui mediu de examinare echitabil
+                                \end{center}
+                        \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+% Slide 5: Diagrama de clase
+\begin{frame}{Diagrama de clase}
+        \begin{center}
+                \includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{screenshots/s12.png}
+        \end{center}
+\end{frame}
+
+% Slide 6: Diagrama Secvențială și de Activitate
+\begin{frame}{Diagrama Secvențială și de Activitate}
+        \begin{columns}[T]
+                \column{0.48\textwidth}
+                        \vspace{-0.2cm}            
+                        \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{screenshots/s13.png}            
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.8em]{block body}
+                                \small\textbf{Fluxul de execuție:}
+                                \small
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Pornire monitorizare din interfață
+                                        \item[\textcolor{green}{\faCheck}] Inițializare detectoare și handlere
+                                        \item[\textcolor{green}{\faCheck}] Procesare cadre video în buclă
+                                        \item[\textcolor{green}{\faCheck}] Actualizare interfață cu alerte
+                                \end{itemize}
+                        \end{beamercolorbox}
+                        
+                \column{0.48\textwidth}            
+                        \vspace{-1.2cm}
+                        \begin{center}
+                                \includegraphics[width=1.05\textwidth,height=0.47\textheight,keepaspectratio]{screenshots/s14.png}
+                        \end{center}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.8em]{block body}
+                                \small\textbf{Procesarea paralelă:}                
+                                \small
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Detectare față și analiză privire
+                                        \item[\textcolor{green}{\faCheck}] Detectare obiecte neautorizate
+                                        \item[\textcolor{green}{\faCheck}] Verificare încălcări și generare alerte
+                                        \item[\textcolor{green}{\faCheck}] Salvare cadre pentru rapoarte
+                                \end{itemize}
+                        \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+% Slide 7: Tehnologii Utilizate (Combined)
+\begin{frame}{Tehnologii Utilizate}
+        \vspace{-0.6cm}
+        \begin{columns}[T]
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{OpenCV}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Procesare imagini}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize 
+                                        \begin{itemize}[leftmargin=*]
+                                            \setlength{\itemsep}{0pt}
+                                            \item Capturare flux video
+                                            \item Procesare imagini
+                                            \item Detecție pupile
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.3cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{NumPy}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Calcule algebrice}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize
+                                        \begin{itemize}[leftmargin=*]
+                                                \setlength{\itemsep}{0pt}
+                                                \item Operații vectoriale
+                                                \item Manipulare matrice
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{Dlib}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Detectare facială}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize
+                                        \begin{itemize}[leftmargin=*]
+                                                \setlength{\itemsep}{0pt}
+                                                \item Detector facial HOG
+                                                \item Predictor repere faciale
+                                                \item Analiză orientare cap
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.3cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{PyQt5}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Interfață grafică}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize
+                                        \begin{itemize}[leftmargin=*]
+                                                \setlength{\itemsep}{0pt}
+                                                \item Interfață intuitivă
+                                                \item Afișare alerte
+                                                \item Generare rapoarte
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                \column{0.31\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{YOLOv8}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Detectare obiecte}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize
+                                        \begin{itemize}[leftmargin=*]
+                                                \setlength{\itemsep}{0pt}
+                                                \item Modele specializate
+                                                \item Detecție în timp real
+                                                \item Praguri optimizate
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.3cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \begin{center}
+                                        {\fontsize{18}{18}\selectfont\textcolor{mainblue}{Altele}}
+                                        \vspace{0.1cm}
+                                        
+                                        \textbf{\small Utilități suport}
+                                        \vspace{0.1cm}
+                                        
+                                        \footnotesize
+                                        \begin{itemize}[leftmargin=*]
+                                            \setlength{\itemsep}{0pt}
+                                            \item Datetime, Logging
+                                            \item Jurnalizare evenimente
+                                            \item Export date (JSON, CSV)
+                                        \end{itemize}
+                                \end{center}
+                        \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+% Slide 8: Detectarea Direcției Privirii
+\begin{frame}{Detectarea Direcției Privirii}
+        \begin{columns}[T]
+                \column{0.49\textwidth}
+                        \vspace{-0.5cm}
+                        \includegraphics[width=0.95\textwidth,height=0.45\textheight,keepaspectratio]{screenshots/s15.png}
+                        
+                        \vspace{0.05cm}
+                        
+                        \includegraphics[width=0.95\textwidth,height=0.45\textheight,keepaspectratio]{screenshots/s16.png}
+
+                        
+                \column{0.5\textwidth}
+                        \vspace{-1.2cm}
+                        \hspace{-2.5cm}
+                        \begin{minipage}{1.05\textwidth}
+                                \begin{cardblock}{Optimizări implementate}
+                                        \small
+                                        \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                                \item[\textcolor{green}{\faCheck}] Normalizarea coordonatelor pupilelor
+                                                \item[\textcolor{green}{\faCheck}] Compensarea orientării capului
+                                                \item[\textcolor{green}{\faCheck}] Robustețe la variații de iluminare
+                                                \item[\textcolor{green}{\faCheck}] Filtrare bazată pe praguri optimizate
+                                        \end{itemize}
+                                \end{cardblock}
+                                
+                                \centering\includegraphics[width=0.95\textwidth,height=0.26\textheight,keepaspectratio]{screenshots/s5.png}
+                                
+                                \centering\footnotesize Valorile RGB ale pixelilor din zona oculară
+                                
+                                \vspace{0.2cm}
+                                
+                                \begin{columns}
+                                        \column{0.48\textwidth}
+                                                \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.4em]{block body}
+                                                        \centering
+                                                        \begin{tikzpicture}[scale=0.8]
+                                                                \fill[green] (0,0) circle (0.4cm);
+                                                        \end{tikzpicture}
+                                                        
+                                                        \small\color{green!60!black}Privire centrată
+                                                \end{beamercolorbox}
+                                                
+                                        \column{0.48\textwidth}
+                                                \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.4em]{block body}
+                                                        \centering
+                                                        \begin{tikzpicture}[scale=0.8]
+                                                                \fill[red] (0,0) circle (0.4cm);
+                                                        \end{tikzpicture}
+                                                        
+                                                        \small\color{red!60!black}Privire suspectă
+                                                \end{beamercolorbox}
+                                \end{columns}
+                        \end{minipage}
+        \end{columns}
+\end{frame}
+
+% Slide 9: Interfața Utilizator și Detectare Obiecte
+\begin{frame}{Interfața Utilizator și Detectare Obiecte}
+        \vspace{-0.3cm}
+        \begin{columns}
+                \column{0.5\textwidth}
+                        \includegraphics[width=0.9\textwidth,height=0.5\textheight,keepaspectratio]{screenshots/s1.png}
+                        
+                        \vspace{0.05cm}
+                        
+                        \includegraphics[width=0.9\textwidth,height=0.5\textheight,keepaspectratio]{screenshots/s2.png}
+                        
+                \column{0.5\textwidth}
+                        \includegraphics[width=0.9\textwidth,height=0.5\textheight,keepaspectratio]{screenshots/s3.png}
+                        
+                        \vspace{0.05cm}
+                        
+                        \includegraphics[width=0.9\textwidth,height=0.5\textheight,keepaspectratio]{screenshots/s10.png}
+        \end{columns}
+\end{frame}
+
+% Slide 10: Rapoarte și Monitorizare
+\begin{frame}{Rapoarte și Monitorizare}
+        \vspace{-1.3cm}
+        \begin{columns}
+                \hspace{0.25cm}
+                \column{0.55\textwidth}
+                        \begin{cardblock}{Formate de raportare}
+                                \small
+                                \begin{tabular}{p{1.5cm}p{6.5cm}}
+                                        \cellcolor{lightblue!30}\textcolor{mainblue!60!black}{\textbf{HTML}} & Vizualizare interactivă și ușor de navigat \\
+                                        \cellcolor{lightgreen}\textcolor{green!60!black}{\textbf{CSV}} & Compatibil cu Excel și alte aplicații de analiză \\
+                                        \cellcolor{lightyellow}\textcolor{yellow!60!black}{\textbf{JSON}} & Integrare cu alte sisteme și procesare automatizată \\
+                                \end{tabular}
+                        \end{cardblock}    
+                        \vspace{0.2cm}
+                        
+                        \begin{cardblock}{Conținut rapoarte}
+                                \small
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Înregistrare temporală exactă a încălcărilor
+                                        \item[\textcolor{green}{\faCheck}] Tipul obiectului detectat și locația
+                                        \item[\textcolor{green}{\faCheck}] Statistici generale privind sesiunea
+                                        \item[\textcolor{green}{\faCheck}] Identificarea persoanei examinate
+                                \end{itemize}
+                        \end{cardblock}
+                        
+                \column{0.5\textwidth}
+                        \centering\includegraphics[width=0.98\textwidth,height=0.4\textheight,keepaspectratio]{screenshots/s4.png}
+                        
+                        \vspace{0.2cm}
+                        
+                        \centering\includegraphics[width=2.07\textwidth,height=0.5\textheight,keepaspectratio]{screenshots/s11.png}
+        \end{columns}
+\end{frame}
+
+% Slide 11: Avantaje Față de Soluțiile Existente
+\begin{frame}{Avantaje Față de Soluțiile Existente}
+        \vspace{-0.4cm}
+        \begin{columns}[T]
+                \column{0.32\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textbf{\small ProctorU}
+                                \vspace{0.1cm}
+                                
+                                \footnotesize
+                                \textcolor{red}{→} Costuri ridicate: 15-25 USD per candidat
+                                \vspace{0.1cm}
+                                
+                                \textcolor{red}{→} Necesită conexiune stabilă la internet
+                                \vspace{0.1cm}
+                                
+                                \textcolor{green}{→} \textbf{Soluția propusă:} Cost redus, rulare locală
+                        \end{beamercolorbox}
+                        
+                \column{0.32\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textbf{\small Proctorio}
+                                \vspace{0.1cm}
+                                
+                                \footnotesize
+                                \textcolor{red}{→} Funcționează doar pe Google Chrome
+                                \vspace{0.1cm}
+                                
+                                \textcolor{red}{→} Rată ridicată de falsuri pozitive
+                                \vspace{0.1cm}
+                                
+                                \textcolor{green}{→} \textbf{Soluția propusă:} Independentă de browser, algoritmi optimizați
+                        \end{beamercolorbox}
+                        
+                \column{0.32\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textbf{\small Respondus}
+                                \vspace{0.1cm}
+                                
+                                \footnotesize
+                                \textcolor{red}{→} Nu detectează dispozitive secundare
+                                \vspace{0.1cm}
+                                
+                                \textcolor{red}{→} Nu monitorizează comportamentul fizic
+                                \vspace{0.1cm}
+                                
+                                \textcolor{green}{→} \textbf{Soluția propusă:} Detectează dispozitive și analizează comportamentul
+                        \end{beamercolorbox}
+        \end{columns}
+        
+        \vspace{0.2cm}
+        
+        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                \centering\textcolor{mainblue}{\textbf{\small Avantaje generale}}
+                \vspace{0.1cm}
+                
+                \begin{columns}[T]
+                        \column{0.5\textwidth}
+                                \footnotesize
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Focalizare pe comportamentul fizic, nu doar pe monitorizarea ecranului
+                                        \item[\textcolor{green}{\faCheck}] Costuri semnificativ reduse, fără taxe pe candidat
+                                        \item[\textcolor{green}{\faCheck}] Independență de platformă și browser
+                                \end{itemize}
+                                
+                        \column{0.5\textwidth}
+                                \footnotesize
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Rapoarte detaliate în multiple formate
+                                        \item[\textcolor{green}{\faCheck}] Compatibilitate multiplatformă (Windows, Linux)
+                                        \item[\textcolor{green}{\faCheck}] Control total asupra datelor și confidențialitate
+                                \end{itemize}
+                \end{columns}
+        \end{beamercolorbox}
+\end{frame}
+
+% Slide 12: Contribuții Personale
+\begin{frame}{Contribuții Personale}
+        \vspace{-0.5cm}
+        \begin{columns}
+                \column{0.5\textwidth}
+                        \begin{cardblock}{}
+                                \begin{tabular}{cp{6.3cm}}
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{1}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Implementarea calculelor de algebră liniară}}
+                                                
+                                                \scriptsize Algoritmi optimizați pentru analiza direcției privirii
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{2}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Utilizarea a două modele YOLOv8}}
+                                                
+                                                \scriptsize Modele specializate pentru detectarea telefoanelor și ceasurilor
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{3}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Optimizarea procesării video în timp real}}
+                                                
+                                                \scriptsize Procesare eficientă pentru hardware limitat
+                                        \end{minipage}
+                                \end{tabular}
+                        \end{cardblock}
+                        
+                \column{0.5\textwidth}
+                        \begin{cardblock}{}
+                                \begin{tabular}{cp{6.3cm}}
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{4}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Generarea rapoartelor multi-format}}
+                                                
+                                                \scriptsize Sistem de raportare în HTML, CSV și JSON
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{5}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Integrarea interfeței grafice intuitive}}
+                                                
+                                                \scriptsize Interfață PyQt5 cu funcționalități avansate
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{6}} & 
+                                        \begin{minipage}[t]{6.3cm}
+                                                \textcolor{mainblue}{\textbf{Editarea parametrilor limitei privirii}}
+                                                
+                                                \scriptsize Ajustarea dinamică pentru diverse contexte de examinare
+                                        \end{minipage}
+                                \end{tabular}
+                        \end{cardblock}
+        \end{columns}
+        
+        \vspace{0.2cm}
+        
+        \begin{beamercolorbox}[rounded=true,shadow=false,sep=0.7em]{block body}
+                \centering
+                \small\textcolor{darkblue}{\textbf{Contribuțiile personale}} au fost centrate pe optimizarea algoritmilor,
+                îmbunătățirea interfeței utilizator și creșterea preciziei de detectare, toate acestea contribuind la
+                un sistem eficient și ușor de utilizat.
+        \end{beamercolorbox}
+\end{frame}
+
+% Slide 13: Îmbunătățiri Viitoare
+\begin{frame}{Îmbunătățiri Viitoare}
+        \vspace{-0.5cm}
+        \begin{columns}[T]
+                \column{0.48\textwidth}
+                        \begin{cardblock}{Dezvoltări tehnice}
+                                \begin{tabular}{cp{5.3cm}}
+                                        \textcolor{mainblue}{\faBook} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Integrarea cu platforme LMS}
+                                                
+                                                \footnotesize Conectare cu Moodle, Blackboard, Canvas
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \textcolor{mainblue}{\faVideo} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Suport multi-cameră}
+                                                
+                                                \footnotesize Utilizarea mai multor camere pentru monitorizare completă
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \textcolor{mainblue}{\faCog} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Îmbunătățirea algoritmilor}
+                                                
+                                                \footnotesize Reducerea falsurilor pozitive și creșterea preciziei
+                                        \end{minipage}
+                                \end{tabular}
+                        \end{cardblock}
+                        
+                \column{0.48\textwidth}
+                        \begin{cardblock}{Noi funcționalități}
+                                \begin{tabular}{cp{5.3cm}}
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{AI}} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Monitorizare audio avansată}
+                                                
+                                                \footnotesize Detectarea conversațiilor suspecte și dispozitivelor audio
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{API}} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Interfață programabilă}
+                                                
+                                                \footnotesize Integrare cu alte sisteme de monitorizare și management
+                                        \end{minipage} \\[0.3cm]
+                                        
+                                        \cellcolor{lightblue}\textcolor{mainblue}{\textbf{ML}} & 
+                                        \begin{minipage}[t]{5.3cm}
+                                                \small\textbf{Învățare automată adaptivă}
+                                                
+                                                \footnotesize Adaptare la comportamentul specific al fiecărui candidat
+                                        \end{minipage}
+                                \end{tabular}
+                        \end{cardblock}
+        \end{columns}
+        
+        \vspace{0.1cm}
+        
+        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.5em]{block body}
+                \centering
+                \footnotesize\itshape
+                „Cercetările recente în domeniul ceasurilor inteligente au propus o categorizare a utilizării acestora 
+                în sectorul de sănătate în 3 domenii funcționale: monitorizare, îndrumare și predicție, 
+                concepte ce ar putea fi adaptate pentru monitorizarea comportamentului candidaților."
+        \end{beamercolorbox}
+\end{frame}
+
+% Slide 14: Concluzii
+\begin{frame}{Concluzii}
+        \vspace{-0.6cm}
+        \begin{columns}
+                \column{0.48\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textcolor{mainblue}{\textbf{\small Îndeplinirea obiectivelor}}
+                                \vspace{0.1cm}
+                                
+                                \footnotesize
+                                \begin{itemize}[leftmargin=0.5cm,itemsep=0.05cm]
+                                        \item[\textcolor{green}{\faCheck}] Detectarea direcției privirii cu precizie
+                                        \item[\textcolor{green}{\faCheck}] Identificarea obiectelor neautorizate
+                                        \item[\textcolor{green}{\faCheck}] Înregistrare și arhivare optimizată
+                                        \item[\textcolor{green}{\faCheck}] Generarea rapoartelor comprehensive
+                                        \item[\textcolor{green}{\faCheck}] Interfață intuitivă și funcțională
+                                \end{itemize}
+                        \end{beamercolorbox}
+                        
+                        \vspace{0.2cm}
+                        
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textcolor{mainblue}{\textbf{\small Impact și relevanță}}
+                                \vspace{0.1cm}
+                                
+                                \footnotesize
+                                Sistemul contribuie semnificativ la menținerea integrității academice și crearea unui mediu de examinare echitabil.
+                                
+                                \vspace{0.2cm}
+                                
+                                Prin utilizarea tehnologiilor moderne, aplicația oferă o soluție robustă, adaptabilă la diverse contexte educaționale.
+                        \end{beamercolorbox}
+                        
+                \column{0.48\textwidth}
+                        \begin{beamercolorbox}[rounded=true,shadow=true,sep=0.7em]{block body}
+                                \centering\textcolor{mainblue}{\textbf{\small Esența proiectului}}
+                                \vspace{0.2cm}
+                                
+                                \footnotesize
+                                Un sistem inovator care utilizează tehnologii avansate pentru a combate plagiatul și frauda academică, oferind:
+                                
+                                \vspace{0.2cm}
+                                
+                                \begin{itemize}[leftmargin=0.5cm, itemsep=0.05cm]
+                                        \item[\textcolor{mainblue}{$\bullet$}] Monitorizare precisă a comportamentului
+                                        \item[\textcolor{mainblue}{$\bullet$}] Detectare automată a obiectelor neautorizate
+                                        \item[\textcolor{mainblue}{$\bullet$}] Cost redus comparativ cu soluțiile comerciale
+                                        \item[\textcolor{mainblue}{$\bullet$}] Flexibilitate pentru diverse scenarii
+                                \end{itemize}
+                                
+                                \vspace{0.2cm}
+                                
+                                \begin{center}
+                                        \footnotesize\itshape "Un pas important către asigurarea integrității academice în era digitală"
+                                \end{center}
+                        \end{beamercolorbox}
+        \end{columns}
+\end{frame}
+
+\end{document}
