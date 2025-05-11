@@ -59,3 +59,5 @@ sistem_anti_plagiat.log
 *.run.xml
 *.bcf
 *.bbl-SAVE-ERROR
+*.nav
+*.snm
