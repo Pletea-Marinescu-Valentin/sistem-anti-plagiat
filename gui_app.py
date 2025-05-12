@@ -140,12 +140,14 @@ class AntiPlagiatGUI(QMainWindow):
         system_layout.addWidget(self.record_button)
         system_layout.addWidget(self.pause_button)
         system_layout.addWidget(self.capture_button)
-        system_group.setLayout(system_layout)
 
         # adugare checkbox pentru a selecta modul oglindire
         self.mirror_check = QCheckBox("Oglindire Imagine")
         self.mirror_check.setChecked(self.config["camera"]["mirror_image"])
         self.mirror_check.stateChanged.connect(self.toggle_mirror)
+        system_layout.addWidget(self.mirror_check)
+
+        system_group.setLayout(system_layout)
 
         # grup de statistici
         stats_group = QGroupBox("Statistici")
