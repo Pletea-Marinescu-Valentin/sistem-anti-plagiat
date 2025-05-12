@@ -51,7 +51,7 @@ class ObjectDetector:
             self.frame_count = 0
 
         # rezolutie mai mare pentru acuratete buna
-        resized_frame = cv2.resize(frame, (640, 640))
+        resized_frame = cv2.resize(frame, (1280, 1280))
         return self._detect_with_yolo(resized_frame, frame)
 
     def _detect_with_yolo(self, resized_frame, original_frame):
@@ -100,11 +100,11 @@ class ObjectDetector:
 
             width = x2 - x1
             height = y2 - y1
-            
+
             current_label = label
             if label == "telefon" and width < 80 and height < 95:
                 current_label = "smartwatch"
-            
+
             # filtrare pentru smartwatch
             if current_label == "smartwatch":
                 aspect_ratio = width / (height + 1e-5) # valoare mica pentru a evita diviziunea cu zero
@@ -118,9 +118,9 @@ class ObjectDetector:
             # filtrare pentru telefon
             if current_label == "telefon":
                 aspect_ratio = height / (width + 1e-5)
-                min_width = 40  # in pixeli
-                min_height = 60
-                min_aspect = 1.4  # telefonul e mai inalt decat lat
+                min_width = 30  # in pixeli
+                min_height = 50
+                min_aspect = 1.2  # telefonul e mai inalt decat lat
 
                 if width < min_width or height < min_height or aspect_ratio < min_aspect:
                     continue  # ignoram obiectele mici sau prea late
