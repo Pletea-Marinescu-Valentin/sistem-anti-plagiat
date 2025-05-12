@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
@@ -12,11 +12,14 @@ RUN apt-get update && \
     wget \
     unzip \
     ffmpeg \
+    build-essential \
+    cmake \
+    libx11-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
 
-COPY requirements.txt /workspace/
+COPY ../requirements.txt /workspace/
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir -p models && \

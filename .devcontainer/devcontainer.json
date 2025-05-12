@@ -1,19 +1,35 @@
 {
     "name": "Anti-Plagiat System",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "context": ".."
     },
     "customizations": {
         "vscode": {
-        "extensions": [
-            "ms-python.python",
-            "ms-python.vscode-pylance"
-        ],
-        "settings": {
-            "python.defaultInterpreterPath": "/usr/local/bin/python",
-            "editor.formatOnSave": true
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker",
+                "ms-python.black-formatter",
+                "njpwerner.autodocstring"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "editor.formatOnSave": true,
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.testing.pytestEnabled": true
+            }
         }
-    }
     },
-    "forwardPorts": [8000]
+    "forwardPorts": [8000],
+    "mounts": [
+        "source=${localWorkspaceFolder}/data,target=/workspace/data,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/recordings,target=/workspace/recordings,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/reports,target=/workspace/reports,type=bind,consistency=cached"
+    ],
+    "runArgs": [
+        "--env-file",
+        ".devcontainer/devcontainer.env"
+    ]
 }
