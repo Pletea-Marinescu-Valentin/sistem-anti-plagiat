@@ -33,7 +33,7 @@ class ObjectDetector:
             self.device = "cpu"
 
         self.frame_count = 0
-        self.process_every_n_frames = 30
+        self.process_every_n_frames = 20
         self.last_detections = []
         self.last_annotated_frame = None
 
@@ -102,18 +102,8 @@ class ObjectDetector:
             height = y2 - y1
 
             current_label = label
-            if label == "telefon" and width < 80 and height < 95:
+            if label == "telefon" and width < 100 and height < 100:
                 current_label = "smartwatch"
-
-            # filtrare pentru smartwatch
-            if current_label == "smartwatch":
-                aspect_ratio = width / (height + 1e-5) # valoare mica pentru a evita diviziunea cu zero
-                max_width = 80  # in pixeli
-                max_height = 100
-                max_aspect = 1.2  # smartwatch-ul este aproape patrat
-
-                if width > max_width or height > max_height or aspect_ratio > max_aspect:
-                    continue  # ignoram obiectele prea mari sau cu aspect necorespunzator
 
             # filtrare pentru telefon
             if current_label == "telefon":
