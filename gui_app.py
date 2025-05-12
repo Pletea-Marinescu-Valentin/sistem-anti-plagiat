@@ -67,7 +67,7 @@ class VideoProcessingThread(QThread):
                                 self.violation_detected.emit(recent_violations)
                         except Exception as e:
                             print(f"Eroare la procesarea frame-ului: {e}")
-                            
+
                 # o scurta pauza pentru a nu supraincarca CPU
                 self.msleep(15)
         except Exception as e:
@@ -240,7 +240,7 @@ class AntiPlagiatGUI(QMainWindow):
             palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
             app.setPalette(palette)
 
-            # stil butoane
+            # stil butoane si spinboxes
             self.setStyleSheet("""
                 QPushButton {
                     background-color: #bbbbbb;
@@ -254,6 +254,34 @@ class AntiPlagiatGUI(QMainWindow):
                 }
                 QPushButton:pressed {
                     background-color: #aaaaaa;
+                }
+                QSpinBox {
+                    background-color: #444444;
+                    color: white;
+                    border: 1px solid #555555;
+                    border-radius: 3px;
+                    padding: 2px;
+                }
+                QSpinBox::up-button, QSpinBox::down-button {
+                    background-color: #666666;
+                }
+                QMessageBox {
+                    background-color: #333333;
+                    color: white;
+                }
+                QMessageBox QLabel {
+                    color: white;
+                }
+                QMessageBox QPushButton {
+                    background-color: #bbbbbb;
+                    color: black;
+                    font-weight: bold;
+                    padding: 5px;
+                    border-radius: 3px;
+                    min-width: 80px;
+                }
+                QMessageBox QPushButton:hover {
+                    background-color: #cccccc;
                 }
             """)
         else:
