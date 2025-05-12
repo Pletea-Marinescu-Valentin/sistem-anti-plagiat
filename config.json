@@ -6,7 +6,7 @@
     "detection": {
         "object": {
             "confidence_thresholds": {
-                "telefon": 0.55,
+                "telefon": 0.3,
                 "smartwatch": 0.4
             },
             "objects_of_interest": [
