@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                             QLabel, QPushButton, QGroupBox, QCheckBox, QTextEdit, QMessageBox, QSpinBox, QFormLayout)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
 from PyQt5.QtGui import QImage, QPixmap, QColor, QPalette
-from main import SistemAntiPlagiat
+from main import AntiPlagiarismSystem
 
 class VideoProcessingThread(QThread):
     frame_ready = pyqtSignal(np.ndarray)
@@ -22,24 +22,24 @@ class VideoProcessingThread(QThread):
         self.running = False
         self.paused = False
 
-        self.frame_buffer = queue.Queue(maxsize=5) # buffer pentru frame-uri
+        self.frame_buffer = queue.Queue(maxsize=5)  # frame buffer
 
-        # procesam unul din trei cadre pentru eficienta
+        # process every third frame for efficiency
         self.process_every_n_frames = 3
         self.frame_count = 0
 
     def run(self):
         try:
-            print("Initializare camera web")
-            cap = cv2.VideoCapture(0)  # Folosim direct camera web(id=0)
+            print("Initializing webcam")
+            cap = cv2.VideoCapture(0)  # Use webcam directly (id=0)
 
             if not cap.isOpened():
-                print("Eroare: Nu s-a putut accesa camera web")
+                print("Error: Could not access webcam")
                 return
 
-            print("Camera web initializata cu succes")
+            print("Webcam initialized successfully")
 
-            # rezolutie camera
+            # camera resolution
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
@@ -49,29 +49,29 @@ class VideoProcessingThread(QThread):
                 if not self.paused:
                     ret, frame = cap.read()
                     if not ret:
-                        print("Eroare: Nu s-a putut citi frame-ul din camera")
+                        print("Error: Could not read frame from camera")
                         self.msleep(100)
                         continue
 
-                    # procesare frame doar la anumite intervale
+                    # process frame only at certain intervals
                     if self.frame_count % self.process_every_n_frames == 0:
                         try:
                             processed_frame = self.system.process_frame(frame)
 
-                            # emite semnale
+                            # emit signals
                             self.frame_ready.emit(processed_frame)
 
-                            # verifica daca exista incalcari recente
+                            # check if there are recent violations
                             recent_violations = self.system.get_recent_violations()
                             if recent_violations:
                                 self.violation_detected.emit(recent_violations)
                         except Exception as e:
-                            print(f"Eroare la procesarea frame-ului: {e}")
+                            print(f"Error processing frame: {e}")
 
-                # o scurta pauza pentru a nu supraincarca CPU
+                # short pause to not overload CPU
                 self.msleep(15)
         except Exception as e:
-            print(f"Eroare in thread-ul de procesare video: {e}")
+            print(f"Error in video processing thread: {e}")
         finally:
             if 'cap' in locals() and cap is not None:
                 cap.release()
@@ -88,14 +88,14 @@ class AntiPlagiatGUI(QMainWindow):
     def __init__(self, config_path="config.json"):
         super().__init__()
 
-        # incarcare configuratie
+        # load configuration
         with open(config_path, 'r') as f:
             self.config = json.load(f)
 
         self.initialize_system()
         self.setup_ui()
 
-        # initializare thread pentru procesare video
+        # initialize thread for video processing
         self.video_thread = VideoProcessingThread(self.config, self.system)
         self.video_thread.frame_ready.connect(self.update_frame)
         self.video_thread.violation_detected.connect(self.handle_violation)
@@ -103,14 +103,14 @@ class AntiPlagiatGUI(QMainWindow):
         self.recording = False
         self.monitoring = False
         self.current_frame = None
-        self.violations_count = 0  # contor explicit pentru incalcari
+        self.violations_count = 0  # explicit counter for violations
 
     def initialize_system(self):
-        self.system = SistemAntiPlagiat(self.config)
+        self.system = AntiPlagiarismSystem(self.config)
 
     def setup_ui(self):
-        # Configurare fereastra principala
-        self.setWindowTitle("Sistem Anti-Plagiat")
+        # Main window configuration
+        self.setWindowTitle("Anti-Plagiarism System")
         self.setGeometry(100, 100, 1200, 800)
         self.set_theme("dark")
 
@@ -119,21 +119,21 @@ class AntiPlagiatGUI(QMainWindow):
         self.video_display.setAlignment(Qt.AlignCenter)
         self.video_display.setMinimumSize(640, 480)
         controls_layout = QVBoxLayout()
-        system_group = QGroupBox("Control Sistem")
+        system_group = QGroupBox("System Control")
         system_layout = QVBoxLayout()
 
-        # configurare butoane
-        self.start_button = QPushButton("Start Monitorizare")
+        # button configuration
+        self.start_button = QPushButton("Start Monitoring")
         self.start_button.clicked.connect(self.toggle_monitoring)
 
-        self.record_button = QPushButton("Start Inregistrare")
+        self.record_button = QPushButton("Start Recording")
         self.record_button.clicked.connect(self.toggle_recording)
 
-        self.pause_button = QPushButton("Pauza")
+        self.pause_button = QPushButton("Pause")
         self.pause_button.clicked.connect(self.toggle_pause)
         self.pause_button.setEnabled(False)
 
-        self.capture_button = QPushButton("Captura Instantanee")
+        self.capture_button = QPushButton("Capture Snapshot")
         self.capture_button.clicked.connect(self.capture_snapshot)
 
         system_layout.addWidget(self.start_button)
@@ -141,49 +141,49 @@ class AntiPlagiatGUI(QMainWindow):
         system_layout.addWidget(self.pause_button)
         system_layout.addWidget(self.capture_button)
 
-        # adugare checkbox pentru a selecta modul oglindire
-        self.mirror_check = QCheckBox("Oglindire Imagine")
+        # add checkbox to select mirror mode
+        self.mirror_check = QCheckBox("Mirror Image")
         self.mirror_check.setChecked(self.config["camera"]["mirror_image"])
         self.mirror_check.stateChanged.connect(self.toggle_mirror)
         system_layout.addWidget(self.mirror_check)
 
         system_group.setLayout(system_layout)
 
-        # grup de statistici
-        stats_group = QGroupBox("Statistici")
+        # statistics group
+        stats_group = QGroupBox("Statistics")
         stats_layout = QVBoxLayout()
 
-        # statisticile despre incalcari
-        self.violations_label = QLabel("Incalcari detectate: 0")
-        self.recording_time_label = QLabel("Timp inregistrare: 00:00:00")
+        # violation statistics
+        self.violations_label = QLabel("Violations detected: 0")
+        self.recording_time_label = QLabel("Recording time: 00:00:00")
 
         stats_layout.addWidget(self.violations_label)
         stats_layout.addWidget(self.recording_time_label)
         stats_group.setLayout(stats_layout)
 
-        # zona de afisare a raportului
-        report_group = QGroupBox("Raport Live")
+        # report display area
+        report_group = QGroupBox("Live Report")
         report_layout = QVBoxLayout()
 
-        # text edit pentru raport live
+        # text edit for live report
         self.report_text = QTextEdit()
         self.report_text.setReadOnly(True)
 
-        # adaugare buton pentru a da export la raport
-        self.export_button = QPushButton("Export Raport")
+        # add button to export report
+        self.export_button = QPushButton("Export Report")
         self.export_button.clicked.connect(self.export_report)
 
         report_layout.addWidget(self.report_text)
         report_layout.addWidget(self.export_button)
         report_group.setLayout(report_layout)
 
-        # adauga grupurile la layout-ul de controale
+        # add groups to controls layout
         controls_layout.addWidget(system_group)
         controls_layout.addWidget(stats_group)
         controls_layout.addWidget(report_group)
 
-        # configurare limite privire
-        config_group = QGroupBox("Configurare Limite Privire")
+        # gaze limits configuration
+        config_group = QGroupBox("Gaze Limits Configuration")
         config_layout = QFormLayout()
 
         self.left_limit_spinbox = QSpinBox()
@@ -198,32 +198,32 @@ class AntiPlagiatGUI(QMainWindow):
         self.down_limit_spinbox.setRange(0, 100)
         self.down_limit_spinbox.setValue(int(self.config["detection"]["gaze"]["down_limit"] * 100))
 
-        save_button = QPushButton("Salveaza Configuratia")
+        save_button = QPushButton("Save Configuration")
         save_button.clicked.connect(self.save_config)
 
-        config_layout.addRow("Limita Stanga (%)", self.left_limit_spinbox)
-        config_layout.addRow("Limita Dreapta (%)", self.right_limit_spinbox)
-        config_layout.addRow("Limita Jos (%)", self.down_limit_spinbox)
+        config_layout.addRow("Left Limit (%)", self.left_limit_spinbox)
+        config_layout.addRow("Right Limit (%)", self.right_limit_spinbox)
+        config_layout.addRow("Down Limit (%)", self.down_limit_spinbox)
         config_layout.addWidget(save_button)
         config_group.setLayout(config_layout)
 
         controls_layout.addWidget(config_group)
 
-        # adauga layout-urile la layout-ul principal
+        # add layouts to main layout
         main_layout.addWidget(self.video_display, 2)
         main_layout.addLayout(controls_layout, 1)
 
-        # widget central
+        # central widget
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        # timer pentru actualizarea timpului de inregistrare
+        # timer for recording time update
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_recording_time)
         self.recording_start_time = None
 
-        # adauga placeholder pentru afisarea video
+        # add placeholder for video display
         self.display_placeholder()
 
     def set_theme(self, theme_name):
@@ -242,7 +242,7 @@ class AntiPlagiatGUI(QMainWindow):
             palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
             app.setPalette(palette)
 
-            # stil butoane si spinboxes
+            # button and spinbox styles
             self.setStyleSheet("""
                 QPushButton {
                     background-color: #bbbbbb;
@@ -291,88 +291,88 @@ class AntiPlagiatGUI(QMainWindow):
             self.setStyleSheet("")
 
     def display_placeholder(self):
-        """Afiseaza un placeholder in zona de afisare video"""
+        """Display a placeholder in the video display area"""
         placeholder = QPixmap(640, 480)
         placeholder.fill(QColor(200, 200, 200))
         self.video_display.setPixmap(placeholder)
 
     def update_frame(self, frame):
-        """Actualizeaza frame-ul afisat"""
+        """Update the displayed frame"""
         if frame is not None:
             try:
-                # salvam frame-ul curent
+                # save current frame
                 self.current_frame = frame.copy()
 
-                # converteste frame-ul OpenCV in QImage
+                # convert OpenCV frame to QImage
                 h, w, ch = frame.shape
                 bytes_per_line = ch * w
                 convert_to_qt_format = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
                 qt_frame = convert_to_qt_format.rgbSwapped()
 
-                # redimensioneaza pentru a se potrivi in zona
+                # resize to fit display area
                 display_size = self.video_display.size()
                 scaled_frame = qt_frame.scaled(display_size, Qt.KeepAspectRatio)
 
-                # afiseaza frame-ul
+                # display frame
                 self.video_display.setPixmap(QPixmap.fromImage(scaled_frame))
             except Exception as e:
-                print(f"Eroare la actualizarea frame-ului: {e}")
+                print(f"Error updating frame: {e}")
 
     def handle_violation(self, violation_data):
         try:
-            # creeaza mesajul curent
+            # create current message
             current_message = f"<b>[{violation_data['timestamp']}]</b> {', '.join(violation_data['violations'])}"
             current_time = datetime.now().timestamp()
 
-            # verificam timpul ultimei incalcari
+            # check time of last violation
             if not hasattr(self, 'last_violation_time'):
                 self.last_violation_time = 0
 
-            # verifica daca au trecut cel putin 5 secunde de la ultima incalcare
+            # check if at least 5 seconds have passed since last violation
             if current_time - self.last_violation_time >= 5:
-                # actualizeaza numarul de incalcari
+                # update violation count
                 self.violations_count += 1
-                self.violations_label.setText(f"Incalcari detectate: {self.violations_count}")
+                self.violations_label.setText(f"Violations detected: {self.violations_count}")
 
-                # adauga mesajul in raport
+                # add message to report
                 self.report_text.append(current_message)
 
-                # actualizeaza timpul ultimei incalcari
+                # update last violation time
                 self.last_violation_time = current_time
 
         except Exception as e:
-            print(f"Eroare la gestionarea incalcarii: {e}")
+            print(f"Error handling violation: {e}")
 
     def update_recording_time(self):
-        # actualizeaza timpul de inregistrare afisat
+        # update displayed recording time
         if self.recording_start_time:
             elapsed = datetime.now() - self.recording_start_time
             hours, remainder = divmod(elapsed.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            self.recording_time_label.setText(f"Timp inregistrare: {hours:02}:{minutes:02}:{seconds:02}")
+            self.recording_time_label.setText(f"Recording time: {hours:02}:{minutes:02}:{seconds:02}")
 
     def toggle_monitoring(self):
         if not self.monitoring:
-            # porneste monitorizarea
-            self.start_button.setText("Stop Monitorizare")
+            # start monitoring
+            self.start_button.setText("Stop Monitoring")
             self.pause_button.setEnabled(True)
 
-            # seteaza camera la 0 (camera web de pe laptop)
+            # set camera to 0 (laptop webcam)
             self.config["camera"]["index"] = 0
 
-            # porneste thread-ul de procesare video
+            # start video processing thread
             self.video_thread.start()
             self.monitoring = True
         else:
-            # opreste monitorizarea
-            self.start_button.setText("Start Monitorizare")
+            # stop monitoring
+            self.start_button.setText("Start Monitoring")
             self.pause_button.setEnabled(False)
 
-            # opreste thread-ul de procesare video
+            # stop video processing thread
             self.video_thread.stop()
             self.monitoring = False
 
-            # daca inregistrarea este pornita, o oprim
+            # if recording is on, stop it
             if self.recording:
                 self.toggle_recording()
 
@@ -380,38 +380,38 @@ class AntiPlagiatGUI(QMainWindow):
 
     def toggle_recording(self):
         if not self.recording:
-            # daca monitorizarea nu este pornita, o pornim
+            # if monitoring is not started, start it
             if not self.monitoring:
                 self.toggle_monitoring()
 
-           # porneste inregistrarea
+           # start recording
             self.system.start_recording()
-            self.record_button.setText("Stop Inregistrare")
+            self.record_button.setText("Stop Recording")
             self.recording = True
 
-            # porneste timer-ul pentru timpul de inregistrare
+            # start timer for recording time
             self.recording_start_time = datetime.now()
-            self.timer.start(1000)  # Actualizeaza la fiecare secunda
+            self.timer.start(1000)  # Update every second
         else:
-            # opreste inregistrarea
+            # stop recording
             self.system.stop_recording()
-            self.record_button.setText("Start Inregistrare")
+            self.record_button.setText("Start Recording")
             self.recording = False
 
-            # opreste timer-ul
+            # stop timer
             self.timer.stop()
-            self.recording_time_label.setText("Timp inregistrare: 00:00:00")
+            self.recording_time_label.setText("Recording time: 00:00:00")
 
-            # afiseaza mesaj de confirmare
-            QMessageBox.information(self, "Inregistrare Oprita",
-                                    f"Inregistrarea a fost salvata in:\n{self.system.get_recording_path()}")
+            # show confirmation message
+            QMessageBox.information(self, "Recording Stopped",
+                                    f"Recording has been saved to:\n{self.system.get_recording_path()}")
 
     def toggle_pause(self):
         self.video_thread.pause()
         if self.video_thread.paused:
-            self.pause_button.setText("Reluare")
+            self.pause_button.setText("Resume")
         else:
-            self.pause_button.setText("Pauza")
+            self.pause_button.setText("Pause")
 
     def toggle_mirror(self, state):
         is_checked = state == Qt.Checked
@@ -423,43 +423,43 @@ class AntiPlagiatGUI(QMainWindow):
         if self.monitoring:
             path = self.system.capture_snapshot()
             if path:
-                QMessageBox.information(self, "Captura Realizata", f"Imaginea a fost salvata in:\n{path}")
+                QMessageBox.information(self, "Snapshot Captured", f"Image has been saved to:\n{path}")
             else:
-                QMessageBox.warning(self, "Eroare", "Nu s-a putut salva captura.")
+                QMessageBox.warning(self, "Error", "Could not save snapshot.")
 
     def export_report(self):
         if not hasattr(self.system, 'violation_monitor') or not self.system.violation_monitor.get_logs():
-            QMessageBox.information(self, "Export Raport", "Nu exista incalcari de raportat.")
+            QMessageBox.information(self, "Export Report", "No violations to report.")
             return
 
-        # timestamp pentru fișiere
+        # timestamp for files
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # Export raport in toate cele 3 formate
+        # Export report in all 3 formats
         report_paths = []
 
         try:
-            # Exportam în HTML
-            html_path = os.path.join(self.config["reporting"]["save_path"], f"raport_{timestamp}.html")
+            # Export to HTML
+            html_path = os.path.join(self.config["reporting"]["save_path"], f"report_{timestamp}.html")
             self.system.export_report(html_path)
             report_paths.append(html_path)
 
-            # Exportam în CSV
-            csv_path = os.path.join(self.config["reporting"]["save_path"], f"raport_{timestamp}.csv")
+            # Export to CSV
+            csv_path = os.path.join(self.config["reporting"]["save_path"], f"report_{timestamp}.csv")
             self.system.export_report(csv_path)
             report_paths.append(csv_path)
 
-            # Exportam în JSON
-            json_path = os.path.join(self.config["reporting"]["save_path"], f"raport_{timestamp}.json")
+            # Export to JSON
+            json_path = os.path.join(self.config["reporting"]["save_path"], f"report_{timestamp}.json")
             self.system.export_report(json_path)
             report_paths.append(json_path)
 
-            # Afisare mesaj de confirmare cu toate caile
+            # Show confirmation message with all paths
             paths_text = "\n".join(report_paths)
-            QMessageBox.information(self, "Export Raport",
-                                f"Rapoartele au fost exportate cu succes in:\n{paths_text}")
+            QMessageBox.information(self, "Export Report",
+                                f"Reports have been exported successfully to:\n{paths_text}")
         except Exception as e:
-            QMessageBox.critical(self, "Eroare", f"Eroare la exportul raportului: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Error exporting report: {str(e)}")
 
     def save_config(self):
         self.config["detection"]["gaze"]["left_limit"] = self.left_limit_spinbox.value() / 100
@@ -469,23 +469,23 @@ class AntiPlagiatGUI(QMainWindow):
         with open("config.json", "w") as f:
             json.dump(self.config, f, indent=4)
 
-        # Actualizare în timp real a componentelor relevante
+        # Real-time update of relevant components
         self.system.face_detector.gaze_tracker.left_limit = self.config["detection"]["gaze"]["left_limit"]
         self.system.face_detector.gaze_tracker.right_limit = self.config["detection"]["gaze"]["right_limit"]
         self.system.face_detector.gaze_tracker.down_limit = self.config["detection"]["gaze"]["down_limit"]
 
-        QMessageBox.information(self, "Configurare Salvata", "Limitele au fost salvate și aplicate cu succes!")
+        QMessageBox.information(self, "Configuration Saved", "Limits have been saved and applied successfully!")
 
 def main():
     app = QApplication(sys.argv)
     config_path = "config.json"
 
-    # incarcare configuratie pentru a avea acces la caile configurate
+    # load configuration to access configured paths
     try:
         with open(config_path, 'r') as f:
             config = json.load(f)
 
-        # Creeaza toate directoarele necesare o singura data
+        # Create all necessary directories once
         recording_path = config.get("recording", {}).get("save_path", "./recordings")
         reporting_path = config.get("reporting", {}).get("save_path", "./reports")
         snapshot_path = config.get("snapshots", {}).get("save_path", "./snapshots")
@@ -494,10 +494,10 @@ def main():
         os.makedirs(reporting_path, exist_ok=True)
         os.makedirs(snapshot_path, exist_ok=True)
 
-        print(f"Directoare create/verificate: {recording_path}, {reporting_path}, {snapshot_path}")
+        print(f"Directories created/verified: {recording_path}, {reporting_path}, {snapshot_path}")
     except Exception as e:
-        print(f"Eroare la crearea directoarelor: {e}")
-        # creare directoare cu nume implicite in caz de eroare
+        print(f"Error creating directories: {e}")
+        # create directories with default names in case of error
         os.makedirs("recordings", exist_ok=True)
         os.makedirs("reports", exist_ok=True)
         os.makedirs("snapshots", exist_ok=True)

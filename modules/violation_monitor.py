@@ -4,45 +4,45 @@ class ViolationMonitor:
     def __init__(self):
         self.violation_log = []
 
-        # mesaje pentru alerte
+        # alert messages
         self.direction_messages = {
-            "left": "Privire suspecta spre STANGA",
-            "right": "Privire suspecta spre DREAPTA",
-            "down": "Privire suspecta in JOS",
-            "no_face": "Fata nu este vizibila"
+            "left": "Suspicious gaze to the LEFT",
+            "right": "Suspicious gaze to the RIGHT", 
+            "down": "Suspicious gaze DOWNWARD",
+            "no_face": "Face is not visible"
         }
 
-        # timpul ultimei incalcari inregistrate
+        # time of last recorded violation
         self.last_log_time = 0
-        # intervalul minim intre inregistrari in secunde
+        # minimum interval between recordings in seconds
         self.min_log_interval = 1.5
 
     def check_violations(self, direction, objects):
         violations = []
 
-        # verificam directia privirii
+        # check gaze direction
         if direction in self.direction_messages:
             message = self.direction_messages[direction]
             violations.append(message)
 
-        # verificam obiectele detectate
+        # check detected objects
         for obj, _ in objects:
-            message = f"Obiect neautorizat detectat: {obj.upper()}"
+            message = f"Unauthorized object detected: {obj.upper()}"
             violations.append(message)
 
         return violations
 
     def log_violation(self, violations):
         if violations:
-            # obtinem timpul curent
+            # get current time
             current_time = datetime.now()
             current_timestamp = current_time.timestamp()
 
-            # verificam daca a trecut intervalul minim de la ultima inregistrare
+            # check if minimum interval has passed since last recording
             time_diff = current_timestamp - self.last_log_time
 
             if time_diff >= self.min_log_interval:
-                # inregistram alerta
+                # record alert
                 timestamp = current_time.strftime("%Y-%m-%d %H:%M:%S")
                 violation_record = {
                     "timestamp": timestamp,

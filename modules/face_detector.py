@@ -2,7 +2,7 @@ from .gaze_tracking import GazeTracker
 
 class FaceDetector:
     """
-    Clasa pentru detectarea directiei privirii
+    Class for gaze direction detection
     """
     def __init__(self, mirror_image=True):
         self.mirror_image = mirror_image
@@ -32,10 +32,10 @@ class FaceDetector:
         return self.gaze_tracker.is_down()
 
     def detect_direction(self, frame):
-        # detecteaza directia privirii folosind tracker-ul
+        # detect gaze direction using tracker
         direction, annotated_frame, h_ratio, v_ratio = self.gaze_tracker.detect_gaze_direction(frame)
 
-        # actualizeaza ultima directie valida daca exista fata
+        # update last valid direction if face exists
         if direction != "no_face":
             self.last_valid_direction = direction
 

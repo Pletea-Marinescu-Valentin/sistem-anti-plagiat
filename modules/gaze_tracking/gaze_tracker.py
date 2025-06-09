@@ -5,7 +5,7 @@ import json
 from .eye import Eye
 
 class GazeTracker(object):
-    """aceasta clasa urmareste directia privirii utilizatorului si ofera informatii despre pozitia ochilor si a pupilelor"""
+    """this class tracks the user's gaze direction and provides information about eye and pupil positions"""
 
     def __init__(self, mirror_image=True, config_path="config.json"):
         self.frame = None
@@ -13,10 +13,10 @@ class GazeTracker(object):
         self.eye_right = None
         self.mirror_image = mirror_image
 
-        # detector fete
+        # face detector
         self._face_detector = dlib.get_frontal_face_detector()
 
-        # predictor repere faciale
+        # facial landmarks predictor
         model_path = "shape_predictor_68_face_landmarks.dat"
         self._predictor = dlib.shape_predictor(model_path)
 
@@ -24,20 +24,20 @@ class GazeTracker(object):
         self.max_frames_without_detection = 10
         self.last_valid_direction = "center"
 
-        # optimizare procesare
+        # processing optimization
         self.process_every_n_frames = 2
         self.frame_count = 0
 
-        # valori pentru filtrare
+        # values for filtering
         self.prev_h_ratio = 0.5
         self.prev_v_ratio = 0.5
         self.h_ratio = 0.5
         self.v_ratio = 0.5
 
-        # factor filtrare
+        # filtering factor
         self.smoothing_factor = 0.3
 
-        # incarcare configuratie
+        # load configuration
         self.config = self.load_config(config_path)
         self.left_limit = self.config["detection"]["gaze"]["left_limit"]
         self.right_limit = self.config["detection"]["gaze"]["right_limit"]
@@ -49,7 +49,7 @@ class GazeTracker(object):
 
     @property
     def pupils_located(self):
-        """verifica daca pupilele sunt localizate"""
+        """checks if pupils are located"""
         try:
             int(self.eye_left.pupil.x)
             int(self.eye_left.pupil.y)
@@ -60,19 +60,19 @@ class GazeTracker(object):
             return False
 
     def _analyze(self):
-        """detecteaza fata si ochii"""
+        """detects face and eyes"""
         if self.frame is None:
             return False
 
         frame_copy = self.frame.copy()
 
-        # resize pentru procesare mai rapida
+        # resize for faster processing
         scale_factor = 0.5
         small_frame = cv2.resize(frame_copy, None, fx=scale_factor, fy=scale_factor)
 
         gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
 
-        # detectare fete
+        # face detection
         faces = self._face_detector(gray, 1)
 
         if len(faces) == 0:
@@ -80,7 +80,7 @@ class GazeTracker(object):
             return False
 
         try:
-            # convertire coordonate
+            # convert coordinates
             face_orig = dlib.rectangle(
                 int(faces[0].left() / scale_factor),
                 int(faces[0].top() / scale_factor),
@@ -88,23 +88,23 @@ class GazeTracker(object):
                 int(faces[0].bottom() / scale_factor)
             )
 
-            # conversie frame original
+            # convert original frame
             gray_orig = cv2.cvtColor(frame_copy, cv2.COLOR_BGR2GRAY)
 
             landmarks = self._predictor(gray_orig, face_orig)
 
-            # calcul orientare cap
+            # calculate head orientation
             new_h_ratio, new_v_ratio = self.calculate_head_orientation(landmarks)
 
-            # filtrare valori
+            # filter values
             self.h_ratio = self.prev_h_ratio * (1 - self.smoothing_factor) + new_h_ratio * self.smoothing_factor
             self.v_ratio = self.prev_v_ratio * (1 - self.smoothing_factor) + new_v_ratio * self.smoothing_factor
 
-            # update valori
+            # update values
             self.prev_h_ratio = self.h_ratio
             self.prev_v_ratio = self.v_ratio
 
-            # initializare ochi
+            # initialize eyes
             self.eye_left = Eye(gray_orig, landmarks, 0)
             self.eye_right = Eye(gray_orig, landmarks, 1)
 
@@ -112,11 +112,11 @@ class GazeTracker(object):
             return True
         except Exception as e:
             self.frames_without_detection += 1
-            print(f"eroare analiza fata: {e}")
+            print(f"face analysis error: {e}")
             return False
 
     def refresh(self, frame):
-        """update frame si analiza"""
+        """update frame and analyze"""
         self.frame = frame
         return self._analyze()
     
@@ -202,28 +202,28 @@ class GazeTracker(object):
         return pupil_ratio
 
     def is_right(self):
-        """verifica privire dreapta"""
+        """check right gaze"""
         if hasattr(self, 'h_ratio'):
             if self.h_ratio < self.right_limit:
                 return True
         return False
 
     def is_left(self):
-        """verifica privire stanga"""
+        """check left gaze"""
         if hasattr(self, 'h_ratio'):
             if self.h_ratio > self.left_limit:
                 return True
         return False
 
     def is_down(self):
-        """verifica privire jos"""
+        """check downward gaze"""
         if hasattr(self, 'v_ratio'):
             if self.v_ratio > self.down_limit:
                 return True
         return False
 
     def is_center(self):
-        """verifica privire centru"""
+        """check center gaze"""
         if hasattr(self, 'h_ratio') and hasattr(self, 'v_ratio'):
             h_ok = self.right_limit <= self.h_ratio <= self.left_limit
             v_ok = self.v_ratio <= self.down_limit
@@ -276,14 +276,14 @@ class GazeTracker(object):
         return None
 
     def determine_direction(self):
-        """determina directia privirii"""
+        """determine gaze direction"""
         if not self.pupils_located:
             if self.frames_without_detection > self.max_frames_without_detection:
                 return "no_face"
             else:
                 return self.last_valid_direction
 
-        # determinare directie
+        # determine direction
         if self.is_right():
             if not self.mirror_image:
                 direction = "right"
@@ -299,7 +299,7 @@ class GazeTracker(object):
         else:
             direction = "center"
 
-        # ultima directie valida
+        # last valid direction
         self.last_valid_direction = direction
 
         return direction

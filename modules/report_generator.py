@@ -4,15 +4,15 @@ import os
 class ReportGenerator:
     def __init__(self, timestamp, save_path="./reports"):
         self.timestamp = timestamp
-        # folosim calea din configuratie
+        # use path from configuration
         self.save_path = save_path
 
     def generate_html_report(self, violation_log, output_video_path):
-        # construim calea completa
-        report_filename = f"raport_anti_plagiat_{self.timestamp}.html"
+        # build complete path
+        report_filename = f"anti_plagiarism_report_{self.timestamp}.html"
         report_path = os.path.join(self.save_path, report_filename)
 
-        # cream directorul daca nu exista
+        # create directory if it doesn't exist
         os.makedirs(self.save_path, exist_ok=True)
 
         total_violations = len(violation_log)
@@ -25,13 +25,13 @@ class ReportGenerator:
                     grouped_violations[violation_type] = 0
                 grouped_violations[violation_type] += 1
 
-        # generare html
+        # generate html
         html_content = f"""<!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raport Anti-Plagiat</title>
+    <title>Anti-Plagiarism Report</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -87,32 +87,32 @@ class ReportGenerator:
 </head>
 <body>
     <div class="container">
-        <h1>Raport Sistem Anti-Plagiat</h1>
-        <p>Raport generat la: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+        <h1>Anti-Plagiarism System Report</h1>
+        <p>Report generated at: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
 
         <div class="summary">
-            <h2>Sumar</h2>
-            <p>Total incalcari detectate: <strong>{total_violations}</strong></p>
-            <p>Durata monitorizare: De la {violation_log[0]["timestamp"] if violation_log else "N/A"} pana la {violation_log[-1]["timestamp"] if violation_log else "N/A"}</p>
-            <p>Inregistrare video salvata in: <strong>{output_video_path}</strong></p>
+            <h2>Summary</h2>
+            <p>Total violations detected: <strong>{total_violations}</strong></p>
+            <p>Monitoring duration: From {violation_log[0]["timestamp"] if violation_log else "N/A"} to {violation_log[-1]["timestamp"] if violation_log else "N/A"}</p>
+            <p>Video recording saved at: <strong>{output_video_path}</strong></p>
         </div>
 
         <div class="chart">
-            <h2>Tipuri de incalcari</h2>
+            <h2>Violation Types</h2>
             <table>
                 <tr>
-                    <th>Tipul incalcarii</th>
-                    <th>Numar de aparitii</th>
+                    <th>Violation Type</th>
+                    <th>Number of Occurrences</th>
                 </tr>
                 {"".join([f"<tr><td>{k}</td><td>{v}</td></tr>" for k, v in grouped_violations.items()])}
             </table>
         </div>
 
-        <h2>Detalii incalcari</h2>
+        <h2>Violation Details</h2>
         <table>
             <tr>
                 <th>Timestamp</th>
-                <th>Incalcari detectate</th>
+                <th>Detected Violations</th>
             </tr>
             {"".join([f"<tr><td>{record['timestamp']}</td><td class='violation'>{', '.join(record['violations'])}</td></tr>" for record in violation_log])}
         </table>
@@ -121,9 +121,9 @@ class ReportGenerator:
 </html>
 """
 
-        # salvare raport html
+        # save html report
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
 
-        print(f"Raportul HTML a fost generat: {report_path}")
+        print(f"HTML report has been generated: {report_path}")
         return report_path

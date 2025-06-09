@@ -2,42 +2,42 @@ import os
 import cv2
 import time
 
-# Forteaza utilizarea platformei X11
+# Force X11 platform usage
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 def test_camera():
-    print("Testare camera web...")
+    print("Testing webcam...")
     cap = cv2.VideoCapture(0, cv2.CAP_ANY)
     
     if not cap.isOpened():
-        print("Nu s-a putut accesa camera web")
-        return "Camera inaccesibila"
+        print("Could not access webcam")
+        return "Camera inaccessible"
     
-    # Afiseaza rezolutia camerei
+    # Display camera resolution
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
     height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    print(f"Rezolutia camerei: {int(width)}x{int(height)}")
+    print(f"Camera resolution: {int(width)}x{int(height)}")
 
-    # Afiseaza un preview live al camerei
+    # Display live camera preview
     start_time = time.time()
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("Nu s-a putut citi frame-ul din camera")
+            print("Could not read frame from camera")
             break
 
-        cv2.imshow("Preview Camera", frame)
+        cv2.imshow("Camera Preview", frame)
 
-        # Inchide preview-ul daca utilizatorul apasa tasta 'q' sau dupa 30 de secunde
+        # Close preview when user presses 'q' key or after 30 seconds
         if cv2.waitKey(1) & 0xFF == ord('q') or (time.time() - start_time > 30):
-            print("Preview inchis")
+            print("Preview closed")
             break
 
-    # Elibereaza resursele
+    # Release resources
     cap.release()
     cv2.destroyAllWindows()
-    return "Test finalizat cu succes"
+    return "Test completed successfully"
 
 if __name__ == "__main__":
-    rezultat = test_camera()
-    print(rezultat)
+    result = test_camera()
+    print(result)

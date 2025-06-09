@@ -15,18 +15,18 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("sistem_anti_plagiat.log"),
+        logging.FileHandler("anti_plagiarism_system.log"),
         logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
 
-class SistemAntiPlagiat:
+class AntiPlagiarismSystem:
     def __init__(self, config):
         self.config = config
         self.mirror_image = config["camera"]["mirror_image"]
 
-        # timestamp pentru fisiere
+        # timestamp for files
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         self.face_detector = FaceDetector(self.mirror_image)
@@ -39,7 +39,7 @@ class SistemAntiPlagiat:
         self.recording_path = None
 
     def process_frame(self, frame):
-        # procesarea unui frame si detectarea unei nereguli
+        # process a frame and detect violations
         if frame is None:
             return np.zeros((480, 640, 3), dtype=np.uint8)
 
@@ -59,12 +59,12 @@ class SistemAntiPlagiat:
                 self.video_writer = cv2.VideoWriter(
                     self.recording_path, fourcc, 20.0, (w, h)
                 )
-                logger.info(f"Inregistrare video in: {self.recording_path}")
+                logger.info(f"Video recording at: {self.recording_path}")
 
             if self.video_writer is not None:
                 self.video_writer.write(display_frame)
 
-        # Salveaza ultimul frame procesat pentru capturi
+        # Save last processed frame for captures
         self.last_processed_frame = frame.copy()
 
         return display_frame
@@ -72,7 +72,7 @@ class SistemAntiPlagiat:
     def get_recent_violations(self):
         logs = self.violation_monitor.get_logs()
         if logs and len(logs) > 0:
-            return logs[-1]  # cea mai recenta inregistrare
+            return logs[-1]  # most recent record
         return None
 
     def start_recording(self):
@@ -105,22 +105,22 @@ class SistemAntiPlagiat:
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             
-            # garantie ca directorul exista
+            # ensure directory exists
             snapshot_dir = self.config.get("snapshots", {}).get("save_path", "./snapshots")
             os.makedirs(snapshot_dir, exist_ok=True)
             
             snapshot_path = os.path.join(snapshot_dir, f"snapshot_{timestamp}.jpg")
             
-            # Verifica dacă monitorizarea este activa
+            # Check if monitoring is active
             if hasattr(self, 'last_processed_frame') and self.last_processed_frame is not None:
-                # Foloseste ultimul frame procesat în loc să deschidă camera din nou
+                # Use last processed frame instead of opening camera again
                 cv2.imwrite(snapshot_path, self.last_processed_frame)
                 return snapshot_path
             else:
-                # Deschide camera doar dacă nu avem un frame existent
+                # Open camera only if we don't have an existing frame
                 cap = cv2.VideoCapture(0)
                 if not cap.isOpened():
-                    logger.error("Nu s-a putut accesa camera")
+                    logger.error("Could not access camera")
                     return None
 
                 ret, frame = cap.read()
@@ -131,7 +131,7 @@ class SistemAntiPlagiat:
                     return snapshot_path
                 return None
         except Exception as e:
-            logger.exception(f"Eroare la capturare: {e}")
+            logger.exception(f"Capture error: {e}")
             return None
 
     def export_report(self, file_path):
@@ -141,12 +141,12 @@ class SistemAntiPlagiat:
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # obtinem calea de salvare din configuratie
+        # get save path from configuration
         report_save_path = self.config.get("reporting", {}).get("save_path", "./reports")
 
         try:
             if file_path.endswith(".html"):
-                # pasam calea corecta la initializarea ReportGenerator
+                # pass correct path to ReportGenerator initialization
                 report_gen = ReportGenerator(timestamp, save_path=report_save_path)
                 report_gen.generate_html_report(logs, self.recording_path)
                 return True
@@ -160,11 +160,11 @@ class SistemAntiPlagiat:
                 return bool(result)
             return False
         except Exception as e:
-            logger.exception(f"Eroare la export: {e}")
+            logger.exception(f"Export error: {e}")
             return False
 
     def set_mirror_mode(self, mirror_mode):
-        # modul oglinda
+        # mirror mode
         self.mirror_image = mirror_mode
         self.face_detector.mirror_image = mirror_mode
         self.video_handler.mirror_image = mirror_mode

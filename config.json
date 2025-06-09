@@ -6,11 +6,11 @@
     "detection": {
         "object": {
             "confidence_thresholds": {
-                "telefon": 0.3,
+                "phone": 0.3,
                 "smartwatch": 0.4
             },
             "objects_of_interest": [
-                "telefon",
+                "phone",
                 "smartwatch"
             ]
         },
