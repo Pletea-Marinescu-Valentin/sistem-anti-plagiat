@@ -9,6 +9,14 @@
 \usepackage{tikz}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{microtype}
+\usepackage{ragged2e}
+\usepackage[colorlinks=true,citecolor=black,linkcolor=black,urlcolor=black]{hyperref}
+
+\tolerance=1%
+\emergencystretch=\maxdimen%
+\hyphenpenalty=10000%
+\exhyphenpenalty=100%
 
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
@@ -27,9 +35,24 @@
 \maketitle
 
 \begin{abstract}
-Academic integrity represents a fundamental challenge in modern education systems, with plagiarism rates increasing globally across all educational levels. Traditional exam monitoring approaches rely primarily on screen surveillance and human oversight, creating significant vulnerabilities in detecting sophisticated cheating behaviors during online and remote examinations.
-This research develops a comprehensive anti-plagiarism monitoring system using advanced machine learning and computer vision technologies to address these limitations. The system integrates sophisticated gaze tracking algorithms with YOLO-based object detection models through a modular software architecture that combines facial landmark detection with real-time behavioral analysis. Custom algorithms continuously analyze candidate gaze patterns while convolutional neural networks detect unauthorized objects and suspicious materials, processing video streams efficiently using optimized OpenCV libraries.
-Experimental testing demonstrates highly effective operation on standard CPU-based systems, successfully identifying suspicious gaze patterns, unauthorized devices, and anomalous behaviors while maintaining consistent real-time performance. The system achieved robust detection capabilities during controlled testing scenarios. This research provides a comprehensive open-source solution for educational institutions, enabling widespread deployment using standard computing hardware without requiring specialized equipment.
+Academic integrity represents a fundamental challenge in modern education systems, 
+with plagiarism rates increasing globally across all educational levels. Traditional 
+exam monitoring approaches rely primarily on screen surveillance and human oversight, 
+creating significant vulnerabilities in detecting sophisticated cheating behaviors 
+during online and remote examinations.
+This research develops a comprehensive anti-plagiarism monitoring system using 
+machine learning and computer vision technologies to address these limitations. 
+The system integrates gaze tracking algorithms with YOLO-based object detection 
+models through a modular software architecture that combines facial landmark 
+detection with real-time behavioral analysis. Algorithms continuously analyze 
+candidate gaze patterns while convolutional neural networks detect unauthorized objects 
+and suspicious materials, processing video streams using optimized OpenCV libraries.
+Experimental testing demonstrates effective operation on standard CPU-based 
+systems, identifying suspicious gaze patterns, unauthorized devices, 
+and anomalous behaviors while maintaining real-time performance. The system 
+achieved detection capabilities during controlled testing scenarios. This research 
+provides an open-source solution for educational institutions, enabling 
+widespread deployment using standard computing hardware without requiring specialized equipment.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -38,64 +61,161 @@ Academic integrity, Educational technology, Computer vision, Gaze tracking, Obje
 
 \section{Introduction}
 
-Academic integrity represents a cornerstone of quality education, with educational institutions worldwide facing unprecedented challenges in maintaining fair assessment practices. The proliferation of digital learning environments has amplified concerns about academic misconduct, with studies indicating that plagiarism rates have increased significantly across all educational levels\cite{zimba2021plagiarism}. Traditional examination monitoring approaches, while foundational, present significant limitations in detecting sophisticated cheating behaviors, particularly in remote and hybrid learning contexts\cite{nazari2019detection}.
+Academic integrity represents a cornerstone of quality education, with educational 
+institutions worldwide facing challenges in maintaining fair assessment 
+practices. The proliferation of digital learning environments has amplified concerns 
+about academic misconduct, with studies indicating that plagiarism rates have increased 
+across all educational levels\cite{zimba2021plagiarism}. Traditional 
+examination monitoring approaches present limitations 
+in detecting cheating behaviors, particularly in remote and hybrid 
+learning contexts\cite{nazari2019detection}.
 
-The context of plagiarism in educational settings has evolved dramatically with technological advancement. Research demonstrates that academic dishonesty affects educational quality, credibility, and institutional reputation\cite{pelican2021plagiat}. Current statistics reveal alarming trends, with some regions reporting plagiarism detection rates exceeding 26\% of submitted academic works, nearly double the global average\cite{brainard2018massive}. This widespread issue necessitates immediate technological intervention to preserve educational standards and ensure equitable assessment environments.
+The context of plagiarism in educational settings has evolved with 
+technological advancement. Research demonstrates that academic dishonesty affects 
+educational quality, credibility, and institutional reputation\cite{pelican2021plagiat}. 
+Current statistics reveal trends, with some regions reporting plagiarism 
+detection rates exceeding 26\% of submitted academic works, nearly double the global 
+average\cite{brainard2018massive}. This issue necessitates 
+technological intervention to preserve educational standards and ensure 
+assessment environments.
 
-The problem this research addresses lies in the limitations of existing monitoring solutions, which rely heavily on manual supervision and screen-based surveillance. Traditional approaches fail to detect physical cheating behaviors, such as unauthorized device usage or suspicious gaze patterns, creating vulnerabilities in examination integrity\cite{dilini2021cheating}. While machine learning solutions exist for plagiarism detection\cite{russell2020artificial}, most require extensive computational resources including GPU acceleration, making them inaccessible to many educational institutions with limited hardware infrastructure.
+The problem this research addresses lies in the limitations of existing monitoring 
+solutions, which rely on manual supervision and screen-based surveillance. 
+Traditional approaches fail to detect physical cheating behaviors, such as unauthorized 
+device usage or suspicious gaze patterns, creating vulnerabilities in examination 
+integrity\cite{dilini2021cheating}. While machine learning solutions exist for plagiarism 
+detection\cite{russell2020artificial}, most require computational resources 
+including GPU acceleration, making them inaccessible to many educational institutions 
+with limited hardware infrastructure.
 
-Recent advances in computer vision and artificial intelligence have opened new possibilities for automated monitoring systems. Studies have demonstrated the effectiveness of facial detection algorithms in real-time applications\cite{hasan2021face}, while research in eye-tracking technology has shown promising results for behavioral analysis in educational contexts\cite{el2023drowsiness}. Furthermore, object detection technologies, particularly YOLO architectures, have revolutionized real-time identification capabilities\cite{wang2022object}, making them suitable for detecting unauthorized devices in examination environments.
+Recent advances in computer vision and artificial intelligence have opened 
+possibilities for automated monitoring systems. Studies have demonstrated the effectiveness 
+of facial detection algorithms in real-time applications\cite{hasan2021face}, while 
+research in eye-tracking technology has shown results for behavioral analysis 
+in educational contexts\cite{el2023drowsiness}. Furthermore, object detection technologies, 
+particularly YOLO architectures, have revolutionized real-time identification 
+capabilities\cite{wang2022object}, making them suitable for detecting unauthorized 
+devices in examination environments.
 
-Educational technology integration has become increasingly sophisticated, with modern systems incorporating artificial intelligence to enhance assessment integrity\cite{honorlock2023detecting}. However, most existing commercial solutions require significant computational resources or rely on external cloud processing, limiting their accessibility to institutions with constrained infrastructure\cite{proctoru}. This technological gap highlights the need for efficient, locally-processed solutions that can operate on standard hardware while maintaining high detection accuracy.
+Educational technology integration has become sophisticated, with 
+systems incorporating artificial intelligence to enhance assessment integrity\cite{honorlock2023detecting}. 
+However, most existing commercial solutions require computational resources 
+or rely on external cloud processing, limiting their accessibility to institutions 
+with constrained infrastructure\cite{proctoru}. This technological gap highlights 
+the need for efficient, locally-processed solutions that can operate on standard 
+hardware while maintaining detection accuracy.
 
-This paper presents a comprehensive anti-plagiarism monitoring system that operates efficiently on standard CPU-based hardware, requiring minimal computational resources while maintaining high detection accuracy. The system successfully demonstrates real-time performance on modest hardware configurations, including Intel i5 7th generation processors, making advanced monitoring technology accessible to institutions regardless of their technical infrastructure limitations.
+This paper presents an anti-plagiarism monitoring system that operates 
+on standard CPU-based hardware, requiring minimal computational resources 
+while maintaining detection accuracy. The system demonstrates 
+real-time performance on hardware configurations, including Intel i5 7th 
+generation processors, making monitoring technology accessible to institutions 
+regardless of their technical infrastructure limitations.
 
-The structure of this paper proceeds as follows: Section II reviews fundamental concepts and related work in computer vision and object detection. Section III presents the system architecture and methodology. Section IV details the implementation approach and challenges. Section V evaluates system performance and presents experimental results. Section VI discusses findings and comparisons with existing solutions, followed by conclusions and future work directions in Section VII.
+The structure of this paper proceeds as follows: Section II reviews fundamental 
+concepts and related work in computer vision and object detection. Section III 
+presents the system architecture and methodology. Section IV details the implementation 
+approach and challenges. Section V evaluates system performance and presents experimental 
+results. Section VI discusses findings and comparisons with existing solutions, 
+followed by conclusions and future work directions in Section VII\@.
 
 \section{Background}
 
 \subsection{Computer Vision Fundamentals}
 
-Computer vision technologies form the foundation of modern automated monitoring systems. Facial detection algorithms, particularly those utilizing Histogram of Oriented Gradients (HOG) features, have demonstrated robust performance in real-time applications\cite{hasan2021face}. These algorithms analyze gradient information within image regions to identify distinctive facial characteristics, enabling reliable face localization even under varying lighting conditions.
+Computer vision technologies form the foundation of modern automated monitoring systems. 
+Facial detection algorithms, particularly those utilizing Histogram of Oriented Gradients 
+(HOG) features, have demonstrated robust performance in real-time applications\cite{hasan2021face}. 
+These algorithms analyze gradient information within image regions to identify distinctive 
+facial characteristics, enabling reliable face localization even under varying lighting conditions.
 
-Gaze tracking represents a critical component in behavioral analysis systems. Recent advances in eye-tracking technology have enabled accurate estimation of viewing direction through pupil position analysis and facial landmark detection\cite{dilini2021cheating}. These systems utilize geometric relationships between eye features to calculate horizontal and vertical gaze ratios, providing precise directional information for behavioral assessment\cite{el2023drowsiness}.
+Gaze tracking represents a critical component in behavioral analysis systems. Recent advances 
+in eye-tracking technology have enabled accurate estimation of viewing direction through 
+pupil position analysis and facial landmark detection\cite{dilini2021cheating}. These systems 
+utilize geometric relationships between eye features to calculate horizontal and vertical 
+gaze ratios, providing precise directional information for behavioral assessment\cite{el2023drowsiness}.
 
 \subsection{Object Detection Technologies}
 
-You Only Look Once (YOLO) architectures have revolutionized real-time object detection applications. YOLO algorithms process entire images in single forward passes, enabling rapid detection of multiple object categories simultaneously\cite{wang2022object}. The latest YOLOv8 implementations demonstrate superior performance in detecting small objects and maintaining accuracy across diverse environmental conditions\cite{v7labs2023yolo}.
-Convolutional Neural Networks (CNNs) provide the underlying architecture for modern object detection systems\cite{goodfellow2016deep}. These networks excel at feature extraction and pattern recognition, enabling identification of unauthorized devices such as mobile phones and smartwatches in examination environments. The hierarchical feature learning capabilities of CNNs make them particularly effective for distinguishing between similar object categories\cite{paszke2019pytorch}.
+You Only Look Once (YOLO) architectures have revolutionized real-time object detection 
+applications. YOLO algorithms process entire images in single forward passes, enabling 
+rapid detection of multiple object categories simultaneously\cite{wang2022object}. The 
+latest YOLOv8 implementations demonstrate superior performance in detecting small objects 
+and maintaining accuracy across diverse environmental conditions\cite{v7labs2023yolo}.
+
+Convolutional Neural Networks (CNNs) provide the underlying architecture for modern object 
+detection systems\cite{goodfellow2016deep}. These networks excel at feature extraction 
+and pattern recognition, enabling identification of unauthorized devices such as mobile 
+phones and smartwatches in examination environments. The hierarchical feature learning 
+capabilities of CNNs make them particularly effective for distinguishing between similar 
+object categories\cite{paszke2019pytorch}.
 
 \subsection{Educational Technology Integration}
 
-Modern educational monitoring systems increasingly incorporate artificial intelligence to enhance assessment integrity\cite{russell2020artificial}. Recent research has demonstrated the effectiveness of automated proctoring solutions in detecting various forms of academic misconduct\cite{honorlock2023detecting}. However, most existing solutions require significant computational resources or rely on external cloud processing, limiting their accessibility to institutions with constrained infrastructure.
+Modern educational monitoring systems increasingly incorporate artificial intelligence 
+to enhance assessment integrity\cite{russell2020artificial}. Recent research has demonstrated 
+the effectiveness of automated proctoring solutions in detecting various forms of academic 
+misconduct\cite{honorlock2023detecting}. However, most existing solutions require significant 
+computational resources or rely on external cloud processing, limiting their accessibility 
+to institutions with constrained infrastructure.
 
 \section{System Architecture and Methodology}
 
 \subsection{Modular System Design}
 
-The proposed anti-plagiarism monitoring system employs a modular architecture comprising five primary components: facial detection, gaze analysis, object detection, violation monitoring, and report generation. This modular approach enables independent optimization of each subsystem while maintaining seamless integration through standardized interfaces.
+The proposed anti-plagiarism monitoring system employs a modular architecture comprising 
+five primary components: facial detection, gaze analysis, object detection, violation 
+monitoring, and report generation. This modular approach enables independent optimization 
+of each subsystem while maintaining seamless integration through standardized interfaces.
 
-The facial detection module serves as the primary behavioral analysis component, responsible for identifying human faces within the video stream and extracting facial landmarks necessary for subsequent analysis. The gaze analysis module processes facial landmark data to determine the direction of the candidate's attention, distinguishing between normal examination behavior and potentially suspicious activities.
+The facial detection module serves as the primary behavioral analysis component, responsible 
+for identifying human faces within the video stream and extracting facial landmarks necessary 
+for subsequent analysis. The gaze analysis module processes facial landmark data to determine 
+the direction of the candidate's attention, distinguishing between normal examination behavior 
+and potentially suspicious activities.
 
-The object detection framework operates independently to identify unauthorized devices within the examination environment. The violation monitoring system aggregates information from both behavioral and object detection modules to determine when examination rules have been violated. Finally, the report generation module creates comprehensive documentation of the monitoring session.
+The object detection framework operates independently to identify unauthorized devices 
+within the examination environment. The violation monitoring system aggregates information 
+from both behavioral and object detection modules to determine when examination rules have 
+been violated. Finally, the report generation module creates comprehensive documentation 
+of the monitoring session.
 
 \subsection{Gaze Analysis Subsystem}
 
-The gaze analysis subsystem represents the core behavioral monitoring component of the architecture. This module processes facial landmark data to determine viewing direction through geometric analysis of eye positioning relative to facial structure. The subsystem incorporates compensation mechanisms for natural head movements to distinguish between intentional gaze direction changes and normal physiological behavior.
+The gaze analysis subsystem represents the core behavioral monitoring component of the 
+architecture. This module processes facial landmark data to determine viewing direction 
+through geometric analysis of eye positioning relative to facial structure. The subsystem 
+incorporates compensation mechanisms for natural head movements to distinguish between 
+intentional gaze direction changes and normal physiological behavior.
 
-The module architecture supports real-time analysis while maintaining computational efficiency. Head orientation compensation ensures accurate detection across varying candidate positions and natural movement patterns. The subsystem provides directional classification capabilities for left, right, center, and downward gaze orientations.
+The module architecture supports real-time analysis while maintaining computational efficiency. 
+Head orientation compensation ensures accurate detection across varying candidate positions 
+and natural movement patterns. The subsystem provides directional classification capabilities 
+for left, right, center, and downward gaze orientations.
 
 \subsection{Object Detection Framework}
 
-The object detection component utilizes specialized recognition models to identify unauthorized devices within the examination environment. The framework employs separate detection pathways for different device categories, enabling optimized recognition thresholds and reduced classification errors.
+The object detection component utilizes specialized recognition models to identify unauthorized 
+devices within the examination environment. The framework employs separate detection pathways 
+for different device categories, enabling optimized recognition thresholds and reduced 
+classification errors.
 
-The architecture supports real-time processing through intelligent frame selection strategies that balance detection accuracy with computational efficiency. The framework processes video streams at optimized intervals while maintaining continuous monitoring capabilities for immediate violation detection.
+The architecture supports real-time processing through intelligent frame selection strategies 
+that balance detection accuracy with computational efficiency. The framework processes video 
+streams at optimized intervals while maintaining continuous monitoring capabilities for 
+immediate violation detection.
 
 \subsection{Integration and Communication Architecture}
 
-The system architecture implements a publisher-subscriber communication pattern that enables asynchronous coordination between detection modules and the central violation monitoring system. This architectural approach ensures system responsiveness while accommodating varying processing requirements across different detection algorithms.
+The system architecture implements a publisher-subscriber communication pattern that enables 
+asynchronous coordination between detection modules and the central violation monitoring 
+system. This architectural approach ensures system responsiveness while accommodating 
+varying processing requirements across different detection algorithms.
 
-The violation monitoring module serves as the central coordination point, aggregating detection results from multiple independent sources. The module applies temporal analysis to reduce false positive detections caused by brief, natural movements while maintaining sensitivity to genuine violations.
+The violation monitoring module serves as the central coordination point, aggregating 
+detection results from multiple independent sources. The module applies temporal analysis 
+to reduce false positive detections caused by brief, natural movements while maintaining 
+sensitivity to genuine violations.
 
 \subsection{System Architecture Diagrams and Operational Analysis}
 
@@ -188,25 +308,47 @@ The activity diagram presents the comprehensive operational flow of the anti-pla
     \caption{Activity diagram of the Anti-Plagiarism system with parallel processing flows}
 \end{figure}
 
-The activity diagram demonstrates the sophisticated operational flow beginning with system initialization through \texttt{Start Monitoring}, triggered when users activate monitoring through the graphical interface. The \texttt{Initialize Camera} process configures capture parameters and establishes webcam connectivity, implementing robust error handling through the \texttt{Available?} decision point.
+The activity diagram demonstrates the operational flow beginning with system 
+initialization through Start Monitoring, triggered when users activate monitoring 
+through the graphical interface. The Initialize Camera process configures capture 
+parameters and establishes webcam connectivity, implementing error handling through 
+the Available decision point.
 
-Critical to system robustness, camera availability verification prevents system crashes when hardware is unavailable. Failed initialization triggers \texttt{Display Error}, routing directly to resource cleanup, while successful initialization advances to \texttt{Capture Frame} for video stream processing.
+Camera availability verification prevents system crashes 
+when hardware is unavailable. Failed initialization triggers Display Error, 
+routing directly to resource cleanup, while initialization advances to 
+Capture Frame for video stream processing.
 
-Frame validation through \texttt{Valid?} ensures data integrity, implementing the condition \texttt{if ret and frame is not None} from the video processing module. Invalid frames activate \texttt{Skip Frame}, maintaining system responsiveness while avoiding processing corrupted data.
+Frame validation through Valid ensures data integrity. Invalid frames 
+activate Skip Frame, maintaining system responsiveness while avoiding processing 
+corrupted data.
 
-\textbf{Parallel Processing Architecture:} The system's key innovation emerges after successful frame validation, where processing branches into two independent parallel streams:
+\textbf{Parallel Processing Architecture:} The system's innovation emerges after 
+frame validation, where processing branches into two independent parallel streams:
 
-\textit{Behavioral Analysis Stream:} Executes \texttt{Face Detection} using dlib's 68-point facial landmark detection, followed by \texttt{Check Gaze} implementing the horizontal and vertical ratio algorithms. The \texttt{Suspicious?} decision evaluates gaze direction against configurable thresholds, generating \texttt{Gaze Alert} for violations.
+\textit{Behavioral Analysis Stream:} Executes Face Detection using dlib's 68-point 
+facial landmark detection, followed by Check Gaze implementing the horizontal 
+and vertical ratio algorithms. The Suspicious decision evaluates gaze direction 
+against configurable thresholds, generating Gaze Alert for violations.
 
-\textit{Object Detection Stream:} Simultaneously processes \texttt{Detect Objects} using dual YOLOv8 models for mobile phones and smartwatches. The \texttt{Detected?} decision applies confidence thresholds (0.55 for phones, 0.4 for watches), producing \texttt{Object Alert} for unauthorized devices.
+\textit{Object Detection Stream:} Processes Detect Objects using 
+dual YOLOv8 models for mobile phones and smartwatches. The Detected decision 
+applies confidence thresholds (0.55 for phones, 0.4 for watches), producing Object Alert 
+for unauthorized devices.
 
-This parallel architecture enables simultaneous analysis of different violation vectors, significantly improving detection coverage while maintaining computational efficiency. Both streams converge at \texttt{Save Frame}, where processed data is archived with temporal synchronization.
+This parallel architecture enables analysis of different violation vectors, 
+improving detection coverage while maintaining computational efficiency. 
+Both streams converge at Save Frame, where processed data is archived with 
+temporal synchronization.
 
-\texttt{Update Interface} refreshes the display through PyQt5 signals, providing real-time feedback to supervisors. The \texttt{Continue?} decision implements the monitoring loop, returning to \texttt{Capture Frame} for sustained operation or advancing to cleanup procedures.
+Update Interface refreshes the display through PyQt5 signals, providing real-time 
+feedback to supervisors. The Continue decision implements the monitoring loop, 
+returning to Capture Frame for sustained operation or advancing to cleanup procedures.
 
 \subsubsection{Sequence Diagram Analysis}
 
-The sequence diagram reveals temporal interactions between system components, illustrating message passing and activation patterns critical for real-time operation.
+The sequence diagram reveals temporal interactions between system components, illustrating 
+message passing and activation patterns critical for real-time operation.
 
 \begin{figure}[H]
     \centering
@@ -268,144 +410,269 @@ The sequence diagram reveals temporal interactions between system components, il
     \caption{Sequence diagram showing temporal component interactions}
 \end{figure}
 
-The sequence analysis reveals three distinct phases: initialization, continuous monitoring loop, and controlled termination. During initialization, the GUI triggers cascading component activation through the main system controller, establishing the publisher-subscriber communication pattern essential for asynchronous processing.
+The sequence analysis reveals three distinct phases: initialization, continuous monitoring 
+loop, and controlled termination. During initialization, the GUI triggers cascading component 
+activation through the main system controller, establishing the publisher-subscriber 
+communication pattern essential for asynchronous processing.
 
-The monitoring loop demonstrates the system's real-time capabilities, with VideoHandler continuously providing frames to both FaceDetector and ObjectDetector simultaneously. This parallel processing, evident in the concurrent activation bars, enables the system to maintain sub-100ms response times while processing multiple detection algorithms.
+The monitoring loop demonstrates the system's real-time capabilities, with VideoHandler 
+continuously providing frames to both FaceDetector and ObjectDetector simultaneously. 
+This parallel processing, evident in the concurrent activation bars, enables the system 
+to maintain sub-100ms response times while processing multiple detection algorithms.
 
-Critical to the design is the asynchronous return path from ViolationMonitor to GUI, implementing the signal-slot mechanism of PyQt5. This ensures interface responsiveness remains independent of detection processing times, preventing UI freezing during intensive computational periods.
+Critical to the design is the asynchronous return path from ViolationMonitor to GUI, 
+implementing the signal-slot mechanism of PyQt5. This ensures interface responsiveness 
+remains independent of detection processing times, preventing UI freezing during intensive 
+computational periods.
 
 \section{Implementation}
 
 \subsection{Technology Stack and Platform Compatibility}
 
-The implementation leverages Python as the primary development language, chosen for its extensive computer vision library ecosystem and rapid prototyping capabilities. The system demonstrates excellent cross-platform compatibility, operating efficiently on both Windows and Linux (Ubuntu) environments without modification to the core functionality.
+The implementation leverages Python as the primary development language, chosen for its 
+extensive computer vision library ecosystem and rapid prototyping capabilities. The system 
+demonstrates excellent cross-platform compatibility, operating efficiently on both Windows 
+and Linux (Ubuntu) environments without modification to the core functionality.
 
-\textbf{Windows Platform Performance:} On Windows systems, the application benefits from enhanced performance through CUDA acceleration when NVIDIA GPUs are available. This GPU support provides approximately 40\% improvement in processing speed for object detection tasks. The Windows implementation takes advantage of optimized driver management and CUDA toolkit integration, allowing the system to leverage hardware acceleration for both YOLOv8 model inference and OpenCV operations.
+\textbf{Windows Platform Performance:} On Windows systems, the application benefits from 
+enhanced performance through CUDA acceleration when NVIDIA GPUs are available. This GPU 
+support provides approximately 40\% improvement in processing speed for object detection 
+tasks. The Windows implementation takes advantage of optimized driver management and CUDA 
+toolkit integration, allowing the system to leverage hardware acceleration for both YOLOv8 
+model inference and OpenCV operations.
 
-\textbf{Linux Platform Compatibility:} The system operates effectively on Linux distributions, particularly Ubuntu, maintaining full functionality through CPU-based processing. While GPU acceleration via CUDA is not yet fully implemented on Linux due to differences in driver management and CUDA installation procedures, the optimized algorithms ensure acceptable performance levels for real-time monitoring requirements. Linux deployment benefits from the platform's stability and resource management capabilities, making it suitable for institutional server environments.
+\textbf{Linux Platform Compatibility:} The system operates effectively on Linux distributions, 
+particularly Ubuntu, maintaining full functionality through CPU-based processing. While 
+GPU acceleration via CUDA is not yet fully implemented on Linux due to differences in 
+driver management and CUDA installation procedures, the optimized algorithms ensure 
+acceptable performance levels for real-time monitoring requirements. Linux deployment 
+benefits from the platform's stability and resource management capabilities, making it 
+suitable for institutional server environments.
 
 \subsection{Advanced Gaze Analysis Implementation}
 
-The gaze analysis implementation employs sophisticated mathematical algorithms for determining viewing direction through pupil position analysis. The system calculates horizontal and vertical ratios based on pupil coordinates relative to eye boundaries, incorporating head orientation compensation to distinguish between natural movements and suspicious behavior patterns.
+The gaze analysis implementation employs mathematical algorithms for determining 
+viewing direction through pupil position analysis. The system calculates horizontal and 
+vertical ratios based on pupil coordinates relative to eye boundaries, incorporating head 
+orientation compensation to distinguish between natural movements and suspicious behavior patterns.
 
-The horizontal ratio calculation determines if the candidate is looking left or right. This algorithm processes pupil positions and includes adjustment components for head orientation:
+The horizontal ratio calculation determines if the candidate is looking left or right. 
+This algorithm processes pupil positions and includes adjustment components for head orientation:
 
 \begin{equation}
-horizontal\_ratio = \frac{left\_pupil\_pos + right\_pupil\_pos}{2}
+HR = \frac{LP_{pos} + RP_{pos}}{2}
 \end{equation}
 
-where:
+where HR represents horizontal ratio, LP denotes left pupil, RP denotes right pupil, and:
 \begin{align}
-left\_pupil\_pos &= \frac{left\_pupil.x}{(left\_eye\_center.x \times 2 - 10)} \\
-right\_pupil\_pos &= \frac{right\_pupil.x}{(right\_eye\_center.x \times 2 - 10)}
+LP_{pos} &= \frac{LP_x}{(LE_{center,x} \times 2 - 10)} \\
+RP_{pos} &= \frac{RP_x}{(RE_{center,x} \times 2 - 10)}
 \end{align}
 
-The system incorporates head orientation compensation through position factor analysis. When facial landmarks are available, the algorithm calculates:
+where LE and RE represent left eye and right eye respectively.
+
+The system incorporates head orientation compensation through position factor analysis. 
+When facial landmarks are available, the algorithm calculates:
 
 \begin{equation}
-position\_factor = \frac{eye\_distance}{frame\_width \times 0.3}
+PF = \frac{ED}{FW \times 0.3}
 \end{equation}
 
-This factor enables distinction between intentional gaze direction changes and natural head movements. The algorithm applies adaptive adjustments:
+where PF represents position factor, ED denotes eye distance, and FW represents frame width.
 
-If $position\_factor < 0.8$: head turned left → $adjusted\_ratio = \max(0.6, pupil\_ratio)$  
+This factor enables distinction between intentional gaze direction changes and natural 
+head movements. The algorithm applies adaptive adjustments:
 
-If $position\_factor > 1.2$: head turned right → $adjusted\_ratio = \min(0.4, pupil\_ratio)$
+If $PF < 0.8$: head turned left → $HR_{adj} = \max(0.6, HR)$  
 
-Similarly, vertical ratio calculation determines downward gaze orientation. The algorithm processes vertical pupil positions with head inclination compensation:
+If $PF > 1.2$: head turned right → $HR_{adj} = \min(0.4, HR)$
+
+Similarly, vertical ratio calculation determines downward gaze orientation. The algorithm 
+processes vertical pupil positions with head inclination compensation:
 
 \begin{equation}
-vertical\_ratio = \frac{left\_pupil\_pos\_y + right\_pupil\_pos\_y}{2}
+VR = \frac{LP_{pos,y} + RP_{pos,y}}{2}
 \end{equation}
+
+where VR represents vertical ratio.
 
 Head inclination analysis incorporates facial geometry estimation:
 \begin{align}
-face\_height &= |eye\_center\_y - mouth\_position| \\
-inclination\_factor &= \frac{|eye\_origin\_y - eye\_center\_y|}{face\_height}
+FH &= |EC_y - MP| \\
+IF &= \frac{|EO_y - EC_y|}{FH}
 \end{align}
 
-These calculations enable robust gaze direction detection across varying lighting conditions and head orientations, achieving over 90\% accuracy for distinct directional movements under standard conditions.
+where FH represents face height, EC denotes eye center, MP represents mouth position, 
+IF represents inclination factor, and EO denotes eye origin.
+
+These calculations enable gaze direction detection across varying lighting conditions 
+and head orientations, achieving over 90\% accuracy for distinct directional movements 
+under standard conditions.
 
 \subsection{Dual YOLOv8 Architecture Implementation}
 
-The object detection framework employs sophisticated model specialization, with separate confidence thresholds optimized through empirical testing\cite{ultralytics}. The mobile phone detection model operates at 0.55 confidence, balancing sensitivity with false positive reduction. The smartwatch model utilizes 0.4 confidence, accommodating smaller detection targets while maintaining accuracy through secondary validation based on dimensional characteristics.
+The object detection framework employs sophisticated model specialization, with separate 
+confidence thresholds optimized through empirical testing\cite{ultralytics}. The mobile 
+phone detection model operates at 0.55 confidence, balancing sensitivity with false positive 
+reduction. The smartwatch model utilizes 0.4 confidence, accommodating smaller detection 
+targets while maintaining accuracy through secondary validation based on dimensional characteristics.
 
-Post-detection processing implements dimension-based classification refinement, analyzing detected object aspect ratios and size characteristics. This approach improves distinction between device categories, reducing misclassification rates by approximately 15\% compared to single-model implementations\cite{redmon2018yolov3}.
+Post-detection processing implements dimension-based classification refinement, analyzing 
+detected object aspect ratios and size characteristics. This approach improves distinction 
+between device categories, reducing misclassification rates by approximately 15\% compared 
+to single-model implementations\cite{redmon2018yolov3}.
 
 \subsection{Core Library Integration and Optimization}
 
-\textbf{OpenCV Implementation:} The OpenCV library (\texttt{Open Source Computer Vision Library}) serves as the foundation for all image processing operations\cite{hasan2021face}. Video capture is achieved through the \texttt{VideoCapture} function, which interfaces directly with webcam hardware. The \texttt{cvtColor} function converts color images to grayscale, reducing computational complexity by processing single-channel data instead of three-channel RGB, significantly improving facial detection performance.
+\textbf{OpenCV Implementation:} The OpenCV library (Open Source Computer Vision Library) 
+serves as the foundation for all image processing operations\cite{hasan2021face}. Video 
+capture is achieved through the VideoCapture function, which interfaces directly 
+with webcam hardware. The cvtColor function converts color images to grayscale, 
+reducing computational complexity by processing single-channel data instead of three-channel 
+RGB, improving facial detection performance.
 
-Gaussian filtering implementation utilizes \texttt{cv2.GaussianBlur} with 7×7 kernels for noise reduction in eye region analysis. The standard deviation is automatically calculated using the formula 
+Gaussian filtering implementation utilizes cv2.GaussianBlur with 7×7 kernels 
+for noise reduction in eye region analysis. The standard deviation is automatically calculated 
+using the formula:
+
 \begin{equation}
 \sigma = 0.3 \times \left(\frac{kernel\_size - 1}{2} - 1\right) + 0.8
-\end{equation}resulting in $\sigma = 1.4$ for 7×7 kernels. This configuration provides optimal balance between noise reduction and edge preservation for pupil detection.
+\end{equation}
 
-The \texttt{cv2.minMaxLoc} function enables precise pupil localization by identifying minimum intensity points within isolated eye regions. This approach proves robust across varying lighting conditions when combined with Gaussian pre-filtering. Visual feedback is implemented through \texttt{cv2.circle} for pupil highlighting and \texttt{cv2.rectangle} for object detection visualization.
+resulting in $\sigma = 1.4$ for 7×7 kernels. This configuration provides balance 
+between noise reduction and edge preservation for pupil detection.
 
-\textbf{Dlib Facial Landmark Detection:} The \texttt{dlib.get\_frontal\_face\_detector} initializes HOG-based face detection, optimized for real-time performance. The \texttt{dlib.shape\_predictor} loads pre-trained models for 68-point facial landmark extraction. Points 36-47 specifically define eye contours, enabling precise eye region isolation for subsequent gaze analysis. The \texttt{shape.part} function provides coordinate access for each landmark, facilitating geometric calculations for head orientation and gaze direction estimation.
+The cv2.minMaxLoc function enables pupil localization by identifying 
+minimum intensity points within isolated eye regions. This approach proves robust across 
+varying lighting conditions when combined with Gaussian pre-filtering. Visual feedback 
+is implemented through cv2.circle for pupil highlighting and cv2.rectangle 
+for object detection visualization.
 
-\textbf{PyTorch and YOLOv8 Integration:} Model loading utilizes \texttt{torch.load} for pre-trained YOLOv8 weights, with separate models optimized for mobile phones and smartwatches. The \texttt{model.predict} method processes video frames with configurable confidence thresholds (0.55 for phones, 0.4 for watches). Frame processing optimization reduces computational load by analyzing every 20th frame while maintaining continuous facial monitoring.
+\textbf{Dlib Facial Landmark Detection:} The dlib.get\_frontal\_face\_detector 
+initializes HOG-based face detection, optimized for real-time performance. The 
+dlib.shape\_predictor loads pre-trained models for 68-point facial landmark 
+extraction. Points 36--47 define eye contours, enabling eye region 
+isolation for subsequent gaze analysis. The shape.part function provides coordinate 
+access for each landmark, facilitating geometric calculations for head orientation and 
+gaze direction estimation.
+
+\textbf{PyTorch and YOLOv8 Integration:} Model loading utilizes torch.load for 
+pre-trained YOLOv8 weights, with separate models optimized for mobile phones and smartwatches. 
+The model.predict method processes video frames with configurable confidence 
+thresholds (0.55 for phones, 0.4 for watches). Frame processing optimization reduces 
+computational load by analyzing every 20th frame while maintaining continuous facial monitoring.
 
 \subsection{Real-time Optimization Implementation}
 
-Performance optimization represents a critical aspect of the implementation, enabling operation on standard CPU-based hardware. The system employs several sophisticated optimization techniques:
+Performance optimization represents a critical aspect of the implementation, enabling 
+operation on standard CPU-based hardware. The system employs several sophisticated 
+optimization techniques:
 
-\textbf{Frame Processing Optimization:} The system implements intelligent frame skipping strategies, processing object detection on every 20th frame while maintaining continuous facial analysis. This approach reduces computational load by approximately 95\% for object detection while preserving real-time responsiveness for behavioral monitoring.
+\textbf{Frame Processing Optimization:} The system implements intelligent frame skipping 
+strategies, processing object detection on every 20th frame while maintaining continuous 
+facial analysis. This approach reduces computational load by approximately 95\% for object 
+detection while preserving real-time responsiveness for behavioral monitoring.
 
-\textbf{Memory Management:} Circular buffering mechanisms prevent memory accumulation during extended monitoring sessions. The buffer maintains a fixed-size queue of processed frames, automatically disposing of oldest entries when capacity limits are reached.
+\textbf{Memory Management:} Circular buffering mechanisms prevent memory accumulation 
+during extended monitoring sessions. The buffer maintains a fixed-size queue of processed 
+frames, automatically disposing of oldest entries when capacity limits are reached.
 
-\textbf{Cache Implementation:} Alert caching eliminates duplicate notifications while preserving detection history. The system maintains temporal filtering with minimum intervals between similar alerts, reducing false positive rates by up to 40\%.
+\textbf{Cache Implementation:} Alert caching eliminates duplicate notifications while 
+preserving detection history. The system maintains temporal filtering with minimum intervals 
+between similar alerts, reducing false positive rates by up to 40\%.
 
 \subsection{Facial Landmark Integration and Pupil Detection}
 
-The system leverages dlib's 68-point facial landmark detection for precise eye region isolation\cite{el2023drowsiness}. Points 36-47 define eye contours, enabling accurate pupil localization through polygonal masking and Gaussian filtering. The minimum intensity point detection method proves robust across diverse facial orientations and lighting conditions.
+The system leverages dlib's 68-point facial landmark detection for precise eye region 
+isolation\cite{el2023drowsiness}. Points 36--47 define eye contours, enabling accurate 
+pupil localization through polygonal masking and Gaussian filtering. The minimum intensity 
+point detection method proves robust across diverse facial orientations and lighting conditions.
 
-The gaze analysis algorithms implement head orientation compensation through position factor analysis, distinguishing intentional gaze direction changes from natural head movements. This compensation mechanism reduces false positive rates by up to 30\% in realistic examination environments.
+The gaze analysis algorithms implement head orientation compensation through position factor 
+analysis, distinguishing intentional gaze direction changes from natural head movements. 
+This compensation mechanism reduces false positive rates by up to 30\% in realistic 
+examination environments.
 
 \subsection{Violation Monitoring and Temporal Correlation}
 
-The ViolationMonitor class implements sophisticated temporal filtering, maintaining minimum intervals between similar alerts to prevent notification flooding\cite{pythondatetime}. Alert generation includes confidence scoring and contextual information, enabling supervisors to prioritize responses based on violation severity and frequency.
+The ViolationMonitor class implements temporal filtering, maintaining minimum 
+intervals between similar alerts to prevent notification flooding\cite{pythondatetime}. 
+Alert generation includes confidence scoring and contextual information, enabling supervisors 
+to prioritize responses based on violation severity and frequency.
 
-Temporal synchronization between video frames and detected events utilizes high-precision timestamps, ensuring accurate correlation for subsequent analysis. This synchronization is critical for post-examination review and dispute resolution\cite{pythonlogging}.
+Temporal synchronization between video frames and detected events utilizes timestamps, 
+ensuring correlation for subsequent analysis. This synchronization 
+is critical for post-examination review and dispute resolution\cite{pythonlogging}.
 
 \section{Experimental Validation and Performance Analysis}
 
 \subsection{Comprehensive Testing Methodology}
 
-System evaluation employed rigorous testing protocols across multiple hardware configurations and environmental conditions. Testing platforms included Intel i5 7th generation processors with 8GB RAM, representing typical institutional computing resources available in educational environments.
+System evaluation employed rigorous testing protocols across multiple hardware configurations 
+and environmental conditions. Testing platforms included Intel i5 7th generation processors 
+with 8GB RAM, representing typical institutional computing resources available in educational 
+environments.
 
-\textbf{Environmental Testing Scenarios:} Evaluation encompassed various operational conditions including multiple lighting configurations (natural sunlight, artificial fluorescent, mixed environments), different camera angles (0°, 15°, 30° deviations from optimal positioning), varying distances from camera (50cm to 150cm representing typical examination setups), and diverse participant demographics accounting for facial characteristic variations.
+\textbf{Environmental Testing Scenarios:} Evaluation encompassed various operational conditions 
+including multiple lighting configurations (natural sunlight, artificial fluorescent, 
+mixed environments), different camera angles (0°, 15°, 30° deviations from optimal positioning), 
+varying distances from camera (50cm to 150cm representing typical examination setups), 
+and diverse participant demographics accounting for facial characteristic variations.
 
 \subsection{Quantitative Performance Results}
 
 \textbf{Gaze Detection Performance Metrics:}
-- Horizontal gaze detection achieved 92\% accuracy for left/right movements under standard conditions
-- Vertical gaze detection demonstrated 89\% accuracy for downward orientation detection
-- Center gaze recognition maintained 94\% accuracy across varied lighting conditions
-- Processing latency averaged 15-25ms per frame on target hardware configurations
+-- Horizontal gaze detection achieved 92\% accuracy for left/right movements under 
+standard conditions
+-- Vertical gaze detection demonstrated 89\% accuracy for downward orientation 
+detection
+-- Center gaze recognition maintained 94\% accuracy across varied lighting 
+conditions
+-- Processing latency averaged 15--25ms per frame on target hardware 
+configurations
 
 \textbf{Object Detection Accuracy Results:}
-- Mobile phone identification reached 85\% accuracy with 4\% false positive rate
-- Smartwatch detection achieved 82\% accuracy with 3\% false positive rate
-- Combined object detection latency measured 50-80ms per processed frame
-- Dimensional classification refinement improved accuracy by 15\% over baseline models
+-- Mobile phone identification reached 85\% accuracy with 4\% false positive rate
+-- Smartwatch detection achieved 82\% accuracy with 3\% false positive rate
+-- Combined object detection latency measured 50--80ms per processed frame
+-- Dimensional classification refinement improved accuracy by 15\% over baseline 
+models
 
 \subsection{Comparative Performance Analysis}
 
-Performance benchmarking against existing commercial solutions demonstrates significant advantages in accessibility and deployment flexibility\cite{proctoru}\cite{proctorio}\cite{respondus}. Cost efficiency analysis shows local processing eliminates per-session fees, reducing operational costs by up to 90\% compared to cloud-based solutions like ProctorU (15-25 USD per candidate per session).
+Performance benchmarking against existing commercial solutions demonstrates significant 
+advantages in accessibility and deployment flexibility\cite{proctoru}\cite{proctorio}\cite{respondus}. 
+Cost efficiency analysis shows local processing eliminates per-session fees, reducing 
+operational costs by up to 90\% compared to cloud-based solutions like ProctorU 
+(15--25 USD per candidate per session).
 
-Privacy protection through local data processing ensures complete institutional control over sensitive examination data, addressing privacy concerns associated with cloud-based monitoring while maintaining detection accuracy comparable to commercial alternatives.
+Privacy protection through local data processing ensures complete institutional control 
+over sensitive examination data, addressing privacy concerns associated with cloud-based 
+monitoring while maintaining detection accuracy comparable to commercial alternatives.
 
-Infrastructure requirements analysis confirms standard CPU operation enables deployment without specialized hardware investments, making advanced monitoring accessible to institutions with limited technical resources. This represents a crucial advancement for educational institutions operating under budget constraints\cite{pyqt5}.
+Infrastructure requirements analysis confirms standard CPU operation enables deployment 
+without specialized hardware investments, making advanced monitoring accessible to institutions 
+with limited technical resources. This represents a crucial advancement for educational 
+institutions operating under budget constraints\cite{pyqt5}.
 
 \section{Discussion and Comparison}
 
-The proposed system demonstrates significant advantages over existing commercial solutions in terms of accessibility and deployment flexibility. Unlike ProctorU or Proctorio, which require subscription fees and external server connectivity\cite{proctoru}\cite{proctorio}, this solution operates entirely on local hardware, eliminating ongoing operational costs.
+The proposed system demonstrates significant advantages over existing commercial solutions 
+in terms of accessibility and deployment flexibility. Unlike ProctorU or Proctorio, which 
+require subscription fees and external server connectivity\cite{proctoru}\cite{proctorio}, 
+this solution operates entirely on local hardware, eliminating ongoing operational costs.
 
-Behavioral monitoring capabilities exceed those of Respondus Lockdown Browser by incorporating physical behavior analysis alongside screen monitoring\cite{respondus}. The dual-detection approach (gaze analysis and object detection) provides comprehensive coverage of potential cheating vectors while maintaining computational efficiency.
+Behavioral monitoring capabilities exceed those of Respondus Lockdown Browser by incorporating 
+physical behavior analysis alongside screen monitoring\cite{respondus}. The dual-detection 
+approach (gaze analysis and object detection) provides comprehensive coverage of potential 
+cheating vectors while maintaining computational efficiency.
 
-Recent studies in smart device detection have shown the potential for enhanced monitoring capabilities, where "smart watch-based frameworks for real-time mobility assessment and monitoring" could be integrated for improved behavioral analysis\cite{kheirkhahan2018smartwatch}. Furthermore, research has demonstrated that modern surveillance systems can effectively categorize device usage patterns, which could enhance the precision of unauthorized object detection\cite{moshawrab2023value}.
+Recent studies in smart device detection have shown the potential for enhanced monitoring 
+capabilities, where ``smart watch-based frameworks for real-time mobility assessment and 
+monitoring'' could be integrated for improved behavioral analysis\cite{kheirkhahan2018smartwatch}. 
+Furthermore, research has demonstrated that modern surveillance systems can effectively 
+categorize device usage patterns, which could enhance the precision of unauthorized object 
+detection\cite{moshawrab2023value}.
 
 \begin{thebibliography}{99}
 
@@ -413,79 +680,108 @@ Recent studies in smart device detection have shown the potential for enhanced m
 I. Goodfellow, Y. Bengio, and A. Courville, \textit{Deep Learning}, MIT Press, 2016.
 
 \bibitem{brainard2018massive}
-J. Brainard, "Rethinking retractions," \textit{Science}, vol. 362, no. 6413, pp. 390-393, 2018.
+J. Brainard, ``Rethinking retractions, '' \textit{Science}, vol. 362, no. 6413, 
+pp. 390--393, 2018.
 
 \bibitem{redmon2018yolov3}
-J. Redmon and A. Farhadi, "YOLOv3: An incremental improvement," \textit{arXiv preprint arXiv:1804.02767}, 2018.
+J. Redmon and A. Farhadi, ``YOLOv3: An incremental improvement, '' 
+\textit{arXiv preprint arXiv:1804.02767}, 2018.
 
 \bibitem{yang2018tls}
-Y. Yang et al., "TLS/SSL security analysis and implementation guidelines," \textit{IEEE Security \& Privacy}, vol. 16, no. 4, pp. 45-52, 2018.
+Y. Yang et al., ``TLS/SSL security analysis and implementation guidelines, '' 
+\textit{IEEE Security \& Privacy}, vol. 16, no. 4, pp. 45--52, 2018.
 
 \bibitem{kheirkhahan2018smartwatch}
-M. Kheirkhahan et al., "A smartwatch-based framework for real-time and online assessment and mobility monitoring," \textit{Journal of Biomedical Informatics}, vol. 89, pp. 29-40, 2019.
+M. Kheirkhahan et al., ``A smartwatch-based framework for real-time and online 
+assessment and mobility monitoring, '' \textit{Journal of Biomedical Informatics}, 
+vol. 89, pp. 29--40, 2019.
 
 \bibitem{nazari2019detection}
-M. Nazari et al., "Detection of cheating in online examinations using machine learning," \textit{IEEE Access}, vol. 7, pp. 65543-65554, 2019.
+M. Nazari et al., ``Detection of cheating in online examinations using machine 
+learning, '' \textit{IEEE Access}, vol. 7, pp. 65543--65554, 2019.
 
 \bibitem{paszke2019pytorch}
-A. Paszke et al., "PyTorch: An imperative style, high-performance deep learning library," \textit{Advances in Neural Information Processing Systems}, vol. 32, pp. 8024-8035, 2019.
+A. Paszke et al., ``PyTorch: An imperative style, high-performance deep learning 
+library, '' \textit{Advances in Neural Information Processing Systems}, vol. 32, 
+pp. 8024--8035, 2019.
 
 \bibitem{harris2020array}
-C. R. Harris et al., "Array programming with NumPy," \textit{Nature}, vol. 585, no. 7825, pp. 357-362, 2020.
+C. R. Harris et al., ``Array programming with NumPy, '' \textit{Nature}, vol. 585, 
+no. 7825, pp. 357--362, 2020.
 
 \bibitem{russell2020artificial}
-S. Russell and P. Norvig, \textit{Artificial Intelligence: A Modern Approach}, 4th ed. Pearson, 2020.
+S. Russell and P. Norvig, \textit{Artificial Intelligence: A Modern Approach}, 
+4th ed. Pearson, 2020.
 
 \bibitem{alem2021novel}
-A. Alem et al., "A novel approach for exam surveillance using computer vision techniques," \textit{Educational Technology Research}, vol. 34, no. 2, pp. 78-95, 2021.
+A. Alem et al., ``A novel approach for exam surveillance using computer vision 
+techniques, '' \textit{Educational Technology Research}, vol. 34, no. 2, 
+pp. 78--95, 2021.
 
 \bibitem{dilini2021cheating}
-D. Silva et al., "A novel cheating detection system for online examinations using eye-tracking technology," \textit{Computers \& Education}, vol. 165, 104-115, 2021.
+D. Silva et al., ``A novel cheating detection system for online examinations using 
+eye-tracking technology, '' \textit{Computers \& Education}, vol. 165, 104--115, 2021.
 
 \bibitem{hasan2021face}
-M. Hasan et al., "Face detection using computer vision for surveillance applications," \textit{IEEE Transactions on Image Processing}, vol. 30, pp. 3456-3467, 2021.
+M. Hasan et al., ``Face detection using computer vision for surveillance 
+applications, '' \textit{IEEE Transactions on Image Processing}, vol. 30, 
+pp. 3456--3467, 2021.
 
 \bibitem{pelican2021plagiat}
-G. Pelican, "Academic plagiarism in the digital age: Challenges and solutions," \textit{Journal of Educational Technology}, vol. 15, no. 3, pp. 45-62, 2021.
+G. Pelican, ``Academic plagiarism in the digital age: Challenges and solutions, '' 
+\textit{Journal of Educational Technology}, vol. 15, no. 3, pp. 45--62, 2021.
 
 \bibitem{zimba2021plagiarism}
-A. Zimba et al., "Plagiarism detection in academia: A systematic literature review," \textit{Computers \& Education}, vol. 176, pp. 104-118, 2021.
+A. Zimba et al., ``Plagiarism detection in academia: A systematic literature 
+review, '' \textit{Computers \& Education}, vol. 176, pp. 104--118, 2021.
 
 \bibitem{wang2022object}
-C. Wang et al., "YOLOv5: A comprehensive review of object detection algorithms," \textit{Pattern Recognition}, vol. 125, 108-123, 2022.
+C. Wang et al., ``YOLOv5: A comprehensive review of object detection algorithms, '' 
+\textit{Pattern Recognition}, vol. 125, 108--123, 2022.
 
 \bibitem{el2023drowsiness}
-M. El-Sayed et al., "Real-time drowsiness detection using dlib facial landmarks," \textit{Journal of Computer Vision}, vol. 45, no. 2, pp. 123-135, 2023.
+M. El-Sayed et al., ``Real-time drowsiness detection using dlib facial landmarks, '' 
+\textit{Journal of Computer Vision}, vol. 45, no. 2, pp. 123--135, 2023.
 
 \bibitem{honorlock2023detecting}
-Honorlock Inc., "Advanced Detection Technologies for Online Proctoring," Technical Report, 2023.
+Honorlock Inc., ``Advanced Detection Technologies for Online Proctoring, '' 
+Technical Report, 2023.
 
 \bibitem{moshawrab2023value}
-M. Moshawrab et al., "Smart wearables in healthcare: A systematic review of applications and challenges," \textit{IEEE Access}, vol. 11, pp. 23845-23863, 2023.
+M. Moshawrab et al., ``Smart wearables in healthcare: A systematic review of 
+applications and challenges, '' \textit{IEEE Access}, vol. 11, pp. 23845--23863, 2023.
 
 \bibitem{proctorio}
-Proctorio Inc., "Automated Online Proctoring Platform," \textit{Technical Specifications}, 2023.
+Proctorio Inc., ``Automated Online Proctoring Platform, '' 
+\textit{Technical Specifications}, 2023.
 
 \bibitem{proctoru}
-ProctorU, "Online Proctoring Solutions for Academic Integrity," \textit{Company Documentation}, 2023.
+ProctorU, ``Online Proctoring Solutions for Academic Integrity, '' 
+\textit{Company Documentation}, 2023.
 
 \bibitem{pyqt5}
-Riverbank Computing, "PyQt5 Reference Guide," \textit{Technical Documentation}, 2023.
+Riverbank Computing, ``PyQt5 Reference Guide, '' 
+\textit{Technical Documentation}, 2023.
 
 \bibitem{pythondatetime}
-Python Software Foundation, "datetime — Basic date and time types," \textit{Python Documentation}, 2023.
+Python Software Foundation, ``datetime --- Basic date and time types, '' 
+\textit{Python Documentation}, 2023.
 
 \bibitem{pythonlogging}
-Python Software Foundation, "logging — Logging facility for Python," \textit{Python Documentation}, 2023.
+Python Software Foundation, ``logging --- Logging facility for Python, '' 
+\textit{Python Documentation}, 2023.
 
 \bibitem{respondus}
-Respondus Inc., "Lockdown Browser and Monitor Documentation," \textit{User Guide}, 2023.
+Respondus Inc., ``Lockdown Browser and Monitor Documentation, '' 
+\textit{User Guide}, 2023.
 
 \bibitem{ultralytics}
-Ultralytics, "YOLOv8: Next-Generation Object Detection," \textit{Technical Documentation}, 2023.
+Ultralytics, ``YOLOv8: Next-Generation Object Detection, '' 
+\textit{Technical Documentation}, 2023.
 
 \bibitem{v7labs2023yolo}
-V7Labs, "YOLO Object Detection: A Comprehensive Guide," \textit{Computer Vision Research}, 2023.
+V7Labs, ``YOLO Object Detection: A Comprehensive Guide, '' 
+\textit{Computer Vision Research}, 2023.
 
 \end{thebibliography}
 
