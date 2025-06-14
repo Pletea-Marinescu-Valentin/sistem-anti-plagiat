@@ -1,4 +1,4 @@
-# fisiere python
+# Python files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -22,16 +22,27 @@ var/
 .venv/
 venv/
 
-# directoare specifice proiectului
+# Project-specific directories
 recordings/
 reports/
 snapshots/
 *.mp4
 *.jpg
 *.png
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.tif
+*.svg
+*.webp
+*.ico
+*.raw
+*.heic
+*.heif
 /screenshots/
 
-# fisiere temporare
+# Temporary files
 .DS_Store
 Thumbs.db
 .idea/
@@ -39,10 +50,10 @@ Thumbs.db
 *.swp
 *~
 
-# model yolov8 ce va fi generat automat la rularea aplicatiei
+# YOLOv8 model that will be automatically generated when running the application
 yolov8s.pt
 
-# log file
+# Log file
 sistem_anti_plagiat.log
 
 # LaTeX build artifacts
