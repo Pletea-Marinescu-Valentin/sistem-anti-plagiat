@@ -1,0 +1,60 @@
+MIT License
+
+Copyright (c) 2025 Valentin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+ADDITIONAL TERMS FOR ANTI-PLAGIARISM MONITORING SYSTEM:
+
+1. EDUCATIONAL USE: This software is primarily intended for educational and 
+   examination monitoring purposes in academic institutions.
+
+2. PRIVACY COMPLIANCE: Users of this software are responsible for ensuring 
+   compliance with local privacy laws, data protection regulations (GDPR, 
+   CCPA, etc.), and institutional policies regarding student monitoring and 
+   data collection.
+
+3. ETHICAL USE: This software should be used ethically and transparently. 
+   Students/candidates should be informed about the monitoring system before 
+   its use.
+
+4. DATA HANDLING: Users are responsible for the secure handling, storage, and 
+   disposal of any recorded video data, violation reports, and personal 
+   information collected by this system.
+
+5. NO WARRANTY FOR ACCURACY: While the system is designed to be accurate, 
+   the authors make no warranty regarding the accuracy of gaze detection, 
+   object recognition, or violation detection. False positives and false 
+   negatives may occur.
+
+6. INSTITUTIONAL APPROVAL: Use of this system should be approved by 
+   appropriate institutional review boards or ethics committees where 
+   required.
+
+7. MODIFICATIONS: Any modifications to the core detection algorithms should 
+   be thoroughly tested before use in production environments.
+
+8. ATTRIBUTION: If you use this software in academic research or 
+   publications, please provide appropriate attribution.
+
+For questions regarding the ethical use of this software or compliance with 
+local regulations, please consult with your institution's legal and ethics 
+departments.
