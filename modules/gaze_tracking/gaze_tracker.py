@@ -2,6 +2,7 @@ from __future__ import division
 import cv2
 import dlib
 import json
+import numpy as np
 from .eye import Eye
 
 class GazeTracker(object):
@@ -46,18 +47,6 @@ class GazeTracker(object):
     def load_config(self, config_path):
         with open(config_path, 'r') as f:
             return json.load(f)
-
-    @property
-    def pupils_located(self):
-        """checks if pupils are located"""
-        try:
-            int(self.eye_left.pupil.x)
-            int(self.eye_left.pupil.y)
-            int(self.eye_right.pupil.x)
-            int(self.eye_right.pupil.y)
-            return True
-        except Exception:
-            return False
 
     def _analyze(self):
         """detects face and eyes"""
@@ -120,86 +109,213 @@ class GazeTracker(object):
         self.frame = frame
         return self._analyze()
     
-    def horizontal_ratio(self):
-        """calculeaza raport orizontal"""
+    def calculate_gaze_vector(self):
+        """Calculate gaze direction vector with confidence weighting"""
         if not self.pupils_located:
-            return 0.5
+            return None, None
+        
+        # Get relative pupil positions (normalized to eye center)
+        left_gaze_x = (self.eye_left.pupil.x - self.eye_left.center[0]) / self.eye_left.center[0]
+        left_gaze_y = (self.eye_left.pupil.y - self.eye_left.center[1]) / self.eye_left.center[1]
+        
+        right_gaze_x = (self.eye_right.pupil.x - self.eye_right.center[0]) / self.eye_right.center[0]
+        right_gaze_y = (self.eye_right.pupil.y - self.eye_right.center[1]) / self.eye_right.center[1]
+        
+        # Weight by detection confidence
+        left_confidence = self.eye_left.detection_confidence() if hasattr(self.eye_left, 'detection_confidence') else 0.5
+        right_confidence = self.eye_right.detection_confidence() if hasattr(self.eye_right, 'detection_confidence') else 0.5
+        
+        total_confidence = left_confidence + right_confidence
+        
+        if total_confidence > 0:
+            # Confidence-weighted average
+            gaze_x = (left_gaze_x * left_confidence + right_gaze_x * right_confidence) / total_confidence
+            gaze_y = (left_gaze_y * left_confidence + right_gaze_y * right_confidence) / total_confidence
+        else:
+            # Simple average if no confidence data
+            gaze_x = (left_gaze_x + right_gaze_x) / 2
+            gaze_y = (left_gaze_y + right_gaze_y) / 2
+        
+        return gaze_x, gaze_y
 
-        # calcul pozitie pupile
-        pupil_left = self.eye_left.pupil.x / (self.eye_left.center[0] * 2 - 10)
-        pupil_right = self.eye_right.pupil.x / (self.eye_right.center[0] * 2 - 10)
-        pupil_ratio = (pupil_left + pupil_right) / 2
+    def horizontal_ratio(self):
+        """Enhanced horizontal gaze ratio with temporal smoothing"""
+        if not self.pupils_located:
+            return self.prev_h_ratio if hasattr(self, 'prev_h_ratio') else 0.5
+        
+        # Get current ratio
+        current_ratio = self._calculate_base_horizontal_ratio()
+        
+        # Check movement stability
+        left_stable = True
+        right_stable = True
+        
+        if self.eye_left and hasattr(self.eye_left, 'get_movement_stability'):
+            left_stable = self.eye_left.get_movement_stability() > 0.7
+            
+        if self.eye_right and hasattr(self.eye_right, 'get_movement_stability'):
+            right_stable = self.eye_right.get_movement_stability() > 0.7
+        
+        # Adjust smoothing based on stability
+        if left_stable and right_stable:
+            # High stability - less smoothing needed
+            smoothing = 0.2
+        else:
+            # Low stability - more smoothing
+            smoothing = 0.5
+        
+        # Apply temporal smoothing
+        if hasattr(self, 'prev_h_ratio'):
+            filtered_ratio = self.prev_h_ratio * smoothing + current_ratio * (1 - smoothing)
+        else:
+            filtered_ratio = current_ratio
+        
+        self.prev_h_ratio = filtered_ratio
+        return np.clip(filtered_ratio, 0.0, 1.0)
 
-        # ajustare factor pozitie cap
-        if self.eye_left.origin and self.eye_right.origin:
-            left_center_x = self.eye_left.origin[0] + self.eye_left.center[0]
-            right_center_x = self.eye_right.origin[0] + self.eye_right.center[0]
+    def detect_head_profile(self):
+        """Detect if head is in profile position"""
+        # Check if eyes are initialized
+        if self.eye_left is None or self.eye_right is None:
+            return True
+        
+        # Check if origins exist
+        if not hasattr(self.eye_left, 'origin') or not hasattr(self.eye_right, 'origin'):
+            return True
+            
+        if not self.eye_left.origin or not self.eye_right.origin:
+            return True
+        
+        eye_distance = abs(self.eye_right.origin[0] - self.eye_left.origin[0])
+        expected_distance = self.frame.shape[1] * 0.15
+        
+        return eye_distance < expected_distance * 0.5
 
-            # distanta centre ochi
-            eye_distance = right_center_x - left_center_x
-
-            # latime cadru
-            if self.frame is not None:
-                frame_width = self.frame.shape[1]
+    def calculate_detection_confidence(self):
+        """Calculate overall detection confidence with movement stability"""
+        confidence = 0.0
+        
+        # Check if eyes are initialized
+        if self.eye_left is None or self.eye_right is None:
+            return 0.0
+        
+        # Base confidence from pupil detection
+        if self.both_pupils_located:
+            left_conf = self.eye_left.detection_confidence() if hasattr(self.eye_left, 'detection_confidence') else 0.5
+            right_conf = self.eye_right.detection_confidence() if hasattr(self.eye_right, 'detection_confidence') else 0.5
+            confidence += (left_conf + right_conf) / 2 * 0.6  # 60% weight
+        elif self.pupils_located:
+            single_conf = 0.5
+            if self.eye_left.pupil:
+                single_conf = self.eye_left.detection_confidence() if hasattr(self.eye_left, 'detection_confidence') else 0.5
+            elif self.eye_right.pupil:
+                single_conf = self.eye_right.detection_confidence() if hasattr(self.eye_right, 'detection_confidence') else 0.5
+            confidence += single_conf * 0.4  # Lower confidence for single eye
+        
+        # Head pose factor - penalize extreme angles
+        try:
+            if not self.detect_head_profile():
+                confidence += 0.2  # Bonus for frontal face
             else:
-                frame_width = 640
+                confidence -= 0.1  # Penalty for profile view
+        except (AttributeError, TypeError):
+            pass
+        
+        # Frame quality factor
+        if self.frame is not None:
+            # Check illumination quality
+            frame_mean = np.mean(self.frame)
+            if 50 < frame_mean < 200:  # Good illumination range
+                confidence += 0.1
+            
+            # Check for motion blur (via Laplacian variance)
+            gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY) if len(self.frame.shape) == 3 else self.frame
+            laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+            if laplacian_var > 100:  # Sharp image
+                confidence += 0.1
+        
+        # Add movement stability factor
+        if self.eye_left and hasattr(self.eye_left, 'get_movement_stability'):
+            left_stability = self.eye_left.get_movement_stability()
+            confidence += left_stability * 0.1
+            
+        if self.eye_right and hasattr(self.eye_right, 'get_movement_stability'):
+            right_stability = self.eye_right.get_movement_stability()
+            confidence += right_stability * 0.1
+        
+        return min(confidence, 1.0)
 
-            # normalizare distanta
-            eye_position_factor = eye_distance / (frame_width * 0.3)
-
-            # ajustare rata
-            adjusted_ratio = pupil_ratio
-
-            # cap intors stanga
-            if eye_position_factor < 0.8:
-                adjusted_ratio = max(0.6, pupil_ratio)
-            # cap intors dreapta
-            elif eye_position_factor > 1.2:
-                adjusted_ratio = min(0.4, pupil_ratio)
-
-            return adjusted_ratio
-
-        return pupil_ratio
+    def _horizontal_ratio_single_eye(self):
+        """Calculate horizontal ratio when only one eye is visible"""
+        # Check if eyes are initialized
+        if self.eye_left is None or self.eye_right is None:
+            return None
+            
+        if self.eye_left.pupil and (self.eye_right is None or not self.eye_right.pupil):
+            ratio = self.eye_left.pupil.x / (self.eye_left.center[0] * 2 - 10)
+            # Adjustment for left eye alone
+            return max(0.1, min(0.9, ratio * 1.2))
+        elif self.eye_right.pupil and (self.eye_left is None or not self.eye_left.pupil):
+            ratio = self.eye_right.pupil.x / (self.eye_right.center[0] * 2 - 10)
+            # Adjustment for right eye alone
+            return max(0.1, min(0.9, ratio * 0.8))
+        return None
 
     def vertical_ratio(self):
-        """calculeaza raport vertical"""
+        """Returns a number between 0.0 and 1.0 that indicates the vertical direction of the gaze.
+        The extreme top is 0.0, the center is 0.5 and the extreme bottom is 1.0"""
         if not self.pupils_located:
-            return 0.5
-
-        # calcul pozitie pupile
+            return None
+        
+        # Try single eye if both pupils not available
+        if not self.both_pupils_located:
+            return self._vertical_ratio_single_eye()
+        
         pupil_left = self.eye_left.pupil.y / (self.eye_left.center[1] * 2 - 10)
         pupil_right = self.eye_right.pupil.y / (self.eye_right.center[1] * 2 - 10)
-        pupil_ratio = (pupil_left + pupil_right) / 2
+        return (pupil_left + pupil_right) / 2
 
-        # ajustare factor pozitie cap
-        if self.eye_left.origin and self.eye_right.origin:
-            eye_center_y = (self.eye_left.origin[1] + self.eye_left.center[1] +
-                            self.eye_right.origin[1] + self.eye_right.center[1]) / 2
-            # aproximare pentru gura
-            mouth_y = self.eye_left.origin[1] + self.eye_left.center[1] + 50
+    def _vertical_ratio_single_eye(self):
+        """Calculate vertical ratio when only one eye is visible"""
+        # Check if eyes are initialized
+        if self.eye_left is None or self.eye_right is None:
+            return None
+            
+        if self.eye_left.pupil and (self.eye_right is None or not self.eye_right.pupil):
+            return self.eye_left.pupil.y / (self.eye_left.center[1] * 2 - 10)
+        elif self.eye_right.pupil and (self.eye_left is None or not self.eye_left.pupil):
+            return self.eye_right.pupil.y / (self.eye_right.center[1] * 2 - 10)
+        return None
 
-            # distanta ochi-gura
-            face_height = abs(eye_center_y - mouth_y)
+    @property
+    def pupils_located(self):
+        """Check if at least one pupil is detected with good confidence"""
+        if self.eye_left is None and self.eye_right is None:
+            return False
+        
+        left_valid = (self.eye_left is not None and 
+                      self.eye_left.pupil is not None and 
+                      self.eye_left.is_valid_detection())
+        
+        right_valid = (self.eye_right is not None and 
+                       self.eye_right.pupil is not None and 
+                       self.eye_right.is_valid_detection())
+        
+        return left_valid or right_valid
 
-            # normalizare distanta
-            if face_height > 0:
-                eye_position_factor = abs(self.eye_left.origin[1] - eye_center_y) / face_height
-            else:
-                eye_position_factor = 0.5
-
-            # ajustare rata
-            adjusted_ratio = pupil_ratio
-
-            # cap inclinat in jos
-            if eye_position_factor > 0.6:
-                adjusted_ratio = min(0.4, pupil_ratio)
-            # cap inclinat in sus
-            elif eye_position_factor < 0.4:
-                adjusted_ratio = max(0.6, pupil_ratio)
-
-            return adjusted_ratio
-
-        return pupil_ratio
+    @property
+    def both_pupils_located(self):
+        """Check if both pupils are detected with good confidence"""
+        if self.eye_left is None or self.eye_right is None:
+            return False
+        
+        left_valid = (self.eye_left.pupil is not None and 
+                      self.eye_left.is_valid_detection())
+        
+        right_valid = (self.eye_right.pupil is not None and 
+                       self.eye_right.is_valid_detection())
+        
+        return left_valid and right_valid
 
     def is_right(self):
         """check right gaze"""
@@ -375,3 +491,111 @@ class GazeTracker(object):
             v_ratio = nose_to_eyes / face_height
 
         return h_ratio, v_ratio
+
+    def calculate_head_orientation_advanced(self, landmarks):
+        """Advanced head orientation calculation with 3D pose estimation"""
+        if landmarks is None:
+            return 0.5, 0.5, 0.0
+        
+        # Key facial points for 3D pose estimation
+        nose_tip = np.array([landmarks.part(30).x, landmarks.part(30).y])
+        nose_bridge = np.array([landmarks.part(27).x, landmarks.part(27).y])
+        left_eye = np.array([landmarks.part(36).x, landmarks.part(36).y])
+        right_eye = np.array([landmarks.part(45).x, landmarks.part(45).y])
+        left_mouth = np.array([landmarks.part(48).x, landmarks.part(48).y])
+        right_mouth = np.array([landmarks.part(54).x, landmarks.part(54).y])
+        chin = np.array([landmarks.part(8).x, landmarks.part(8).y])
+        
+        # Calculate roll angle (head tilt)
+        eye_vector = right_eye - left_eye
+        roll_angle = np.arctan2(eye_vector[1], eye_vector[0])
+        
+        # Calculate yaw (left-right head rotation)
+        face_center = (left_eye + right_eye) / 2
+        nose_to_center = nose_tip - face_center
+        face_width = np.linalg.norm(right_eye - left_eye)
+        
+        if face_width > 0:
+            yaw_ratio = np.dot(nose_to_center, np.array([1, 0])) / face_width
+            yaw_ratio = np.clip(yaw_ratio * 2 + 0.5, 0.0, 1.0)  # Normalize to 0-1
+        else:
+            yaw_ratio = 0.5
+        
+        # Calculate pitch (up-down head rotation)
+        mouth_center = (left_mouth + right_mouth) / 2
+        face_height = np.linalg.norm(chin - face_center)
+        
+        if face_height > 0:
+            nose_offset = np.dot(nose_tip - face_center, np.array([0, 1])) / face_height
+            pitch_ratio = np.clip(nose_offset + 0.5, 0.0, 1.0)
+        else:
+            pitch_ratio = 0.5
+        
+        return yaw_ratio, pitch_ratio, roll_angle
+
+    def calibrate_user(self, calibration_frames, instruction="look_center"):
+        """Calibrate system for specific user's gaze patterns"""
+        if not hasattr(self, 'user_baseline'):
+            self.user_baseline = {
+                'center_h': [],
+                'center_v': [],
+                'left_h': [],
+                'right_h': [],
+                'up_v': [],
+                'down_v': []
+            }
+        
+        calibration_data = []
+        
+        for frame in calibration_frames:
+            self.frame = frame
+            if self._analyze() and self.pupils_located:
+                h_ratio = self.horizontal_ratio()
+                v_ratio = self.vertical_ratio()
+                
+                if h_ratio is not None and v_ratio is not None:
+                    calibration_data.append((h_ratio, v_ratio))
+        
+        if len(calibration_data) < 5:  # Need minimum samples
+            return False
+        
+        # Store calibration data based on instruction
+        h_values = [data[0] for data in calibration_data]
+        v_values = [data[1] for data in calibration_data]
+        
+        if instruction == "look_center":
+            self.user_baseline['center_h'].extend(h_values)
+            self.user_baseline['center_v'].extend(v_values)
+        elif instruction == "look_left":
+            self.user_baseline['left_h'].extend(h_values)
+        elif instruction == "look_right":
+            self.user_baseline['right_h'].extend(h_values)
+        elif instruction == "look_up":
+            self.user_baseline['up_v'].extend(v_values)
+        elif instruction == "look_down":
+            self.user_baseline['down_v'].extend(v_values)
+        
+        # Update personalized thresholds
+        self._update_personalized_thresholds()
+        return True
+
+    def _update_personalized_thresholds(self):
+        """Update detection thresholds based on user calibration"""
+        if self.user_baseline['center_h']:
+            center_h_mean = np.mean(self.user_baseline['center_h'])
+            center_h_std = np.std(self.user_baseline['center_h'])
+            
+            # Adjust thresholds based on user's natural gaze pattern
+            self.left_limit = center_h_mean + 2.5 * center_h_std
+            self.right_limit = center_h_mean - 2.5 * center_h_std
+            
+            # Ensure reasonable bounds
+            self.left_limit = min(0.8, max(0.6, self.left_limit))
+            self.right_limit = max(0.2, min(0.4, self.right_limit))
+        
+        if self.user_baseline['center_v']:
+            center_v_mean = np.mean(self.user_baseline['center_v'])
+            center_v_std = np.std(self.user_baseline['center_v'])
+            
+            self.down_limit = center_v_mean + 2.5 * center_v_std
+            self.down_limit = min(0.8, max(0.6, self.down_limit))
