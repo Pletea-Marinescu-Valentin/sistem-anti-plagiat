@@ -3,7 +3,6 @@ import os
 import numpy as np
 from datetime import datetime
 from modules.face_detector import FaceDetector
-from modules.object_detector import ObjectDetector
 from modules.violation_monitor import ViolationMonitor
 from modules.video_handler import VideoHandler
 from modules.report_generator import ReportGenerator
@@ -30,28 +29,40 @@ class AntiPlagiarismSystem:
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         self.face_detector = FaceDetector(self.mirror_image)
-        self.object_detector = ObjectDetector(self.config)
         self.violation_monitor = ViolationMonitor()
         self.video_handler = VideoHandler(self.mirror_image, self.config.get("recording", {}).get("save_path", "./recordings"))
 
         self.recording = False
         self.video_writer = None
         self.recording_path = None
+        self.last_processed_frame = None
 
     def process_frame(self, frame):
-        # process a frame and detect violations
+        """Process a frame and detect violations"""
         if frame is None:
             return np.zeros((480, 640, 3), dtype=np.uint8)
 
-        direction, frame, h_ratio, v_ratio = self.face_detector.detect_direction(frame)
-        objects, frame = self.object_detector.detect_objects(frame)
-        violations = self.violation_monitor.check_violations(direction, objects)
+        results = self.face_detector.detect_with_objects(frame)
+        
+        direction = results['direction']
+        h_ratio = results['h_ratio']
+        v_ratio = results['v_ratio']
+        detected_objects = results['objects']
+        
+        # Check violations
+        violations = self.violation_monitor.check_violations(direction, detected_objects)
 
         if violations:
             self.violation_monitor.log_violation(violations)
 
-        display_frame = self.video_handler.prepare_frame_for_display(frame, violations, h_ratio, v_ratio)
+        display_frame = self.video_handler.prepare_frame_for_display(
+            results['annotated_frame'], 
+            violations, 
+            h_ratio, 
+            v_ratio
+        )
 
+        # Handle recording
         if self.recording:
             if self.video_writer is None and frame is not None:
                 h, w = frame.shape[:2]
@@ -65,7 +76,7 @@ class AntiPlagiarismSystem:
                 self.video_writer.write(display_frame)
 
         # Save last processed frame for captures
-        self.last_processed_frame = frame.copy()
+        self.last_processed_frame = results['annotated_frame'].copy()
 
         return display_frame
 
@@ -164,7 +175,22 @@ class AntiPlagiarismSystem:
             return False
 
     def set_mirror_mode(self, mirror_mode):
-        # mirror mode
+        """Update mirror mode for all components"""
         self.mirror_image = mirror_mode
-        self.face_detector.mirror_image = mirror_mode
-        self.video_handler.mirror_image = mirror_mode
+        
+        # Update face detector
+        if hasattr(self.face_detector, 'mirror_image'):
+            self.face_detector.mirror_image = mirror_mode
+            
+        # Update object detector via face detector
+        if hasattr(self.face_detector, 'object_detector') and self.face_detector.object_detector:
+            self.face_detector.object_detector.set_mirror_state(mirror_mode)
+            print(f"DEBUG: Mirror state updated to {mirror_mode}")
+        
+        # Update video handler
+        if hasattr(self.video_handler, 'mirror_image'):
+            self.video_handler.mirror_image = mirror_mode
+            
+        # Update gaze tracker
+        if hasattr(self.face_detector, 'gaze_tracker'):
+            self.face_detector.gaze_tracker.mirror_image = mirror_mode
