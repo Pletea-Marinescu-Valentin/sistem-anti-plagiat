@@ -384,7 +384,7 @@ class AntiPlagiatGUI(QMainWindow):
             if not self.monitoring:
                 self.toggle_monitoring()
 
-           # start recording
+            # start recording
             self.system.start_recording()
             self.record_button.setText("Stop Recording")
             self.recording = True

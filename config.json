@@ -1,28 +1,36 @@
 {
     "camera": {
-        "index": 0,
-        "mirror_image": false
+        "source": 0,
+        "mirror_image": false,
+        "resolution": [
+            640,
+            480
+        ],
+        "fps": 30,
+        "index": 0
     },
     "detection": {
+        "gaze": {
+            "left_limit": 0.6,
+            "right_limit": 0.4,
+            "down_limit": 0.6,
+            "smoothing_factor": 0.3
+        },
         "object": {
+            "enabled": true,
             "confidence_thresholds": {
-                "phone": 0.3,
+                "phone": 0.5,
                 "smartwatch": 0.4
             },
             "objects_of_interest": [
                 "phone",
                 "smartwatch"
             ]
-        },
-        "gaze": {
-            "left_limit": 0.62,
-            "right_limit": 0.38,
-            "down_limit": 0.6
         }
     },
     "recording": {
         "save_path": "./recordings",
-        "record_all": true
+        "format": "mp4"
     },
     "reporting": {
         "save_path": "./reports",
@@ -34,8 +42,5 @@
     },
     "snapshots": {
         "save_path": "./snapshots"
-    },
-    "ui": {
-        "theme": "dark"
     }
 }
