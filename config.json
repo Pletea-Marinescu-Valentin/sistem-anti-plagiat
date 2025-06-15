@@ -11,9 +11,9 @@
     },
     "detection": {
         "gaze": {
-            "left_limit": 0.6,
-            "right_limit": 0.4,
-            "down_limit": 0.6,
+            "left_limit": 0.65,
+            "right_limit": 0.35,
+            "down_limit": 0.57,
             "smoothing_factor": 0.3
         },
         "object": {

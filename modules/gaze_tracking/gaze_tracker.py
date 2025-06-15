@@ -3,6 +3,7 @@ import cv2
 import dlib
 import json
 import numpy as np
+import gc
 from .eye import Eye
 
 class GazeTracker(object):
@@ -44,9 +45,55 @@ class GazeTracker(object):
         self.right_limit = self.config["detection"]["gaze"]["right_limit"]
         self.down_limit = self.config["detection"]["gaze"]["down_limit"]
 
+        # Image mode for static image processing
+        self._image_mode = False
+
     def load_config(self, config_path):
         with open(config_path, 'r') as f:
             return json.load(f)
+
+    def reset_all_state(self):
+        """Reset complet al tuturor variabilelor de stare pentru imagini statice"""
+        print("🔄 Complete gaze tracker reset...")
+        
+        # Clear frame and detection state
+        self.frame = None
+        self.eye_left = None
+        self.eye_right = None
+        
+        # Clear processing state
+        self.frames_without_detection = 0
+        self.last_valid_direction = "center"
+        
+        # Clear optimization variables
+        self.frame_count = 0
+        
+        # Clear filtering variables - CRITICAL pentru imagini
+        self.prev_h_ratio = 0.5
+        self.prev_v_ratio = 0.5
+        self.h_ratio = 0.5
+        self.v_ratio = 0.5
+        
+        # Clear any cached results
+        if hasattr(self, 'last_annotated_frame'):
+            delattr(self, 'last_annotated_frame')
+        
+        # Force garbage collection
+        gc.collect()
+        
+        print("✅ Reset complete")
+
+    def set_image_mode(self, enabled=True):
+        """Activează/dezactivează modul pentru imagini statice"""
+        self._image_mode = enabled
+        if enabled:
+            print("📸 Image mode enabled - will reset state for each frame")
+            self.smoothing_factor = 0.0  # No smoothing for images
+            self.process_every_n_frames = 1  # Process every frame
+        else:
+            print("📹 Video mode enabled - will use temporal smoothing")
+            self.smoothing_factor = 0.3  # Restore smoothing for video
+            self.process_every_n_frames = 2  # Skip frames for performance
 
     def _analyze(self):
         """detects face and eyes"""
@@ -85,9 +132,14 @@ class GazeTracker(object):
             # calculate head orientation
             new_h_ratio, new_v_ratio = self.calculate_head_orientation(landmarks)
 
-            # filter values
-            self.h_ratio = self.prev_h_ratio * (1 - self.smoothing_factor) + new_h_ratio * self.smoothing_factor
-            self.v_ratio = self.prev_v_ratio * (1 - self.smoothing_factor) + new_v_ratio * self.smoothing_factor
+            # Pentru imagini statice, nu aplica smoothing
+            if self._image_mode or self.smoothing_factor == 0.0:
+                self.h_ratio = new_h_ratio
+                self.v_ratio = new_v_ratio
+            else:
+                # filter values pentru video
+                self.h_ratio = self.prev_h_ratio * (1 - self.smoothing_factor) + new_h_ratio * self.smoothing_factor
+                self.v_ratio = self.prev_v_ratio * (1 - self.smoothing_factor) + new_v_ratio * self.smoothing_factor
 
             # update values
             self.prev_h_ratio = self.h_ratio
@@ -421,11 +473,20 @@ class GazeTracker(object):
         return direction
 
     def detect_gaze_direction(self, frame):
-        """proceseaza frame si detecteaza directia"""
+        """proceseaza frame si detecteaza directia - FIXED VERSION"""
+        
+        # Pentru imagini statice, resetează complet starea
+        if self._image_mode:
+            self.reset_all_state()
+        
         self.frame_count += 1
 
-        # procesare la n frame-uri
-        if self.frame_count % self.process_every_n_frames == 0:
+        # Pentru imagini, procesează la fiecare frame; pentru video, skip frames
+        process_frame = True
+        if not self._image_mode:
+            process_frame = (self.frame_count % self.process_every_n_frames == 0)
+
+        if process_frame:
             # update frame si analiza
             self.frame = frame
             self._analyze()
