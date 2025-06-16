@@ -87,8 +87,7 @@ def capture_device_images():
         key = cv2.waitKey(1) & 0xFF
         
         if key == ord(' '):  # Space to capture
-            timestamp = datetime.now().strftime("%H%M%S_%f")[:-3]  # Include milliseconds
-            filename = f"{scenario_name}_{captured_count+1:02d}_{timestamp}.jpg"
+            filename = f"{scenario_name}_{captured_count+1:02d}.jpg"
             filepath = os.path.join("device_test_images", filename)
             
             # Save original frame WITHOUT overlays
