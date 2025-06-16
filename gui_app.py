@@ -67,6 +67,8 @@ class VideoProcessingThread(QThread):
                                 self.violation_detected.emit(recent_violations)
                         except Exception as e:
                             print(f"Error processing frame: {e}")
+                            import traceback
+                            traceback.print_exc()
 
                 # short pause to not overload CPU
                 self.msleep(15)
