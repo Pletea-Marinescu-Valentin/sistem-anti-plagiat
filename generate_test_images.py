@@ -20,7 +20,6 @@ def capture_gaze_images():
     
     images_per_direction = 25  # 25 x 4 = 100 images
     
-    print("=== Gaze Image Capture Tool ===")
     print("Instructions:")
     for i, direction in enumerate(directions):
         print(f"{i+1}. Look {direction.upper()}")

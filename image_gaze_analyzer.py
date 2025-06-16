@@ -25,7 +25,7 @@ class ImageGazeAnalyzer:
             with open(self.config_path, 'r') as f:
                 return json.load(f)
         except Exception as e:
-            print(f"⚠️  Error loading config: {e}")
+            print(f"Error loading config: {e}")
             return {
                 'detection': {
                     'gaze': {
@@ -44,7 +44,7 @@ class ImageGazeAnalyzer:
         image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.JPG', '.JPEG', '.PNG', '.BMP', '.TIFF']
         
         if not os.path.exists(self.input_dir):
-            print(f"❌ Input directory not found: {self.input_dir}")
+            print(f"Input directory not found: {self.input_dir}")
             return []
         
         image_files = []
@@ -95,7 +95,7 @@ class ImageGazeAnalyzer:
 
     def force_fresh_detection(self, detector, frame):
         """Force completely fresh detection by breaking temporal cache"""
-        print("   🔄 Forcing fresh detection...")
+        print("Forcing fresh detection...")
         
         # Method 1: Reset gaze tracker state completely
         if hasattr(detector, 'gaze_tracker') and detector.gaze_tracker:
@@ -166,7 +166,7 @@ class ImageGazeAnalyzer:
             raise Exception("All detection passes failed")
         
         # Choose the most "different" result to avoid cache
-        print(f"   📊 Detection passes: {len(results)}")
+        print(f"Detection passes: {len(results)}")
         for i, (direction, _, h_ratio, v_ratio, method) in enumerate(results):
             print(f"      Pass {i+1} ({method}): {direction}, H: {h_ratio:.3f}, V: {v_ratio:.3f}")
         
@@ -174,7 +174,7 @@ class ImageGazeAnalyzer:
         best_index = min(1, len(results) - 1)
         direction, processed_frame, h_ratio, v_ratio, method = results[best_index]
         
-        print(f"   ✅ Using result from pass: {method}")
+        print(f"Using result from pass: {method}")
         return direction, processed_frame, h_ratio, v_ratio
 
     def create_annotated_image(self, frame, filename, expected, h_ratio, v_ratio, is_correct):
@@ -190,20 +190,20 @@ class ImageGazeAnalyzer:
         
         # Main ratios (large and prominent)
         cv2.putText(annotated, f"H-Ratio: {h_ratio:.3f}", 
-                   (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 0, 0), 3)
+                    (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 0, 0), 3)
         cv2.putText(annotated, f"V-Ratio: {v_ratio:.3f}", 
-                   (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 0, 0), 3)
+                    (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 0, 0), 3)
         
         # Expected direction
         if expected:
             cv2.putText(annotated, f"EXPECTED: {expected.upper()}", 
-                       (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
+                        (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
             
             # Result (CORRECT/WRONG)
             color = (0, 255, 0) if is_correct else (0, 0, 255)
             status = "CORRECT" if is_correct else "WRONG"
             cv2.putText(annotated, status, 
-                       (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 4)
+                        (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 4)
         
         # Threshold checks (detailed)
         left_limit = self.config['detection']['gaze']['left_limit']
@@ -212,40 +212,40 @@ class ImageGazeAnalyzer:
         
         y_pos = 250
         cv2.putText(annotated, "THRESHOLD CHECKS:", 
-                   (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                    (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         
         y_pos += 30
         left_check = h_ratio > left_limit
         cv2.putText(annotated, f"Left: H({h_ratio:.3f}) > {left_limit} = {left_check}", 
-                   (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
-                   (0, 255, 0) if left_check else (128, 128, 128), 2)
+                    (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
+                    (0, 255, 0) if left_check else (128, 128, 128), 2)
         
         y_pos += 25
         right_check = h_ratio < right_limit
         cv2.putText(annotated, f"Right: H({h_ratio:.3f}) < {right_limit} = {right_check}", 
-                   (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
-                   (0, 255, 0) if right_check else (128, 128, 128), 2)
+                    (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
+                    (0, 255, 0) if right_check else (128, 128, 128), 2)
         
         y_pos += 25
         down_check = v_ratio > down_limit
         cv2.putText(annotated, f"Down: V({v_ratio:.3f}) > {down_limit} = {down_check}", 
-                   (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
-                   (0, 255, 0) if down_check else (128, 128, 128), 2)
+                    (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
+                    (0, 255, 0) if down_check else (128, 128, 128), 2)
         
         # File info
         cv2.putText(annotated, f"File: {filename}", 
-                   (10, annotated.shape[0] - 90), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                    (10, annotated.shape[0] - 90), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
         
         cv2.putText(annotated, f"Hash: {image_hash}", 
-                   (10, annotated.shape[0] - 60), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
+                    (10, annotated.shape[0] - 60), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
         
         # Timestamp
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cv2.putText(annotated, f"Analyzed: {timestamp}", 
-                   (10, annotated.shape[0] - 30), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
+                    (10, annotated.shape[0] - 30), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
         
         # Add gaze indicator
         self.draw_gaze_indicator(annotated, h_ratio, v_ratio, expected)
@@ -315,11 +315,10 @@ class ImageGazeAnalyzer:
     def analyze_all_images(self):
         """Analyze all images with forced fresh detection"""
         print("🎯 Starting Anti-Cache Threshold Analysis...")
-        print("="*60)
         
         image_files = self.get_image_files()
         if not image_files:
-            print("❌ No images found!")
+            print("No images found!")
             return
         
         correct_count = 0
@@ -338,7 +337,7 @@ class ImageGazeAnalyzer:
             # Load image
             frame = cv2.imread(image_info['full_path'])
             if frame is None:
-                print(f"   ❌ Could not load image")
+                print(f"Could not load image")
                 continue
             
             try:
@@ -357,8 +356,8 @@ class ImageGazeAnalyzer:
                         correct_count += 1
                     
                     # Terminal output
-                    status = "✅ CORRECT" if is_correct else "❌ WRONG"
-                    print(f"   Expected: {expected} | H: {h_ratio:.3f} | V: {v_ratio:.3f} | {status}")
+                    status = "CORRECT" if is_correct else "WRONG"
+                    print(f"Expected: {expected} | H: {h_ratio:.3f} | V: {v_ratio:.3f} | {status}")
                     
                     # Create detailed annotated image
                     annotated_frame = self.create_annotated_image(
@@ -369,7 +368,7 @@ class ImageGazeAnalyzer:
                     output_filename = f"analyzed_{filename}"
                     output_path = os.path.join(self.output_dir, output_filename)
                     cv2.imwrite(output_path, annotated_frame)
-                    print(f"   💾 Saved: {output_filename}")
+                    print(f"Saved: {output_filename}")
                     
                     results.append({
                         'filename': filename,
@@ -379,10 +378,10 @@ class ImageGazeAnalyzer:
                         'correct': is_correct
                     })
                 else:
-                    print(f"   ⚠️  No expected direction found in filename")
+                    print(f"No expected direction found in filename")
                     
             except Exception as e:
-                print(f"   ❌ Error: {e}")
+                print(f"Error: {e}")
             
             # Extended delay between images
             time.sleep(1.0)
@@ -393,16 +392,12 @@ class ImageGazeAnalyzer:
         if total_count > 0:
             accuracy = (correct_count / total_count) * 100
             
-            print(f"\n{'='*60}")
-            print(f"🎉 ANTI-CACHE ANALYSIS COMPLETE!")
-            print(f"{'='*60}")
-            print(f"📊 Total images tested: {total_count}")
-            print(f"✅ Correct: {correct_count}")
-            print(f"❌ Wrong: {total_count - correct_count}")
-            print(f"🎯 Accuracy: {correct_count}/{total_count} = {accuracy:.1f}%")
-            print(f"⏱️  Total time: {total_time:.1f} seconds")
-            print(f"📁 Annotated images saved to: {os.path.abspath(self.output_dir)}")
-            print(f"{'='*60}")
+            print(f"Total images tested: {total_count}")
+            print(f"Correct: {correct_count}")
+            print(f"Wrong: {total_count - correct_count}")
+            print(f"Accuracy: {correct_count}/{total_count} = {accuracy:.1f}%")
+            print(f"Total time: {total_time:.1f} seconds")
+            print(f"Annotated images saved to: {os.path.abspath(self.output_dir)}")
             
             # Check for duplicate ratios (cache detection)
             ratio_groups = {}
@@ -414,41 +409,34 @@ class ImageGazeAnalyzer:
             
             duplicates = {k: v for k, v in ratio_groups.items() if len(v) > 1}
             if duplicates:
-                print(f"\n⚠️  CACHE WARNING - Identical ratios found:")
+                print(f"\nCACHE WARNING - Identical ratios found:")
                 for ratios, files in duplicates.items():
                     print(f"   {ratios}: {', '.join(files)}")
             else:
-                print(f"\n✅ NO CACHE ISSUES - All ratios are unique!")
+                print(f"\nNO CACHE ISSUES - All ratios are unique!")
             
             # Show thresholds used
-            print(f"\n📏 Thresholds used:")
             print(f"   Left: H > {self.config['detection']['gaze']['left_limit']}")
             print(f"   Right: H < {self.config['detection']['gaze']['right_limit']}")
             print(f"   Down: V > {self.config['detection']['gaze']['down_limit']}")
             print(f"   Center: None of the above")
             
             # Show detailed breakdown
-            print(f"\n📋 Detailed results:")
             for result in results:
-                status_icon = "✅" if result['correct'] else "❌"
-                print(f"   {status_icon} {result['filename']} → Expected: {result['expected']}, H: {result['h_ratio']:.3f}, V: {result['v_ratio']:.3f}")
-            
+                print(f"{result['filename']} → Expected: {result['expected']}, H: {result['h_ratio']:.3f}, V: {result['v_ratio']:.3f}")
         else:
-            print("❌ No images with expected directions found!")
+            print("No images with expected directions found!")
 
 
 def main():
-    """Main function"""
-    print("=== Anti-Cache Threshold Analysis ===")
-    
     try:
         analyzer = ImageGazeAnalyzer()
         analyzer.analyze_all_images()
         
-        print(f"\n🎯 Analysis complete! Check:")
-        print(f"   📺 Terminal output for accuracy results")
-        print(f"   🖼️  'analyzed_images/' folder for detailed annotated images")
-        print(f"   🔍 Cache detection warnings")
+        print(f"\nAnalysis complete! Check:")
+        print(f"Terminal output for accuracy results")
+        print(f"'analyzed_images/' folder for detailed annotated images")
+        print(f"Cache detection warnings")
         
     except Exception as e:
         print(f"❌ Error: {e}")

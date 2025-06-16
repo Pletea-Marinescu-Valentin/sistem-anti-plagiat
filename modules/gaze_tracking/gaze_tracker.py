@@ -54,7 +54,7 @@ class GazeTracker(object):
 
     def reset_all_state(self):
         """Reset complet al tuturor variabilelor de stare pentru imagini statice"""
-        print("🔄 Complete gaze tracker reset...")
+        print("Complete gaze tracker reset...")
         
         # Clear frame and detection state
         self.frame = None
@@ -81,17 +81,17 @@ class GazeTracker(object):
         # Force garbage collection
         gc.collect()
         
-        print("✅ Reset complete")
+        print("Reset complete")
 
     def set_image_mode(self, enabled=True):
-        """Activează/dezactivează modul pentru imagini statice"""
+        """Activate/Deactivate mode for static images"""
         self._image_mode = enabled
         if enabled:
-            print("📸 Image mode enabled - will reset state for each frame")
+            print("Image mode enabled - will reset state for each frame")
             self.smoothing_factor = 0.0  # No smoothing for images
             self.process_every_n_frames = 1  # Process every frame
         else:
-            print("📹 Video mode enabled - will use temporal smoothing")
+            print("Video mode enabled - will use temporal smoothing")
             self.smoothing_factor = 0.3  # Restore smoothing for video
             self.process_every_n_frames = 2  # Skip frames for performance
 
@@ -346,12 +346,12 @@ class GazeTracker(object):
             return False
         
         left_valid = (self.eye_left is not None and 
-                      self.eye_left.pupil is not None and 
-                      self.eye_left.is_valid_detection())
+                        self.eye_left.pupil is not None and 
+                        self.eye_left.is_valid_detection())
         
         right_valid = (self.eye_right is not None and 
-                       self.eye_right.pupil is not None and 
-                       self.eye_right.is_valid_detection())
+                        self.eye_right.pupil is not None and 
+                        self.eye_right.is_valid_detection())
         
         return left_valid or right_valid
 
@@ -362,10 +362,10 @@ class GazeTracker(object):
             return False
         
         left_valid = (self.eye_left.pupil is not None and 
-                      self.eye_left.is_valid_detection())
+                        self.eye_left.is_valid_detection())
         
         right_valid = (self.eye_right.pupil is not None and 
-                       self.eye_right.is_valid_detection())
+                        self.eye_right.is_valid_detection())
         
         return left_valid and right_valid
 
