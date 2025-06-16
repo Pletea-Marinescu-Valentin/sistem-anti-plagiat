@@ -60,7 +60,7 @@ class DeviceDetectionAnalyzer:
     def analyze_single_image(self, image_info):
         """Analyze single image with object_detector.py"""
         filename = image_info['filename']
-        print(f"🔍 Analyzing: {filename}")
+        print(f"Analyzing: {filename}")
         
         # Load image
         frame = cv2.imread(image_info['full_path'])
@@ -76,8 +76,27 @@ class DeviceDetectionAnalyzer:
         
         print(f"Expected: {expected_type}")
         
-        # Run object detection
-        detected_objects, annotated_frame = self.object_detector.detect_objects(frame)
+        # Run object detection - FIX PENTRU UNPACKING
+        detected_objects = self.object_detector.detect_objects(frame)
+        
+        # Creează frame annotat manual pentru analyzer
+        annotated_frame = frame.copy()
+        
+        # Desenează manual box-urile pentru analyzer
+        for obj in detected_objects:
+            if len(obj) >= 6:  # ('phone', conf, x1, y1, x2, y2)
+                obj_type, confidence, x1, y1, x2, y2 = obj
+                
+                # Desenează box
+                color = (0, 0, 255) if obj_type == 'phone' else (255, 0, 0)
+                cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
+                
+                # Desenează label
+                label = f"{obj_type.upper()} {confidence:.2f}"
+                cv2.putText(annotated_frame, label, (x1, y1-10), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+        
+        print(f"Raw detection results: {detected_objects}")  # Debug info
         
         # Process detection results
         detected_phones = [obj for obj in detected_objects if obj[0] == 'phone']
@@ -95,6 +114,7 @@ class DeviceDetectionAnalyzer:
         
         # Output results
         status = "CORRECT" if is_correct else "WRONG"
+        print(f"All objects detected: {len(detected_objects)}")
         print(f"Phones detected: {len(detected_phones)}")
         print(f"Smartwatches detected: {len(detected_watches)}")
         print(f"Result: {status} (confidence: {confidence:.3f})")
@@ -118,9 +138,10 @@ class DeviceDetectionAnalyzer:
     def create_detailed_annotation(self, annotated_frame, filename, expected_type, 
                                     detected_type, detected_objects, is_correct, confidence):
         """Create detailed annotated image"""
+        # Start with annotated frame from ObjectDetector (already has bounding boxes)
         frame = annotated_frame.copy()
         
-        # Colors
+        # Colors for results
         result_color = (0, 255, 0) if is_correct else (0, 0, 255)
         phone_color = (0, 0, 255)      # Red
         watch_color = (255, 0, 0)      # Blue
@@ -148,8 +169,9 @@ class DeviceDetectionAnalyzer:
         # Detection summary
         phones_detected = len([obj for obj in detected_objects if obj[0] == 'phone'])
         watches_detected = len([obj for obj in detected_objects if obj[0] == 'smartwatch'])
+        total_objects = len(detected_objects)
         
-        cv2.putText(frame, f"Phones: {phones_detected} | Smartwatches: {watches_detected}", 
+        cv2.putText(frame, f"Total: {total_objects} | Phones: {phones_detected} | Watches: {watches_detected}", 
                     (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
         
         # File info
@@ -174,7 +196,7 @@ class DeviceDetectionAnalyzer:
 
     def analyze_all_images(self):
         """Analyze all device test images"""
-        print("🔍 Device Detection Analysis with object_detector.py")
+        print("Device Detection Analysis using object_detector.py")
         
         image_files = self.get_image_files()
         if not image_files:
@@ -209,8 +231,6 @@ class DeviceDetectionAnalyzer:
                 output_path = os.path.join(self.output_dir, output_filename)
                 cv2.imwrite(output_path, result['annotated_frame'])
                 print(f"Saved: {output_filename}")
-            
-            time.sleep(0.2)  # Small delay
         
         total_time = time.time() - start_time
         
@@ -223,33 +243,42 @@ class DeviceDetectionAnalyzer:
         watch_accuracy = (watch_stats['correct'] / watch_stats['total'] * 100) if watch_stats['total'] > 0 else 0
         
         # Display results
+        print(f"\n" + "="*60)
+        print(f"DEVICE DETECTION ANALYSIS COMPLETE!")
+        print(f"="*60)
         print(f"Total images: {total_images}")
         print(f"Correct detections: {total_correct}")
         print(f"Overall accuracy: {overall_accuracy:.1f}%")
         print(f"Analysis time: {total_time:.1f} seconds")
         
         print(f"\nPhone Detection:")
-        print(f"Images tested: {phone_stats['total']}")
-        print(f"Correct detections: {phone_stats['correct']}")
-        print(f"Accuracy: {phone_accuracy:.1f}%")
+        print(f"  Images tested: {phone_stats['total']}")
+        print(f"  Correct detections: {phone_stats['correct']}")
+        print(f"  Accuracy: {phone_accuracy:.1f}%")
         
         print(f"\nSmartwatch Detection:")
-        print(f"Images tested: {watch_stats['total']}")
-        print(f"Correct detections: {watch_stats['correct']}")
-        print(f"Accuracy: {watch_accuracy:.1f}%")
+        print(f"  Images tested: {watch_stats['total']}")
+        print(f"  Correct detections: {watch_stats['correct']}")
+        print(f"  Accuracy: {watch_accuracy:.1f}%")
         
         print(f"\nResults saved to: {os.path.abspath(self.output_dir)}")
         
         # Show detailed results
+        print(f"\nDetailed Results:")
         for result in results:
-            print(f"{result['filename']} → Expected: {result['expected_type']}, "
+            status_icon = "✓" if result['is_correct'] else "✗"
+            print(f"{result['filename']} -> Expected: {result['expected_type']}, "
                     f"Detected: {result['detected_type']} (conf: {result['confidence']:.3f})")
 
-def main():    
+def main():
+    print("Device Detection Analyzer using object_detector.py")
+    
     try:
         analyzer = DeviceDetectionAnalyzer()
         analyzer.analyze_all_images()
-                
+        
+        print(f"\nAnalysis complete!")
+        
     except Exception as e:
         print(f"Error: {e}")
         import traceback
