@@ -25,10 +25,18 @@ class ViolationMonitor:
             message = self.direction_messages[direction]
             violations.append(message)
 
-        # check detected objects
-        for obj, _ in objects:
-            message = f"Unauthorized object detected: {obj.upper()}"
-            violations.append(message)
+        # Check object violations
+        for obj_data in objects:
+            if len(obj_data) >= 2:
+                obj_type = obj_data[0]
+                confidence = obj_data[1]
+                
+                if obj_type == 'phone':
+                    violations.append(f"Phone detected (confidence: {confidence:.2f})")
+                elif obj_type == 'smartwatch':
+                    violations.append(f"Smartwatch detected (confidence: {confidence:.2f})")
+            else:
+                print(f"DEBUG: Unexpected object data format: {obj_data}")
 
         return violations
 
