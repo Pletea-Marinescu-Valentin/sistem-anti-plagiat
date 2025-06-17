@@ -50,9 +50,6 @@ Thumbs.db
 *.swp
 *~
 
-# YOLOv8 model that will be automatically generated when running the application
-*.pt
-
 # Log file
 sistem_anti_plagiat.log
 
