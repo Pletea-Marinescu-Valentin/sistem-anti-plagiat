@@ -26,12 +26,6 @@ venv/
 recordings/
 reports/
 snapshots/
-*.mp4
-*.jpg
-*.png
-*.jpeg
-*.gif
-*.bmp
 *.tiff
 *.tif
 *.svg
@@ -61,7 +55,6 @@ sistem_anti_plagiat.log
 *.toc
 *.out
 *.synctex.gz
-*.pdf
 *.bbl
 *.blg
 *.run.xml

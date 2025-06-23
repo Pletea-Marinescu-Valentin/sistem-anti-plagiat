@@ -1,0 +1,64 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[none]{hyphenat}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{microtype}
+\usepackage{ragged2e}
+\usepackage[colorlinks=true,citecolor=black,linkcolor=black,urlcolor=black]{hyperref}
+
+\tolerance=1%
+\emergencystretch=\maxdimen%
+\hyphenpenalty=10000%
+\exhyphenpenalty=100%
+
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+
+\title{Anti-Plagiarism System for Exam Monitoring}
+
+\author{
+    \IEEEauthorblockN{Valentin Pletea-Marinescu}
+    \IEEEauthorblockA{
+        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        Email: \texttt{pletea.valentin2003@gmail.com}
+    }
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Academic integrity represents a fundamental challenge in modern education systems, 
+with plagiarism rates increasing globally across all educational levels. Traditional 
+exam monitoring approaches rely primarily on screen surveillance and human oversight, 
+creating significant vulnerabilities in detecting sophisticated cheating behaviors 
+during online and remote examinations.
+This research develops a comprehensive anti-plagiarism monitoring system using 
+deep learning and computer vision technologies to address these limitations. 
+The system integrates gaze tracking algorithms with YOLO-based object detection 
+models through a modular software architecture. Facial landmark detection enables 
+precise gaze direction analysis, while specialized convolutional neural networks 
+identify unauthorized objects and suspicious materials in the examination environment. 
+These two complementary approaches work together to provide comprehensive monitoring 
+coverage: gaze analysis detects abnormal visual attention patterns that may indicate 
+unauthorized assistance seeking, while object detection identifies physical cheating 
+aids such as smartphones and smartwatches.
+Experimental testing demonstrates effective operation on CPU-based 
+systems, identifying suspicious gaze patterns, abnormal behaviors, 
+and unauthorized objects while maintaining real-time performance. The system provides 
+comprehensive exam monitoring capabilities suitable for educational institutions, enabling 
+widespread deployment using standard computing hardware without requiring specialized equipment.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Academic integrity, Educational technology, Computer vision, Gaze tracking, Object detection, Real-time systems, Machine learning, Convolutional neural networks, Image processing, Kalman Filters
+\end{IEEEkeywords}
+
+\end{document}
