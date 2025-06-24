@@ -31,7 +31,7 @@ class ImageGazeAnalyzer:
                     'gaze': {
                         'left_limit': 0.65,
                         'right_limit': 0.35,
-                        'down_limit': 0.68
+                        'down_limit': 0.55
                     }
                 },
                 'video': {
@@ -384,7 +384,7 @@ class ImageGazeAnalyzer:
                 print(f"Error: {e}")
             
             # Extended delay between images
-            time.sleep(1.0)
+            time.sleep(0.1)
         
         total_time = time.time() - start_time
         
@@ -439,7 +439,7 @@ def main():
         print(f"Cache detection warnings")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":

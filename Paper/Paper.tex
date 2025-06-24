@@ -26,7 +26,22 @@
     \IEEEauthorblockN{Valentin Pletea-Marinescu}
     \IEEEauthorblockA{
         \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
-        Email: \texttt{pletea.valentin2003@gmail.com}
+        Email: \texttt{valentin.pletea@stud.acs.upb.ro}
+    }
+    \IEEEauthorblockN{Ge Su}
+    \IEEEauthorblockA{
+        \textit{Zhejiang University}\\
+        Email: \texttt{suge@zju.edu.cn}
+    }
+    \IEEEauthorblockN{Ștefan-Dan Ciocîrlan}
+    \IEEEauthorblockA{
+        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        Email: \texttt{stefan\_dan.ciocirlan@upb.ro}
+    }
+    \IEEEauthorblockN{Ștefan-Alexandru Mocanu}
+    \IEEEauthorblockA{
+        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        Email: \texttt{stefan.mocanu@upb.ro}
     }
 }
 
@@ -217,7 +232,7 @@ The activity diagram presents the comprehensive operational flow of the anti-pla
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
-        scale=0.5,
+        scale=0.45,
         transform shape,
         node distance=1.0cm,
         start/.style={circle, fill=black, minimum width=0.5cm},
@@ -474,53 +489,35 @@ The system implements a constant velocity motion model with state vector $\mathb
 0 & 0 & 0 & 1
 \end{bmatrix}
 \end{equation}
-
 Process noise covariance $\mathbf{Q} = 0.01 \times \mathbf{I}_4$ accounts for model uncertainties, while measurement noise adapts dynamically: $\mathbf{R} = \text{diag}(0.1/\text{confidence})$. The filter prediction step computes:
-
 \begin{equation}
 \mathbf{x}_{k|k-1} = \mathbf{F}\mathbf{x}_{k-1|k-1}
 \end{equation}
-
 \begin{equation}
 \mathbf{P}_{k|k-1} = \mathbf{F}\mathbf{P}_{k-1|k-1}\mathbf{F}^T + \mathbf{Q}
 \end{equation}
-
 The correction step incorporates measurements with adaptive gain:
-
 \begin{equation}
 \mathbf{K}_k = \mathbf{P}_{k|k-1}\mathbf{H}^T(\mathbf{H}\mathbf{P}_{k|k-1}\mathbf{H}^T + \mathbf{R})^{-1}
 \end{equation}
-
 where $\mathbf{H} = [1, 0, 0, 0; 0, 1, 0, 0]$ extracts position measurements.
-
 \subsubsection{Outlier Detection and Validation}
-
 Euclidean distance outlier rejection ($d > 30$ pixels) prevents spurious measurements, while velocity constraints ($v_{max} = 50$ pixels/frame) ensure physically realistic tracking. Enhanced pupil detection incorporates contour circularity validation:
-
 \begin{equation}
 \text{Circularity} = \frac{4\pi \cdot \text{Area}}{\text{Perimeter}^2}
 \end{equation}
-
 with acceptance threshold $> 0.7$ and area constraints (0.01-0.3 × eye region) for robust performance under challenging conditions\cite{li2003survey}.
-
 \subsubsection{Gaze Direction Classification}
-
 The system computes horizontal and vertical gaze ratios using filtered pupil coordinates:
-
 \begin{equation}
 \text{Horizontal Ratio} = \frac{x_{pupil} - x_{eye\_left}}{x_{eye\_right} - x_{eye\_left}}
 \end{equation}
-
 \begin{equation}
 \text{Vertical Ratio} = \frac{y_{pupil} - y_{eye\_top}}{y_{eye\_bottom} - y_{eye\_top}}
 \end{equation}
-
 Classification thresholds: left (HR $<$ 0.35), right (HR $>$ 0.65), down (VR $>$ 0.6), with center classification for intermediate values. Head pose compensation adjusts thresholds based on facial orientation angles derived from landmark geometry\cite{bar2001estimation}.
-
 \subsection{Dual YOLOv8 Architecture Implementation}
-
 The object detection framework employs specialized YOLOv8 models with unified 0.65 confidence threshold, optimized through systematic validation on dedicated training datasets. Implementation specifications:
-
 \textbf{Model Architecture:} Dual-path detection pipeline processing smartphone (84\% accuracy, 4\% FPR) and smartwatch targets (81.6\% accuracy, 3\% FPR) with independent confidence thresholds and post-processing validation.
 
 \textbf{Training Performance:} Smartphone model achieves mAP@0.5 of 0.936 with final training losses (box: 0.799, classification: 0.626). Smartwatch model reaches mAP@0.5 of 0.617 with convergent loss characteristics across 100 training epochs.
@@ -622,7 +619,7 @@ Performance validation demonstrates significant advantages over commercial solut
 
 Future development directions include expanding object detection capabilities to additional unauthorized devices, implementing advanced behavioral pattern recognition for detecting collaborative cheating scenarios, and integrating natural language processing for audio-based violation detection. The modular design facilitates these enhancements while maintaining system stability and performance characteristics essential for production educational environments.
 
-The implementation successfully bridges the gap between advanced computer vision research and practical educational applications, providing institutions with accessible, cost-effective monitoring capabilities that maintain academic integrity standards while respecting privacy requirements and operational constraints.
+The implementation successfully bridges the gap between advanced computer vision research and practical educational applications, providing institutions with accessible, cost-effective monitoring capabilities that maintain academic integrity standards.
 
 
 \begin{thebibliography}{99}
