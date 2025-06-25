@@ -1,0 +1,65 @@
+Collecting mediapipe
+  Downloading mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (9.7 kB)
+Collecting absl-py (from mediapipe)
+  Downloading absl_py-2.3.0-py3-none-any.whl.metadata (2.4 kB)
+Collecting attrs>=19.1.0 (from mediapipe)
+  Downloading attrs-25.3.0-py3-none-any.whl.metadata (10 kB)
+Collecting flatbuffers>=2.0 (from mediapipe)
+  Downloading flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)
+Collecting jax (from mediapipe)
+  Downloading jax-0.6.2-py3-none-any.whl.metadata (13 kB)
+Collecting jaxlib (from mediapipe)
+  Downloading jaxlib-0.6.2-cp311-cp311-manylinux2014_x86_64.whl.metadata (1.3 kB)
+Requirement already satisfied: matplotlib in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from mediapipe) (3.10.3)
+Collecting numpy<2 (from mediapipe)
+  Using cached numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Collecting opencv-contrib-python (from mediapipe)
+  Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting protobuf<5,>=4.25.3 (from mediapipe)
+  Downloading protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl.metadata (541 bytes)
+Collecting sounddevice>=0.4.4 (from mediapipe)
+  Downloading sounddevice-0.5.2-py3-none-any.whl.metadata (1.6 kB)
+Collecting sentencepiece (from mediapipe)
+  Downloading sentencepiece-0.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+Requirement already satisfied: CFFI>=1.0 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from sounddevice>=0.4.4->mediapipe) (1.17.1)
+Requirement already satisfied: pycparser in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from CFFI>=1.0->sounddevice>=0.4.4->mediapipe) (2.22)
+Collecting ml_dtypes>=0.5.0 (from jax->mediapipe)
+  Downloading ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (21 kB)
+Collecting opt_einsum (from jax->mediapipe)
+  Downloading opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)
+Requirement already satisfied: scipy>=1.12 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from jax->mediapipe) (1.15.2)
+Requirement already satisfied: contourpy>=1.0.1 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (1.3.2)
+Requirement already satisfied: cycler>=0.10 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (4.58.4)
+Requirement already satisfied: kiwisolver>=1.3.1 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (1.4.7)
+Requirement already satisfied: packaging>=20.0 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (25.0)
+Requirement already satisfied: pillow>=8 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (11.2.1)
+Requirement already satisfied: pyparsing>=2.3.1 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (3.2.3)
+Requirement already satisfied: python-dateutil>=2.7 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from matplotlib->mediapipe) (2.9.0.post0)
+Requirement already satisfied: six>=1.5 in /home/valentin/ls/envs/anti-plagiat/lib/python3.11/site-packages (from python-dateutil>=2.7->matplotlib->mediapipe) (1.17.0)
+Downloading mediapipe-0.10.21-cp311-cp311-manylinux_2_28_x86_64.whl (35.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.6/35.6 MB 8.1 MB/s eta 0:00:00
+Using cached numpy-1.26.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.3 MB)
+Downloading protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl (294 kB)
+Downloading attrs-25.3.0-py3-none-any.whl (63 kB)
+Downloading flatbuffers-25.2.10-py2.py3-none-any.whl (30 kB)
+Downloading sounddevice-0.5.2-py3-none-any.whl (32 kB)
+Downloading absl_py-2.3.0-py3-none-any.whl (135 kB)
+Downloading jax-0.6.2-py3-none-any.whl (2.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.7/2.7 MB 10.6 MB/s eta 0:00:00
+Downloading jaxlib-0.6.2-cp311-cp311-manylinux2014_x86_64.whl (89.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 89.9/89.9 MB 8.6 MB/s eta 0:00:00
+Downloading ml_dtypes-0.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 11.3 MB/s eta 0:00:00
+Downloading opencv_contrib_python-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (69.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.1/69.1 MB 11.6 MB/s eta 0:00:00
+Downloading opt_einsum-3.4.0-py3-none-any.whl (71 kB)
+Downloading sentencepiece-0.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 10.4 MB/s eta 0:00:00
+Installing collected packages: sentencepiece, flatbuffers, protobuf, opt_einsum, numpy, attrs, absl-py, sounddevice, opencv-contrib-python, ml_dtypes, jaxlib, jax, mediapipe
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.3.0
+    Uninstalling numpy-2.3.0:
+      Successfully uninstalled numpy-2.3.0
+
+Successfully installed absl-py-2.3.0 attrs-25.3.0 flatbuffers-25.2.10 jax-0.6.2 jaxlib-0.6.2 mediapipe-0.10.21 ml_dtypes-0.5.1 numpy-1.26.4 opencv-contrib-python-4.11.0.86 opt_einsum-3.4.0 protobuf-4.25.8 sentencepiece-0.2.0 sounddevice-0.5.2

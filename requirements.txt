@@ -13,3 +13,4 @@ scikit-image>=0.18.0
 imageio>=2.9.0
 loguru>=0.5.3
 pytest>=6.0.0
+mediapipe>=0.10.0

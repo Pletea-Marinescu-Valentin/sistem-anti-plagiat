@@ -6,106 +6,237 @@ from .pupil_tracker import KalmanPupilTracker
 
 
 class Eye(object):
-    """class that isolates the eye region from the image and initiates pupil detection"""
+    """
+    Clasa Eye îmbunătățită care poate funcționa cu landmarks MediaPipe sau dlib
+    """
 
-    # reference points for left and right eyes (according to 68-point facial model)
+    # Indicii pentru ochii din MediaPipe (468 puncte)
+    LEFT_EYE_MP_INDICES = [
+        33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246
+    ]
+    
+    RIGHT_EYE_MP_INDICES = [
+        362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398
+    ]
+    
+    # Punctele pentru iris (MediaPipe)
+    LEFT_IRIS_INDICES = [468, 469, 470, 471, 472]
+    RIGHT_IRIS_INDICES = [473, 474, 475, 476, 477]
+
+    # Indicii dlib originali (pentru compatibilitate)
     LEFT_EYE_POINTS = [36, 37, 38, 39, 40, 41]
     RIGHT_EYE_POINTS = [42, 43, 44, 45, 46, 47]
 
-    def __init__(self, original_frame, landmarks, side):
+    def __init__(self, original_frame, landmarks, side, landmark_type="dlib"):
         self.frame = None
         self.origin = None
         self.center = None
         self.pupil = None
         self.landmark_points = None
         self.blinking = None
+        self.landmark_type = landmark_type  # "dlib" sau "mediapipe"
         
         # Add Kalman tracker for pupil
         self.pupil_tracker = KalmanPupilTracker()
-        self.raw_pupil_position = None  # Store unfiltered position
+        self.raw_pupil_position = None
         
         self._analyze(original_frame, landmarks, side)
 
     @staticmethod
     def _middle_point(p1, p2):
-        # coordinates of the midpoint between two points
-        x = int((p1.x + p2.x) / 2)
-        y = int((p1.y + p2.y) / 2)
+        """Calculează punctul de mijloc între două puncte"""
+        if hasattr(p1, 'x'):  # dlib point
+            x = int((p1.x + p2.x) / 2)
+            y = int((p1.y + p2.y) / 2)
+        else:  # tuplu (x, y)
+            x = int((p1[0] + p2[0]) / 2)
+            y = int((p1[1] + p2[1]) / 2)
         return (x, y)
 
-    def _isolate(self, frame, landmarks, points):
-        """isolates the eye from the face image using a mask"""
-        # convert reference points to coordinates for mask creation
-        region = np.array([(landmarks.part(point).x, landmarks.part(point).y) for point in points])
-        region = region.astype(np.int32)
-        self.landmark_points = region
-
-        # create a mask to isolate only the eye
-        height, width = frame.shape[:2]
-        black_frame = np.zeros((height, width), np.uint8)
-        mask = np.full((height, width), 255, np.uint8)
-        cv2.fillPoly(mask, [region], (0, 0, 0))
-        eye = cv2.bitwise_not(black_frame, frame.copy(), mask=mask)
-
-        # crop eye region with margin
-        margin = 7
-        min_x = max(0, np.min(region[:, 0]) - margin)
-        max_x = min(width, np.max(region[:, 0]) + margin)
-        min_y = max(0, np.min(region[:, 1]) - margin)
-        max_y = min(height, np.max(region[:, 1]) + margin)
-
-        # check if cropped region is valid
-        if min_x >= max_x or min_y >= max_y:
-            return
-
-        # save cropped frame and origin coordinates
-        self.frame = eye[min_y:max_y, min_x:max_x]
-        self.origin = (min_x, min_y)
-
-        # calculate eye center
-        if self.frame is not None and self.frame.size > 0:
-            height, width = self.frame.shape[:2]
-        else:
-            height, width = 1, 1
-        self.center = (width / 2, height / 2)
-
-    def _blinking_ratio(self, landmarks, points):
-        """calculates ratio indicating if eye is closed (blinking)"""
-        # get coordinates of important points for blink calculation
-        left = (landmarks.part(points[0]).x, landmarks.part(points[0]).y)
-        right = (landmarks.part(points[3]).x, landmarks.part(points[3]).y)
-        top = self._middle_point(landmarks.part(points[1]), landmarks.part(points[2]))
-        bottom = self._middle_point(landmarks.part(points[5]), landmarks.part(points[4]))
-
-        # calculate eye width and height
-        eye_width = math.hypot((left[0] - right[0]), (left[1] - right[1]))
-        eye_height = math.hypot((top[0] - bottom[0]), (top[1] - bottom[1]))
-
-        # calculate width/height ratio
+    def _isolate_mediapipe(self, frame, landmarks_px, eye_indices):
+        """Izolează ochiul folosind landmarks MediaPipe"""
         try:
-            ratio = eye_width / eye_height
-        except ZeroDivisionError:
-            ratio = None
+            # Obține punctele ochiului
+            eye_points = []
+            for idx in eye_indices:
+                if idx < len(landmarks_px):
+                    eye_points.append(landmarks_px[idx])
+                else:
+                    # Fallback dacă indexul nu există
+                    eye_points.append((0, 0))
+            
+            if len(eye_points) < 6:
+                return False
+            
+            # Convertește la numpy array pentru procesare
+            region = np.array(eye_points, dtype=np.int32)
+            self.landmark_points = region
 
-        return ratio
+            # Creează mască pentru izolarea ochiului
+            height, width = frame.shape[:2]
+            mask = np.zeros((height, width), np.uint8)
+            
+            # Folosește convex hull pentru o formă mai bună a ochiului
+            hull = cv2.convexHull(region)
+            cv2.fillPoly(mask, [hull], 255)
+            
+            # Aplică masca
+            eye = cv2.bitwise_and(frame, frame, mask=mask)
+
+            # Calculează bounding box cu marjă
+            x_coords = [p[0] for p in eye_points]
+            y_coords = [p[1] for p in eye_points]
+            
+            min_x = max(0, min(x_coords) - 10)
+            max_x = min(width, max(x_coords) + 10)
+            min_y = max(0, min(y_coords) - 10)
+            max_y = min(height, max(y_coords) + 10)
+
+            # Verifică dacă regiunea este validă
+            if min_x >= max_x or min_y >= max_y:
+                return False
+
+            # Salvează frame-ul croppat și originea
+            self.frame = eye[min_y:max_y, min_x:max_x]
+            self.origin = (min_x, min_y)
+
+            # Calculează centrul ochiului
+            if self.frame is not None and self.frame.size > 0:
+                height, width = self.frame.shape[:2]
+                self.center = (width / 2, height / 2)
+            else:
+                self.center = (1, 1)
+            
+            return True
+            
+        except Exception as e:
+            print(f"Eroare la izolarea ochiului MediaPipe: {e}")
+            return False
+
+    def _isolate_dlib(self, frame, landmarks, points):
+        """Izolarea originală cu dlib (păstrată pentru compatibilitate)"""
+        try:
+            region = np.array([(landmarks.part(point).x, landmarks.part(point).y) for point in points])
+            region = region.astype(np.int32)
+            self.landmark_points = region
+
+            height, width = frame.shape[:2]
+            black_frame = np.zeros((height, width), np.uint8)
+            mask = np.full((height, width), 255, np.uint8)
+            cv2.fillPoly(mask, [region], (0, 0, 0))
+            eye = cv2.bitwise_not(black_frame, frame.copy(), mask=mask)
+
+            margin = 7
+            min_x = max(0, np.min(region[:, 0]) - margin)
+            max_x = min(width, np.max(region[:, 0]) + margin)
+            min_y = max(0, np.min(region[:, 1]) - margin)
+            max_y = min(height, np.max(region[:, 1]) + margin)
+
+            if min_x >= max_x or min_y >= max_y:
+                return False
+
+            self.frame = eye[min_y:max_y, min_x:max_x]
+            self.origin = (min_x, min_y)
+
+            if self.frame is not None and self.frame.size > 0:
+                height, width = self.frame.shape[:2]
+                self.center = (width / 2, height / 2)
+            else:
+                self.center = (1, 1)
+                
+            return True
+            
+        except Exception as e:
+            print(f"Eroare la izolarea ochiului dlib: {e}")
+            return False
+
+    def _blinking_ratio_mediapipe(self, landmarks_px, eye_indices):
+        """Calculează ratio-ul de clipire pentru MediaPipe"""
+        try:
+            if len(eye_indices) < 6:
+                return None
+                
+            # Folosește punctele extreme ale ochiului
+            eye_points = [landmarks_px[i] for i in eye_indices if i < len(landmarks_px)]
+            
+            if len(eye_points) < 6:
+                return None
+            
+            # Găsește punctele extreme
+            leftmost = min(eye_points, key=lambda p: p[0])
+            rightmost = max(eye_points, key=lambda p: p[0])
+            topmost = min(eye_points, key=lambda p: p[1])
+            bottommost = max(eye_points, key=lambda p: p[1])
+            
+            # Calculează dimensiunile
+            eye_width = math.hypot(rightmost[0] - leftmost[0], rightmost[1] - leftmost[1])
+            eye_height = math.hypot(topmost[0] - bottommost[0], topmost[1] - bottommost[1])
+
+            if eye_height == 0:
+                return None
+                
+            ratio = eye_width / eye_height
+            return ratio
+            
+        except Exception as e:
+            print(f"Eroare la calculul ratio-ului de clipire MediaPipe: {e}")
+            return None
+
+    def _blinking_ratio_dlib(self, landmarks, points):
+        """Calculează ratio-ul de clipire pentru dlib (original)"""
+        try:
+            left = (landmarks.part(points[0]).x, landmarks.part(points[0]).y)
+            right = (landmarks.part(points[3]).x, landmarks.part(points[3]).y)
+            top = self._middle_point(landmarks.part(points[1]), landmarks.part(points[2]))
+            bottom = self._middle_point(landmarks.part(points[5]), landmarks.part(points[4]))
+
+            eye_width = math.hypot((left[0] - right[0]), (left[1] - right[1]))
+            eye_height = math.hypot((top[0] - bottom[0]), (top[1] - bottom[1]))
+
+            try:
+                ratio = eye_width / eye_height
+            except ZeroDivisionError:
+                ratio = None
+
+            return ratio
+        except Exception as e:
+            print(f"Eroare la calculul ratio-ului de clipire dlib: {e}")
+            return None
 
     def _analyze(self, original_frame, landmarks, side):
-        """detects and isolates eye, then initializes Pupil object"""
-        # determine reference points based on selected eye
-        if side == 0:
-            points = self.LEFT_EYE_POINTS
-        elif side == 1:
-            points = self.RIGHT_EYE_POINTS
+        """Detectează și izolează ochiul, apoi inițializează obiectul Pupil"""
+        
+        if self.landmark_type == "mediapipe":
+            # Folosește landmarks MediaPipe
+            if side == 0:  # ochi stâng
+                eye_indices = self.LEFT_EYE_MP_INDICES
+            elif side == 1:  # ochi drept
+                eye_indices = self.RIGHT_EYE_MP_INDICES
+            else:
+                return
+
+            # Calculează blinking ratio
+            self.blinking = self._blinking_ratio_mediapipe(landmarks, eye_indices)
+
+            # Izolează ochiul
+            if not self._isolate_mediapipe(original_frame, landmarks, eye_indices):
+                return
+                
         else:
-            return
+            # Folosește landmarks dlib (original)
+            if side == 0:
+                points = self.LEFT_EYE_POINTS
+            elif side == 1:
+                points = self.RIGHT_EYE_POINTS
+            else:
+                return
 
-        # calculate blinking ratio
-        self.blinking = self._blinking_ratio(landmarks, points)
+            self.blinking = self._blinking_ratio_dlib(landmarks, points)
+            
+            if not self._isolate_dlib(original_frame, landmarks, points):
+                return
 
-        # isolate eye
-        self._isolate(original_frame, landmarks, points)
-
-        # check if eye was isolated correctly and create pupil
+        # Creează pupila dacă ochiul a fost izolat cu succes
         if self.frame is not None and self.frame.size > 0:
             self.pupil = Pupil(self.frame)
 
@@ -150,7 +281,7 @@ class Eye(object):
             self.pupil.y < margin or self.pupil.y > eye_height - margin):
             return False
         
-        # Check distance from eye center - pupil shouldn't be too far from center
+        # Check distance from eye center
         center_x, center_y = eye_width // 2, eye_height // 2
         distance_from_center = np.sqrt((self.pupil.x - center_x)**2 + (self.pupil.y - center_y)**2)
         max_distance = min(eye_width, eye_height) * 0.4
@@ -158,14 +289,14 @@ class Eye(object):
         if distance_from_center > max_distance:
             return False
         
-        # Validate pupil intensity - should be darker than average
+        # Validate pupil intensity
         if hasattr(self.pupil, 'confidence') and self.pupil.confidence < 0.3:
             return False
         
         # Check local intensity around pupil position
         try:
             pupil_region = self.frame[max(0, self.pupil.y-3):min(eye_height, self.pupil.y+3),
-                                     max(0, self.pupil.x-3):min(eye_width, self.pupil.x+3)]
+                                        max(0, self.pupil.x-3):min(eye_width, self.pupil.x+3)]
             
             if pupil_region.size > 0:
                 pupil_intensity = np.mean(pupil_region)
