@@ -1,66 +1,70 @@
 import os
+import sys
 import cv2
 import json
 import time
-import gc
 import hashlib
-import logging
 import numpy as np
 from datetime import datetime
-from modules.face_detector import FaceDetector
 
-class ImageGazeAnalyzer:
-    def __init__(self, config_path="config.json", use_mediapipe=True):
+# Eliminate ALL warnings before importing mediapipe
+import warnings
+warnings.filterwarnings("ignore")
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+# Suppress stdout/stderr temporarily for mediapipe import
+class SuppressOutput:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        self._original_stderr = sys.stderr
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stderr.close()
+        sys.stdout = self._original_stdout
+        sys.stderr = self._original_stderr
+
+# Import mediapipe quietly
+with SuppressOutput():
+    import mediapipe as mp
+
+class CleanMediaPipeAnalyzer:
+    def __init__(self, config_path="config.json"):
+        print("Starting MediaPipe Gaze Analysis...")
+        
         self.config_path = config_path
         self.config = self.load_config()
         self.input_dir = "input_images"
-        self.output_dir = "analyzed_images_mediapipe" if use_mediapipe else "analyzed_images_dlib"
-        self.mirror_image = self.config.get('video', {}).get('mirror_image', True)
-        self.use_mediapipe = use_mediapipe
+        self.output_dir = "analyzed_images_mediapipe"
         
         # Create output directory
         os.makedirs(self.output_dir, exist_ok=True)
         
-        # Setup logging
-        self.setup_logging()
-
-    def setup_logging(self):
-        """Setup logging to file"""
-        log_dir = "logs"
-        os.makedirs(log_dir, exist_ok=True)
-        
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        method = "mediapipe" if self.use_mediapipe else "dlib"
-        log_file = os.path.join(log_dir, f"gaze_analysis_{method}_{timestamp}.log")
-        
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(log_file, encoding='utf-8'),
-            ]
-        )
-        
-        self.logger = logging.getLogger(__name__)
-        self.log_file = log_file
-        
-        # Log startup
-        self.logger.info("=" * 60)
-        self.logger.info(f"GAZE ANALYSIS SESSION STARTED - {method.upper()}")
-        self.logger.info("=" * 60)
-        self.logger.info(f"Detection method: {method}")
-        self.logger.info(f"Log file: {os.path.abspath(log_file)}")
-        self.logger.info(f"Input directory: {os.path.abspath(self.input_dir)}")
-        self.logger.info(f"Output directory: {os.path.abspath(self.output_dir)}")
-        self.logger.info(f"Mirror image: {self.mirror_image}")
+        # Initialize MediaPipe quietly
+        print("Initializing MediaPipe...")
+        with SuppressOutput():
+            self.mp_face_mesh = mp.solutions.face_mesh
+            self.face_mesh = self.mp_face_mesh.FaceMesh(
+                static_image_mode=True,
+                max_num_faces=1,
+                refine_landmarks=True,
+                min_detection_confidence=0.5
+            )
+        print("MediaPipe initialized successfully")
 
     def load_config(self):
         """Load configuration from JSON file"""
         try:
             with open(self.config_path, 'r') as f:
-                return json.load(f)
+                config = json.load(f)
+                print(f"Config loaded: left={config['detection']['gaze']['left_limit']}, right={config['detection']['gaze']['right_limit']}, down={config['detection']['gaze']['down_limit']}")
+                return config
         except Exception as e:
-            print(f"Error loading config: {e}")
+            print(f"Using default config due to error: {e}")
             return {
                 'detection': {
                     'gaze': {
@@ -68,23 +72,18 @@ class ImageGazeAnalyzer:
                         'right_limit': 0.35,
                         'down_limit': 0.55
                     }
-                },
-                'video': {
-                    'mirror_image': True
                 }
             }
 
     def get_image_files(self):
         """Get all image files from input directory"""
-        image_extensions = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.JPG', '.JPEG', '.PNG', '.BMP', '.TIFF']
-        
         if not os.path.exists(self.input_dir):
-            self.logger.error(f"Input directory not found: {self.input_dir}")
+            print(f"Input directory not found: {self.input_dir}")
             return []
         
         image_files = []
         for file in sorted(os.listdir(self.input_dir)):
-            if any(file.endswith(ext) for ext in image_extensions):
+            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.tiff')):
                 full_path = os.path.join(self.input_dir, file)
                 if os.path.isfile(full_path):
                     image_files.append({
@@ -92,7 +91,7 @@ class ImageGazeAnalyzer:
                         'full_path': full_path
                     })
         
-        self.logger.info(f"Found {len(image_files)} image files")
+        print(f"Found {len(image_files)} images")
         return image_files
 
     def extract_expected_direction(self, filename):
@@ -107,10 +106,47 @@ class ImageGazeAnalyzer:
             return 'right'
         elif filename_lower.startswith('down'):
             return 'down'
-        elif filename_lower.startswith('up'):
-            return 'up'
         
         return None
+
+    def calculate_ratios(self, face_landmarks, width, height):
+        """Calculate H and V ratios using MediaPipe landmarks"""
+        try:
+            # Key landmarks
+            nose_tip = face_landmarks.landmark[1]
+            forehead = face_landmarks.landmark[10] 
+            chin = face_landmarks.landmark[152]
+            left_face = face_landmarks.landmark[234]
+            right_face = face_landmarks.landmark[454]
+            
+            # H ratio calculation
+            nose_x = nose_tip.x * width
+            left_x = left_face.x * width
+            right_x = right_face.x * width
+            
+            if right_x > left_x and (right_x - left_x) > 0:
+                h_ratio = (nose_x - left_x) / (right_x - left_x)
+            else:
+                h_ratio = 0.5
+            
+            # V ratio calculation
+            nose_y = nose_tip.y * height
+            forehead_y = forehead.y * height
+            chin_y = chin.y * height
+            
+            if chin_y > forehead_y and (chin_y - forehead_y) > 0:
+                v_ratio = (nose_y - forehead_y) / (chin_y - forehead_y)
+            else:
+                v_ratio = 0.5
+            
+            # Clamp values to 0-1
+            h_ratio = max(0.0, min(1.0, h_ratio))
+            v_ratio = max(0.0, min(1.0, v_ratio))
+            
+            return h_ratio, v_ratio
+            
+        except Exception as e:
+            return 0.5, 0.5
 
     def check_threshold_correctness(self, h_ratio, v_ratio, expected_direction):
         """Check if H/V ratios are correct for expected direction"""
@@ -123,71 +159,15 @@ class ImageGazeAnalyzer:
         elif expected_direction == 'right':
             return h_ratio < right_limit
         elif expected_direction == 'down':
-            # Enhanced down detection - consider both standard and extreme thresholds
+            # Enhanced down detection - standard OR extreme threshold
             return v_ratio > down_limit or v_ratio > 0.75
         elif expected_direction == 'center':
-            return not (h_ratio > left_limit or h_ratio < right_limit or v_ratio > down_limit)
+            return not (h_ratio > left_limit or h_ratio < right_limit or (v_ratio > down_limit or v_ratio > 0.75))
         
         return None
 
-    def force_fresh_detection(self, detector, frame):
-        """Force completely fresh detection by resetting detector state"""
-        self.logger.info("Forcing fresh detection...")
-        
-        # Reset detector state completely
-        if hasattr(detector, 'reset_state'):
-            detector.reset_state()
-        
-        # Set image mode for static processing
-        if hasattr(detector, 'set_image_mode'):
-            detector.set_image_mode(True)
-        
-        # Multiple detection passes with different approaches
-        results = []
-        
-        # Pass 1: Clean frame
-        try:
-            detector.reset_state()  # Reset before each pass
-            direction1, processed_frame1, h_ratio1, v_ratio1 = detector.detect_direction(frame.copy())
-            results.append((direction1, processed_frame1, h_ratio1, v_ratio1, "clean"))
-            self.logger.info(f"Pass 1 (clean): {direction1}, H: {h_ratio1:.3f}, V: {v_ratio1:.3f}")
-        except Exception as e:
-            self.logger.warning(f"Pass 1 failed: {e}")
-        
-        # Pass 2: Small delay and fresh detection
-        try:
-            time.sleep(0.05)
-            detector.reset_state()
-            direction2, processed_frame2, h_ratio2, v_ratio2 = detector.detect_direction(frame.copy())
-            results.append((direction2, processed_frame2, h_ratio2, v_ratio2, "delayed"))
-            self.logger.info(f"Pass 2 (delayed): {direction2}, H: {h_ratio2:.3f}, V: {v_ratio2:.3f}")
-        except Exception as e:
-            self.logger.warning(f"Pass 2 failed: {e}")
-        
-        # Pass 3: Different frame processing
-        try:
-            detector.reset_state()
-            frame_copy = cv2.GaussianBlur(frame, (3, 3), 0)  # Very light blur
-            direction3, processed_frame3, h_ratio3, v_ratio3 = detector.detect_direction(frame_copy)
-            results.append((direction3, processed_frame3, h_ratio3, v_ratio3, "blurred"))
-            self.logger.info(f"Pass 3 (blurred): {direction3}, H: {h_ratio3:.3f}, V: {v_ratio3:.3f}")
-        except Exception as e:
-            self.logger.warning(f"Pass 3 failed: {e}")
-        
-        if not results:
-            raise Exception("All detection passes failed")
-        
-        # Choose the most consistent result or the middle one
-        self.logger.info(f"Total detection passes: {len(results)}")
-        
-        # Use the first successful result for consistency
-        direction, processed_frame, h_ratio, v_ratio, method = results[0]
-        self.logger.info(f"Using result from: {method}")
-        
-        return direction, processed_frame, h_ratio, v_ratio
-
     def create_annotated_image(self, frame, filename, expected, h_ratio, v_ratio, is_correct):
-        """Create detailed annotated image with MediaPipe/dlib info"""
+        """Create detailed annotated image"""
         if frame is None:
             return frame
         
@@ -197,9 +177,8 @@ class ImageGazeAnalyzer:
         frame_bytes = cv2.imencode('.jpg', frame)[1].tobytes()
         image_hash = hashlib.md5(frame_bytes).hexdigest()[:8]
         
-        # Detection method indicator
-        method = "MediaPipe" if self.use_mediapipe else "dlib"
-        cv2.putText(annotated, f"Method: {method}", 
+        # MediaPipe indicator
+        cv2.putText(annotated, "MediaPipe Detection", 
                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
         
         # Main ratios (large and prominent)
@@ -219,7 +198,7 @@ class ImageGazeAnalyzer:
             cv2.putText(annotated, status, 
                         (10, 220), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 4)
         
-        # Enhanced threshold checks
+        # Threshold checks
         left_limit = self.config['detection']['gaze']['left_limit']
         right_limit = self.config['detection']['gaze']['right_limit']
         down_limit = self.config['detection']['gaze']['down_limit']
@@ -242,12 +221,12 @@ class ImageGazeAnalyzer:
         
         y_pos += 25
         down_check = v_ratio > down_limit
-        extreme_down_check = v_ratio > 0.75
         cv2.putText(annotated, f"Down: V({v_ratio:.3f}) > {down_limit} = {down_check}", 
                     (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
                     (0, 255, 0) if down_check else (128, 128, 128), 2)
         
         y_pos += 25
+        extreme_down_check = v_ratio > 0.75
         cv2.putText(annotated, f"Extreme Down: V({v_ratio:.3f}) > 0.75 = {extreme_down_check}", 
                     (10, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 
                     (0, 255, 0) if extreme_down_check else (128, 128, 128), 2)
@@ -267,281 +246,214 @@ class ImageGazeAnalyzer:
                     (10, annotated.shape[0] - 30), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
         
-        # Add enhanced gaze indicator
-        self.draw_enhanced_gaze_indicator(annotated, h_ratio, v_ratio, expected)
-        
         return annotated
 
-    def draw_enhanced_gaze_indicator(self, frame, h_ratio, v_ratio, expected_direction):
-        """Draw enhanced gaze indicator with MediaPipe zones"""
-        height, width = frame.shape[:2]
-        
-        # Indicator size and position
-        size = 140
-        x = width - size - 20
-        y = 20
-        
-        # Background
-        cv2.rectangle(frame, (x, y), (x + size, y + size), (50, 50, 50), -1)
-        
-        # Draw threshold zones
-        left_limit = self.config['detection']['gaze']['left_limit']
-        right_limit = self.config['detection']['gaze']['right_limit']
-        down_limit = self.config['detection']['gaze']['down_limit']
-        
-        # Left zone
-        left_x = int(x + left_limit * size)
-        cv2.rectangle(frame, (left_x, y), (x + size, y + size), (100, 100, 200), 1)
-        cv2.putText(frame, "L", (left_x + 5, y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 100, 200), 1)
-        
-        # Right zone
-        right_x = int(x + right_limit * size)
-        cv2.rectangle(frame, (x, y), (right_x, y + size), (200, 100, 100), 1)
-        cv2.putText(frame, "R", (x + 5, y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 100, 100), 1)
-        
-        # Down zone (standard)
-        down_y = int(y + down_limit * size)
-        cv2.rectangle(frame, (x, down_y), (x + size, y + size), (100, 200, 100), 1)
-        cv2.putText(frame, "D", (x + 5, down_y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (100, 200, 100), 1)
-        
-        # Extreme down zone (enhanced for MediaPipe)
-        extreme_down_y = int(y + 0.75 * size)
-        cv2.rectangle(frame, (x, extreme_down_y), (x + size, y + size), (50, 150, 50), 2)
-        cv2.putText(frame, "ED", (x + size - 25, extreme_down_y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (50, 150, 50), 1)
-        
-        # Highlight expected zone
-        if expected_direction == 'left':
-            cv2.rectangle(frame, (left_x, y), (x + size, y + size), (0, 255, 255), 3)
-        elif expected_direction == 'right':
-            cv2.rectangle(frame, (x, y), (right_x, y + size), (0, 255, 255), 3)
-        elif expected_direction == 'down':
-            cv2.rectangle(frame, (x, down_y), (x + size, y + size), (0, 255, 255), 3)
-            cv2.rectangle(frame, (x, extreme_down_y), (x + size, y + size), (0, 255, 255), 2)
-        
-        # Grid lines
-        cv2.line(frame, (x + size//2, y), (x + size//2, y + size), (100, 100, 100), 1)
-        cv2.line(frame, (x, y + size//2), (x + size, y + size//2), (100, 100, 100), 1)
-        
-        # Gaze point (bright yellow)
-        gaze_x = int(x + h_ratio * size)
-        gaze_y = int(y + v_ratio * size)
-        
-        # Clamp to bounds
-        gaze_x = max(x, min(gaze_x, x + size))
-        gaze_y = max(y, min(gaze_y, y + size))
-        
-        cv2.circle(frame, (gaze_x, gaze_y), 8, (0, 255, 255), -1)
-        cv2.circle(frame, (gaze_x, gaze_y), 12, (0, 255, 255), 2)
-        
-        # Center reference
-        center_x = x + size // 2
-        center_y = y + size // 2
-        cv2.circle(frame, (center_x, center_y), 4, (0, 0, 255), -1)
-        
-        # Method indicator
-        method_text = "MP" if self.use_mediapipe else "DL"
-        cv2.putText(frame, method_text, (x + size - 25, y + size - 5), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-
     def analyze_all_images(self):
-        """Analyze all images with enhanced MediaPipe detection"""
-        method_name = "MediaPipe" if self.use_mediapipe else "dlib"
-        self.logger.info(f"Starting Enhanced Analysis with {method_name}...")
+        """Analyze all images with MediaPipe"""
+        print("Starting analysis...")
         
         image_files = self.get_image_files()
         if not image_files:
-            self.logger.error("No images found!")
+            print("No images found!")
             return
         
-        correct_count = 0
-        total_count = 0
         results = []
-        down_images_results = []  # Special tracking for down images
+        failed_to_load = 0
         
         start_time = time.time()
         
-        # Create detector with specified method
-        detector = FaceDetector(self.mirror_image, use_mediapipe=self.use_mediapipe)
-        self.logger.info(f"Created FaceDetector with {method_name}, mirror_image={self.mirror_image}")
+        print("=" * 60)
         
         for i, image_info in enumerate(image_files, 1):
             filename = image_info['filename']
-            self.logger.info(f"\n[{i}/{len(image_files)}] Processing: {filename}")
+            
+            # Progress indicator
+            if i % 50 == 0 or i == len(image_files):
+                print(f"Progress: {i}/{len(image_files)} ({i/len(image_files)*100:.1f}%)")
+            
+            # Get expected direction first
+            expected = self.extract_expected_direction(filename)
+            if not expected:
+                continue  # Skip files without expected direction
             
             # Load image
             frame = cv2.imread(image_info['full_path'])
             if frame is None:
-                self.logger.error(f"Could not load image: {filename}")
+                print(f"Could not load: {filename}")
+                failed_to_load += 1
+                # Count as failed detection (incorrect)
+                results.append({
+                    'filename': filename,
+                    'expected': expected,
+                    'h_ratio': 0.5,
+                    'v_ratio': 0.5,
+                    'correct': False,
+                    'detection_failed': True
+                })
                 continue
             
             try:
-                # Force fresh detection
-                direction, processed_frame, h_ratio, v_ratio = self.force_fresh_detection(detector, frame)
+                # Convert to RGB for MediaPipe
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
-                # Get expected direction
-                expected = self.extract_expected_direction(filename)
+                # Process with MediaPipe (suppress any remaining output)
+                with SuppressOutput():
+                    results_mp = self.face_mesh.process(rgb_frame)
                 
-                if expected:
-                    # Check threshold correctness
-                    is_correct = self.check_threshold_correctness(h_ratio, v_ratio, expected)
-                    
-                    total_count += 1
-                    if is_correct:
-                        correct_count += 1
-                    
-                    # Special tracking for down images
-                    if expected == 'down':
-                        down_images_results.append({
-                            'filename': filename,
-                            'h_ratio': h_ratio,
-                            'v_ratio': v_ratio,
-                            'correct': is_correct,
-                            'standard_down': v_ratio > self.config['detection']['gaze']['down_limit'],
-                            'extreme_down': v_ratio > 0.75
-                        })
-                    
-                    # Log results
-                    status = "CORRECT" if is_correct else "WRONG"
-                    self.logger.info(f"Expected: {expected} | H: {h_ratio:.3f} | V: {v_ratio:.3f} | {status}")
-                    
-                    # Create detailed annotated image
-                    annotated_frame = self.create_annotated_image(
-                        processed_frame, filename, expected, h_ratio, v_ratio, is_correct
-                    )
-                    
-                    # Save annotated image
-                    method_prefix = "mp" if self.use_mediapipe else "dl"
-                    output_filename = f"{method_prefix}_{filename}"
-                    output_path = os.path.join(self.output_dir, output_filename)
-                    cv2.imwrite(output_path, annotated_frame)
-                    self.logger.info(f"Saved: {output_filename}")
-                    
+                if not results_mp.multi_face_landmarks:
+                    # No face detected - count as incorrect
                     results.append({
                         'filename': filename,
                         'expected': expected,
-                        'h_ratio': h_ratio,
-                        'v_ratio': v_ratio,
-                        'correct': is_correct
+                        'h_ratio': 0.5,
+                        'v_ratio': 0.5,
+                        'correct': False,
+                        'detection_failed': True
                     })
-                else:
-                    self.logger.warning(f"No expected direction found in filename: {filename}")
+                    continue
+                
+                # Calculate ratios
+                face_landmarks = results_mp.multi_face_landmarks[0]
+                height, width = frame.shape[:2]
+                h_ratio, v_ratio = self.calculate_ratios(face_landmarks, width, height)
+                
+                # Check threshold correctness
+                is_correct = self.check_threshold_correctness(h_ratio, v_ratio, expected)
+                
+                # Create annotated image
+                annotated_frame = self.create_annotated_image(
+                    frame, filename, expected, h_ratio, v_ratio, is_correct
+                )
+                
+                # Save annotated image
+                output_filename = f"mp_{filename}"
+                output_path = os.path.join(self.output_dir, output_filename)
+                cv2.imwrite(output_path, annotated_frame)
+                
+                results.append({
+                    'filename': filename,
+                    'expected': expected,
+                    'h_ratio': h_ratio,
+                    'v_ratio': v_ratio,
+                    'correct': is_correct,
+                    'detection_failed': False
+                })
                     
             except Exception as e:
-                self.logger.error(f"Error processing {filename}: {e}")
-            
-            # Cleanup and delay
-            gc.collect()
-            time.sleep(0.1)
+                # Error in processing - count as incorrect
+                results.append({
+                    'filename': filename,
+                    'expected': expected,
+                    'h_ratio': 0.5,
+                    'v_ratio': 0.5,
+                    'correct': False,
+                    'detection_failed': True
+                })
+                continue
         
         total_time = time.time() - start_time
         
-        # Calculate and display enhanced results
-        if total_count > 0:
-            accuracy = (correct_count / total_count) * 100
+        # Calculate statistics including ALL images
+        total_images = len(results)
+        correct_count = sum(1 for r in results if r['correct'])
+        failed_detections = sum(1 for r in results if r['detection_failed'])
+        successful_detections = total_images - failed_detections
+        
+        # Display results
+        print(f"Total images with expected directions: {total_images}")
+        print(f"Images that failed to load: {failed_to_load}")
+        print(f"Face detection failures: {failed_detections}")
+        print(f"Successfully detected faces: {successful_detections}")
+        
+        if total_images > 0:
+            overall_accuracy = (correct_count / total_images) * 100
+            print(f"Correct predictions: {correct_count}/{total_images}")
+            print(f"Overall Accuracy: {overall_accuracy:.1f}%")
+            print(f"Processing time: {total_time:.1f} seconds")
             
-            self.logger.info("\n" + "=" * 60)
-            self.logger.info(f"ANALYSIS COMPLETE - {method_name.upper()} RESULTS")
-            self.logger.info("=" * 60)
-            self.logger.info(f"Detection method: {method_name}")
-            self.logger.info(f"Total images tested: {total_count}")
-            self.logger.info(f"Correct: {correct_count}")
-            self.logger.info(f"Wrong: {total_count - correct_count}")
-            self.logger.info(f"Overall Accuracy: {correct_count}/{total_count} = {accuracy:.1f}%")
-            self.logger.info(f"Total time: {total_time:.1f} seconds")
-            
-            # Enhanced down detection analysis
-            if down_images_results:
-                down_total = len(down_images_results)
-                down_correct = sum(1 for r in down_images_results if r['correct'])
-                down_accuracy = (down_correct / down_total) * 100
-                
-                standard_down_detected = sum(1 for r in down_images_results if r['standard_down'])
-                extreme_down_detected = sum(1 for r in down_images_results if r['extreme_down'])
-                
-                self.logger.info("\nDOWN DETECTION ANALYSIS:")
-                self.logger.info(f"Down images total: {down_total}")
-                self.logger.info(f"Down images correct: {down_correct}/{down_total} = {down_accuracy:.1f}%")
-                self.logger.info(f"Standard down threshold (>{self.config['detection']['gaze']['down_limit']}) detected: {standard_down_detected}")
-                self.logger.info(f"Extreme down threshold (>0.75) detected: {extreme_down_detected}")
-                
-                if self.use_mediapipe:
-                    self.logger.info("MediaPipe should handle tilted heads better!")
-            
-            # Accuracy by direction
+            # Accuracy by direction (including failures)
             direction_stats = {}
             for result in results:
                 direction = result['expected']
                 if direction not in direction_stats:
-                    direction_stats[direction] = {'total': 0, 'correct': 0}
+                    direction_stats[direction] = {
+                        'total': 0, 
+                        'correct': 0, 
+                        'failed': 0,
+                        'ratios': []
+                    }
                 direction_stats[direction]['total'] += 1
                 if result['correct']:
                     direction_stats[direction]['correct'] += 1
+                if result['detection_failed']:
+                    direction_stats[direction]['failed'] += 1
+                else:
+                    direction_stats[direction]['ratios'].append((result['h_ratio'], result['v_ratio']))
             
-            self.logger.info("\nACCURACY BY DIRECTION:")
+            print(f"\nACCURACY BY DIRECTION (including detection failures):")
             for direction, stats in direction_stats.items():
                 accuracy = (stats['correct'] / stats['total']) * 100
-                self.logger.info(f"  {direction.upper()}: {stats['correct']}/{stats['total']} = {accuracy:.1f}%")
+                detection_rate = ((stats['total'] - stats['failed']) / stats['total']) * 100
+                
+                if stats['ratios']:
+                    avg_h = np.mean([r[0] for r in stats['ratios']])
+                    avg_v = np.mean([r[1] for r in stats['ratios']])
+                    ratio_info = f"H_avg={avg_h:.3f}, V_avg={avg_v:.3f}"
+                else:
+                    ratio_info = "No successful detections"
+                
+                print(f"  {direction.upper()}: {stats['correct']}/{stats['total']} = {accuracy:.1f}% (Detection: {detection_rate:.1f}%, {ratio_info})")
             
-            # Check for duplicate ratios
-            ratio_groups = {}
-            for result in results:
-                ratio_key = f"{result['h_ratio']:.3f},{result['v_ratio']:.3f}"
-                if ratio_key not in ratio_groups:
-                    ratio_groups[ratio_key] = []
-                ratio_groups[ratio_key].append(result['filename'])
+            # Special analysis for DOWN images
+            down_results = [r for r in results if r['expected'] == 'down']
+            if down_results:
+                down_total = len(down_results)
+                down_correct = sum(1 for r in down_results if r['correct'])
+                down_failed = sum(1 for r in down_results if r['detection_failed'])
+                down_successful = down_total - down_failed
+                
+                down_accuracy = (down_correct / down_total) * 100
+                down_detection_rate = (down_successful / down_total) * 100
+                
+                # Only count successful detections for threshold analysis
+                successful_down = [r for r in down_results if not r['detection_failed']]
+                if successful_down:
+                    standard_down = sum(1 for r in successful_down if r['v_ratio'] > self.config['detection']['gaze']['down_limit'])
+                    extreme_down = sum(1 for r in successful_down if r['v_ratio'] > 0.75)
+                else:
+                    standard_down = extreme_down = 0
+                
+                print(f"DOWN total images: {down_total}")
+                print(f"DOWN detection rate: {down_successful}/{down_total} = {down_detection_rate:.1f}%")
+                print(f"DOWN accuracy (including failures): {down_correct}/{down_total} = {down_accuracy:.1f}%")
+                
+                if down_successful > 0:
+                    down_accuracy_detected = (down_correct / down_successful) * 100
+                    print(f"DOWN accuracy (only detected faces): {down_correct}/{down_successful} = {down_accuracy_detected:.1f}%")
+                    print(f"Standard threshold (>{self.config['detection']['gaze']['down_limit']}) detected: {standard_down}/{down_successful}")
+                    print(f"Extreme threshold (>0.75) detected: {extreme_down}/{down_successful}")
+                
+                if down_accuracy > 90:
+                    print("EXCELLENT: MediaPipe handles tilted heads very well!")
+                elif down_accuracy > 70:
+                    print("GOOD: MediaPipe handles tilted heads reasonably well!")
+                else:
+                    print("NEEDS IMPROVEMENT: MediaPipe struggles with tilted heads")
             
-            duplicates = {k: v for k, v in ratio_groups.items() if len(v) > 1}
-            if duplicates:
-                self.logger.warning("CACHE WARNING - Identical ratios found:")
-                for ratios, files in duplicates.items():
-                    self.logger.warning(f"   {ratios}: {', '.join(files)}")
-            else:
-                self.logger.info("NO CACHE ISSUES - All ratios are unique!")
-            
-            # Configuration info
-            self.logger.info("\nTHRESHOLD CONFIGURATION:")
-            self.logger.info(f"   Left: H > {self.config['detection']['gaze']['left_limit']}")
-            self.logger.info(f"   Right: H < {self.config['detection']['gaze']['right_limit']}")
-            self.logger.info(f"   Down: V > {self.config['detection']['gaze']['down_limit']} OR V > 0.75 (extreme)")
-            self.logger.info(f"   Center: None of the above")
-            
-            self.logger.info(f"\nAnnotated images saved to: {os.path.abspath(self.output_dir)}")
-            
-            # Final comparison note
-            if self.use_mediapipe:
-                self.logger.info("\nMEDIAPIPE ADVANTAGES:")
-                self.logger.info("- Better detection at extreme head angles")
-                self.logger.info("- More robust eye tracking when head is tilted")
-                self.logger.info("- Enhanced down detection for tilted heads")
+            annotated_count = sum(1 for r in results if not r['detection_failed'])
+            print(f"\nAnnotated images saved to: {self.output_dir}/")
+            print(f"Total annotated images: {annotated_count}")
             
         else:
-            self.logger.error("No images with expected directions found!")
-
-        self.logger.info("=" * 60)
-        self.logger.info("SESSION ENDED")
-        self.logger.info("=" * 60)
-
+            print("No images were found with expected directions!")
 
 def main():
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Analyze gaze with MediaPipe or dlib')
-    parser.add_argument('--method', choices=['mediapipe', 'dlib'], default='mediapipe',
-                        help='Detection method to use (default: mediapipe)')
-    
-    args = parser.parse_args()
-    
-    use_mediapipe = (args.method == 'mediapipe')
-    
     try:
-        analyzer = ImageGazeAnalyzer(use_mediapipe=use_mediapipe)
+        analyzer = CleanMediaPipeAnalyzer()
         analyzer.analyze_all_images()
         
-        method_name = "MediaPipe" if use_mediapipe else "dlib"
-        print(f"\n{method_name} analysis complete!")
-        print(f"Check log file: {analyzer.log_file}")
-        print(f"Annotated images saved to: {analyzer.output_dir}/")
-        
+    except KeyboardInterrupt:
+        print("\nAnalysis interrupted by user")
     except Exception as e:
         print(f"Error: {e}")
 
