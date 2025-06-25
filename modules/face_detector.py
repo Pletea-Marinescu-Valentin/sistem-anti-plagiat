@@ -1,121 +1,240 @@
 import json
 import logging
-from .gaze_tracking.gaze_tracker import GazeTracker
+import cv2
+import numpy as np
+import mediapipe as mp
 
 class FaceDetector:
     """
-    Enhanced FaceDetector cu suport pentru MediaPipe și dlib
+    Face detector using MediaPipe for gaze tracking
     """
-    def __init__(self, mirror_image=True, use_mediapipe=True):
+    def __init__(self, mirror_image=True):
         self.mirror_image = mirror_image
-        self.use_mediapipe = use_mediapipe
+        self._init_mediapipe()
+    
+    def _init_mediapipe(self):
+        """Initialize MediaPipe face mesh"""
+        self.mp_face_mesh = mp.solutions.face_mesh
+        self.face_mesh = self.mp_face_mesh.FaceMesh(
+            static_image_mode=False,
+            max_num_faces=1,
+            refine_landmarks=True,
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
+        )
         
-        # Inițializează GazeTracker cu MediaPipe sau dlib
+        self.config = self._load_config()
+        self.current_h_ratio = 0.5
+        self.current_v_ratio = 0.5
+        self.pupils_detected = False
+        self.last_direction = "center"
+        self.last_annotated_frame = None
+    
+    def _load_config(self):
+        """Load configuration from JSON file"""
         try:
-            self.gaze_tracker = GazeTracker(
-                mirror_image=mirror_image, 
-                use_mediapipe=use_mediapipe
-            )
-            
-            if use_mediapipe:
-                logging.info("FaceDetector inițializat cu MediaPipe")
-            else:
-                logging.info("FaceDetector inițializat cu dlib")
-                
-        except Exception as e:
-            logging.error(f"Eroare la inițializarea FaceDetector: {e}")
-            # Fallback la dlib dacă MediaPipe nu funcționează
-            if use_mediapipe:
-                logging.info("Revin la dlib ca fallback...")
-                self.use_mediapipe = False
-                self.gaze_tracker = GazeTracker(
-                    mirror_image=mirror_image, 
-                    use_mediapipe=False
-                )
+            with open("config.json", 'r') as f:
+                return json.load(f)
+        except:
+            return {
+                'detection': {
+                    'gaze': {
+                        'left_limit': 0.65,
+                        'right_limit': 0.35,
+                        'down_limit': 0.6
+                    }
+                }
+            }
 
     @property
     def pupils_located(self):
-        """Check if pupils are located"""
-        return self.gaze_tracker.pupils_located
+        """Check if pupils are detected"""
+        return self.pupils_detected
 
     def horizontal_ratio(self):
         """Get horizontal gaze ratio"""
-        return self.gaze_tracker.horizontal_ratio()
+        return self.current_h_ratio
 
     def vertical_ratio(self):
         """Get vertical gaze ratio"""
-        return self.gaze_tracker.vertical_ratio()
+        return self.current_v_ratio
 
     def is_right(self):
         """Check if looking right"""
-        return self.gaze_tracker.is_right()
+        return self.current_h_ratio < self.config['detection']['gaze']['right_limit']
 
     def is_left(self):
         """Check if looking left"""
-        return self.gaze_tracker.is_left()
+        return self.current_h_ratio > self.config['detection']['gaze']['left_limit']
 
     def is_center(self):
         """Check if looking center"""
-        return self.gaze_tracker.is_center()
+        h_ok = self.config['detection']['gaze']['right_limit'] <= self.current_h_ratio <= self.config['detection']['gaze']['left_limit']
+        v_ok = self.current_v_ratio <= self.config['detection']['gaze']['down_limit']
+        return h_ok and v_ok
 
     def is_down(self):
-        """Enhanced down detection"""
-        return self.gaze_tracker.is_down()
+        """Check if looking down"""
+        return self.current_v_ratio > self.config['detection']['gaze']['down_limit'] or self.current_v_ratio > 0.75
 
     def detect_direction(self, frame):
-        """Detect gaze direction using enhanced tracker"""
-        return self.gaze_tracker.detect_gaze_direction(frame)
+        """Detect gaze direction from frame"""
+        if frame is None:
+            return "center", frame, 0.5, 0.5
+        
+        try:
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = self.face_mesh.process(rgb_frame)
+            
+            if not results.multi_face_landmarks:
+                self.pupils_detected = False
+                return "no_face", frame, self.current_h_ratio, self.current_v_ratio
+            
+            face_landmarks = results.multi_face_landmarks[0]
+            height, width = frame.shape[:2]
+            
+            h_ratio, v_ratio = self._calculate_ratios(face_landmarks, width, height)
+            
+            self.current_h_ratio = h_ratio
+            self.current_v_ratio = v_ratio
+            self.pupils_detected = True
+            
+            direction = self._determine_direction(h_ratio, v_ratio)
+            self.last_direction = direction
+            
+            annotated_frame = self._create_annotated_frame(frame, h_ratio, v_ratio, direction)
+            self.last_annotated_frame = annotated_frame
+            
+            return direction, annotated_frame, h_ratio, v_ratio
+            
+        except Exception as e:
+            self.pupils_detected = False
+            return "center", frame, self.current_h_ratio, self.current_v_ratio
+    
+    def _calculate_ratios(self, face_landmarks, width, height):
+        """Calculate H and V ratios from face landmarks"""
+        try:
+            nose_tip = face_landmarks.landmark[1]
+            forehead = face_landmarks.landmark[10] 
+            chin = face_landmarks.landmark[152]
+            left_face = face_landmarks.landmark[234]
+            right_face = face_landmarks.landmark[454]
+            
+            # Calculate H ratio
+            nose_x = nose_tip.x * width
+            left_x = left_face.x * width
+            right_x = right_face.x * width
+            
+            if right_x > left_x and (right_x - left_x) > 0:
+                h_ratio = (nose_x - left_x) / (right_x - left_x)
+            else:
+                h_ratio = 0.5
+            
+            # Calculate V ratio
+            nose_y = nose_tip.y * height
+            forehead_y = forehead.y * height
+            chin_y = chin.y * height
+            
+            if chin_y > forehead_y and (chin_y - forehead_y) > 0:
+                v_ratio = (nose_y - forehead_y) / (chin_y - forehead_y)
+            else:
+                v_ratio = 0.5
+            
+            h_ratio = max(0.0, min(1.0, h_ratio))
+            v_ratio = max(0.0, min(1.0, v_ratio))
+            
+            return h_ratio, v_ratio
+            
+        except Exception as e:
+            return 0.5, 0.5
+    
+    def _determine_direction(self, h_ratio, v_ratio):
+        """Determine gaze direction from ratios"""
+        if v_ratio > self.config['detection']['gaze']['down_limit'] or v_ratio > 0.75:
+            return "down"
+        elif h_ratio > self.config['detection']['gaze']['left_limit']:
+            return "left" if not self.mirror_image else "right"
+        elif h_ratio < self.config['detection']['gaze']['right_limit']:
+            return "right" if not self.mirror_image else "left"
+        else:
+            return "center"
+    
+    def _create_annotated_frame(self, frame, h_ratio, v_ratio, direction):
+        """Create annotated frame with eye tracking"""
+        annotated = frame.copy()
+        
+        if direction == "center":
+            color = (0, 255, 0)
+        elif direction == "no_face":
+            color = (128, 128, 128)
+        else:
+            color = (0, 0, 255)
+        
+        try:
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = self.face_mesh.process(rgb_frame)
+            
+            if results.multi_face_landmarks:
+                face_landmarks = results.multi_face_landmarks[0]
+                height, width = frame.shape[:2]
+                
+                # Left eye landmarks
+                left_eye_landmarks = [33, 160, 158, 133, 153, 144]
+                left_eye_points = []
+                for idx in left_eye_landmarks:
+                    landmark = face_landmarks.landmark[idx]
+                    x = int(landmark.x * width)
+                    y = int(landmark.y * height)
+                    left_eye_points.append((x, y))
+                
+                if left_eye_points:
+                    left_eye_x = int(np.mean([p[0] for p in left_eye_points]))
+                    left_eye_y = int(np.mean([p[1] for p in left_eye_points]))
+                    self.left_eye_coords = (left_eye_x, left_eye_y)
+                else:
+                    self.left_eye_coords = None
+                
+                # Right eye landmarks
+                right_eye_landmarks = [362, 385, 387, 263, 373, 380]
+                right_eye_points = []
+                for idx in right_eye_landmarks:
+                    landmark = face_landmarks.landmark[idx]
+                    x = int(landmark.x * width)
+                    y = int(landmark.y * height)
+                    right_eye_points.append((x, y))
+                
+                if right_eye_points:
+                    right_eye_x = int(np.mean([p[0] for p in right_eye_points]))
+                    right_eye_y = int(np.mean([p[1] for p in right_eye_points]))
+                    self.right_eye_coords = (right_eye_x, right_eye_y)
+                else:
+                    self.right_eye_coords = None
+                
+                # Draw eye circles - single smaller circle per eye
+                if self.left_eye_coords:
+                    cv2.circle(annotated, self.left_eye_coords, 4, color, -1)
+                
+                if self.right_eye_coords:
+                    cv2.circle(annotated, self.right_eye_coords, 4, color, -1)
+            
+        except Exception as e:
+            height, width = frame.shape[:2]
+            self.left_eye_coords = (int(width * 0.35), int(height * 0.4))
+            self.right_eye_coords = (int(width * 0.65), int(height * 0.4))
+            
+            cv2.circle(annotated, self.left_eye_coords, 4, color, -1)
+            cv2.circle(annotated, self.right_eye_coords, 4, color, -1)
+        
+        return annotated
     
     def set_mirror_mode(self, mirror_mode):
-        """Update mirror mode for gaze tracker"""
+        """Update mirror mode"""
         self.mirror_image = mirror_mode
-        if hasattr(self.gaze_tracker, 'mirror_image'):
-            self.gaze_tracker.mirror_image = mirror_mode
-            
-    def set_image_mode(self, enabled=True):
-        """Set image mode for static image processing"""
-        if hasattr(self.gaze_tracker, 'set_image_mode'):
-            self.gaze_tracker.set_image_mode(enabled)
-            
-    def reset_state(self):
-        """Reset tracker state (useful for static images)"""
-        if hasattr(self.gaze_tracker, 'reset_all_state'):
-            self.gaze_tracker.reset_all_state()
-            
-    def switch_to_mediapipe(self):
-        """Switch to MediaPipe detection"""
-        try:
-            self.use_mediapipe = True
-            self.gaze_tracker = GazeTracker(
-                mirror_image=self.mirror_image, 
-                use_mediapipe=True
-            )
-            logging.info("Switched to MediaPipe successfully")
-            return True
-        except Exception as e:
-            logging.error(f"Failed to switch to MediaPipe: {e}")
-            return False
-            
-    def switch_to_dlib(self):
-        """Switch to dlib detection"""
-        try:
-            self.use_mediapipe = False
-            self.gaze_tracker = GazeTracker(
-                mirror_image=self.mirror_image, 
-                use_mediapipe=False
-            )
-            logging.info("Switched to dlib successfully")
-            return True
-        except Exception as e:
-            logging.error(f"Failed to switch to dlib: {e}")
-            return False
-            
-    def get_detection_info(self):
-        """Get information about current detection method"""
-        return {
-            'method': 'MediaPipe' if self.use_mediapipe else 'dlib',
-            'mirror_image': self.mirror_image,
-            'pupils_located': self.pupils_located,
-            'h_ratio': self.horizontal_ratio() if self.pupils_located else None,
-            'v_ratio': self.vertical_ratio() if self.pupils_located else None
-        }
+    
+    def pupil_left_coords(self):
+        """Get left pupil coordinates"""
+        return getattr(self, 'left_eye_coords', None)
+    
+    def pupil_right_coords(self):
+        """Get right pupil coordinates"""
+        return getattr(self, 'right_eye_coords', None)

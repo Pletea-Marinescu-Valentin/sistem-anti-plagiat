@@ -8,7 +8,7 @@ import mediapipe as mp
 from .eye import Eye
 
 class GazeTracker(object):
-    """Enhanced gaze tracker cu suport pentru MediaPipe și dlib"""
+    """Enhanced gaze tracker with MediaPipe and dlib support"""
 
     def __init__(self, mirror_image=True, config_path="config.json", use_mediapipe=True):
         self.frame = None
@@ -48,7 +48,7 @@ class GazeTracker(object):
         self._image_mode = False
 
     def _init_mediapipe(self):
-        """Inițializează MediaPipe Face Mesh"""
+        """Initialize MediaPipe Face Mesh"""
         try:
             self.mp_face_mesh = mp.solutions.face_mesh
             self.face_mesh = self.mp_face_mesh.FaceMesh(
@@ -58,26 +58,26 @@ class GazeTracker(object):
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5
             )
-            print("MediaPipe Face Mesh inițializat cu succes")
+            print("MediaPipe Face Mesh initialized successfully")
         except Exception as e:
-            print(f"Eroare la inițializarea MediaPipe: {e}")
-            print("Revin la dlib...")
+            print(f"MediaPipe initialization error: {e}")
+            print("Falling back to dlib...")
             self.use_mediapipe = False
             self._init_dlib()
 
     def _init_dlib(self):
-        """Inițializează dlib (fallback)"""
+        """Initialize dlib fallback"""
         self._face_detector = dlib.get_frontal_face_detector()
         model_path = "shape_predictor_68_face_landmarks.dat"
         self._predictor = dlib.shape_predictor(model_path)
-        print("dlib inițializat cu succes")
+        print("dlib initialized successfully")
 
     def load_config(self, config_path):
         with open(config_path, 'r') as f:
             return json.load(f)
 
     def reset_all_state(self):
-        """Reset complet pentru imagini statice"""
+        """Complete reset for static images"""
         print("Complete gaze tracker reset...")
         
         self.frame = None
@@ -105,7 +105,7 @@ class GazeTracker(object):
             self.smoothing_factor = 0.0
             self.process_every_n_frames = 1
             
-            # Actualizează MediaPipe pentru imagini statice
+            # Update MediaPipe for static images
             if self.use_mediapipe:
                 self.face_mesh = self.mp_face_mesh.FaceMesh(
                     static_image_mode=True,
@@ -119,7 +119,7 @@ class GazeTracker(object):
             self.smoothing_factor = 0.3
             self.process_every_n_frames = 2
             
-            # Actualizează MediaPipe pentru video
+            # Update MediaPipe for video
             if self.use_mediapipe:
                 self.face_mesh = self.mp_face_mesh.FaceMesh(
                     static_image_mode=False,
@@ -130,25 +130,25 @@ class GazeTracker(object):
                 )
 
     def _analyze_mediapipe(self):
-        """Detectează față și ochi folosind MediaPipe"""
+        """Detect face and eyes using MediaPipe"""
         if self.frame is None:
             return False
 
         try:
-            # Convertește frame-ul la RGB pentru MediaPipe
+            # Convert frame to RGB for MediaPipe
             rgb_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
             
-            # Procesează cu MediaPipe
+            # Process with MediaPipe
             results = self.face_mesh.process(rgb_frame)
             
             if not results.multi_face_landmarks:
                 self.frames_without_detection += 1
                 return False
 
-            # Obține landmarks-urile feței
+            # Get face landmarks
             face_landmarks = results.multi_face_landmarks[0]
             
-            # Convertește landmarks la coordonate pixel
+            # Convert landmarks to pixel coordinates
             height, width = self.frame.shape[:2]
             landmarks_px = []
             
@@ -157,10 +157,10 @@ class GazeTracker(object):
                 y = int(landmark.y * height)
                 landmarks_px.append((x, y))
 
-            # Calculează orientarea capului cu MediaPipe
+            # Calculate head orientation with MediaPipe
             new_h_ratio, new_v_ratio = self.calculate_head_orientation_mediapipe(landmarks_px)
 
-            # Aplică smoothing doar pentru video
+            # Apply smoothing for video only
             if self._image_mode or self.smoothing_factor == 0.0:
                 self.h_ratio = new_h_ratio
                 self.v_ratio = new_v_ratio
@@ -168,14 +168,14 @@ class GazeTracker(object):
                 self.h_ratio = self.prev_h_ratio * (1 - self.smoothing_factor) + new_h_ratio * self.smoothing_factor
                 self.v_ratio = self.prev_v_ratio * (1 - self.smoothing_factor) + new_v_ratio * self.smoothing_factor
 
-            # Actualizează valorile precedente
+            # Update previous values
             self.prev_h_ratio = self.h_ratio
             self.prev_v_ratio = self.v_ratio
 
-            # Convertește frame-ul la grayscale pentru procesarea ochilor
+            # Convert frame to grayscale for eye processing
             gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
-            # Inițializează ochii cu landmarks MediaPipe
+            # Initialize eyes with MediaPipe landmarks
             self.eye_left = Eye(gray_frame, landmarks_px, 0, landmark_type="mediapipe")
             self.eye_right = Eye(gray_frame, landmarks_px, 1, landmark_type="mediapipe")
 
@@ -183,23 +183,23 @@ class GazeTracker(object):
             return True
             
         except Exception as e:
-            print(f"Eroare în analiza MediaPipe: {e}")
+            print(f"MediaPipe analysis error: {e}")
             self.frames_without_detection += 1
             return False
 
     def _analyze_dlib(self):
-        """Detectează față și ochi folosind dlib (metoda originală)"""
+        """Detect face and eyes using dlib original method"""
         if self.frame is None:
             return False
 
         frame_copy = self.frame.copy()
 
-        # Redimensionează pentru procesare mai rapidă
+        # Resize for faster processing
         scale_factor = 0.5
         small_frame = cv2.resize(frame_copy, None, fx=scale_factor, fy=scale_factor)
         gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
 
-        # Detectează față
+        # Detect face
         faces = self._face_detector(gray, 1)
 
         if len(faces) == 0:
@@ -207,7 +207,7 @@ class GazeTracker(object):
             return False
 
         try:
-            # Convertește coordonatele
+            # Convert coordinates
             face_orig = dlib.rectangle(
                 int(faces[0].left() / scale_factor),
                 int(faces[0].top() / scale_factor),
@@ -218,10 +218,10 @@ class GazeTracker(object):
             gray_orig = cv2.cvtColor(frame_copy, cv2.COLOR_BGR2GRAY)
             landmarks = self._predictor(gray_orig, face_orig)
 
-            # Calculează orientarea capului
+            # Calculate head orientation
             new_h_ratio, new_v_ratio = self.calculate_head_orientation_dlib(landmarks)
 
-            # Aplică smoothing
+            # Apply smoothing
             if self._image_mode or self.smoothing_factor == 0.0:
                 self.h_ratio = new_h_ratio
                 self.v_ratio = new_v_ratio
@@ -232,7 +232,7 @@ class GazeTracker(object):
             self.prev_h_ratio = self.h_ratio
             self.prev_v_ratio = self.v_ratio
 
-            # Inițializează ochii cu landmarks dlib
+            # Initialize eyes with dlib landmarks
             self.eye_left = Eye(gray_orig, landmarks, 0, landmark_type="dlib")
             self.eye_right = Eye(gray_orig, landmarks, 1, landmark_type="dlib")
 
@@ -241,38 +241,32 @@ class GazeTracker(object):
             
         except Exception as e:
             self.frames_without_detection += 1
-            print(f"Eroare în analiza dlib: {e}")
+            print(f"dlib analysis error: {e}")
             return False
 
     def _analyze(self):
-        """Analizează frame-ul folosind metoda configurată"""
+        """Analyze frame using configured method"""
         if self.use_mediapipe:
             return self._analyze_mediapipe()
         else:
             return self._analyze_dlib()
 
     def calculate_head_orientation_mediapipe(self, landmarks_px):
-        """Calculează orientarea capului folosind landmarks MediaPipe"""
+        """Calculate head orientation using MediaPipe landmarks"""
         try:
-            # Puncte cheie pentru orientarea capului (MediaPipe indices)
-            # Nas: 1, 2, 5, 6
-            # Față stânga: 234, 93, 132, 172
-            # Față dreapta: 454, 323, 361, 397
-            # Sus: 10, 151
-            # Jos: 175, 18
-            
+            # Key landmarks for head orientation MediaPipe indices
             nose_tip = landmarks_px[1] if len(landmarks_px) > 1 else (0, 0)
             nose_bridge = landmarks_px[6] if len(landmarks_px) > 6 else nose_tip
             
-            # Margini față pentru calcul H
+            # Face edges for H calculation
             left_face = landmarks_px[234] if len(landmarks_px) > 234 else (0, 0)
             right_face = landmarks_px[454] if len(landmarks_px) > 454 else (0, 0)
             
-            # Puncte pentru calcul V
+            # Points for V calculation
             forehead = landmarks_px[10] if len(landmarks_px) > 10 else (0, 0)
             chin = landmarks_px[175] if len(landmarks_px) > 175 else (0, 0)
 
-            # Calculează H ratio (orizontal)
+            # Calculate H ratio horizontal
             if left_face != (0, 0) and right_face != (0, 0):
                 total_width = abs(right_face[0] - left_face[0])
                 if total_width > 0:
@@ -283,7 +277,7 @@ class GazeTracker(object):
             else:
                 h_ratio = 0.5
 
-            # Calculează V ratio (vertical)
+            # Calculate V ratio vertical
             if forehead != (0, 0) and chin != (0, 0):
                 total_height = abs(chin[1] - forehead[1])
                 if total_height > 0:
@@ -294,27 +288,27 @@ class GazeTracker(object):
             else:
                 v_ratio = 0.5
 
-            # Limitează valorile
+            # Clamp values
             h_ratio = max(0.0, min(1.0, h_ratio))
             v_ratio = max(0.0, min(1.0, v_ratio))
 
             return h_ratio, v_ratio
             
         except Exception as e:
-            print(f"Eroare în calculul orientării capului MediaPipe: {e}")
+            print(f"MediaPipe head orientation calculation error: {e}")
             return 0.5, 0.5
 
     def calculate_head_orientation_dlib(self, landmarks):
-        """Calculează orientarea capului folosind landmarks dlib (metoda originală)"""
+        """Calculate head orientation using dlib landmarks original method"""
         if landmarks is None:
             return 0.5, 0.5
 
-        # Pentru orientare orizontală
+        # For horizontal orientation
         nose_point = (landmarks.part(30).x, landmarks.part(30).y)
         left_face = (landmarks.part(0).x, landmarks.part(0).y)
         right_face = (landmarks.part(16).x, landmarks.part(16).y)
 
-        # Calculează distanțele
+        # Calculate distances
         left_dist = abs(nose_point[0] - left_face[0])
         right_dist = abs(nose_point[0] - right_face[0])
 
@@ -324,7 +318,7 @@ class GazeTracker(object):
         else:
             h_ratio = left_dist / total_dist
 
-        # Pentru orientare verticală
+        # For vertical orientation
         eye_left = (landmarks.part(36).x, landmarks.part(36).y)
         eye_right = (landmarks.part(45).x, landmarks.part(45).y)
         mouth = (landmarks.part(57).x, landmarks.part(57).y)
@@ -461,13 +455,13 @@ class GazeTracker(object):
         if not hasattr(self, 'v_ratio'):
             return False
         
-        # Detectie standard bazata pe pupile
+        # Standard pupil-based detection
         pupil_down = self.v_ratio > self.down_limit
         
-        # Detectie extrema pentru capul foarte aplecat
+        # Extreme detection for very tilted head
         extreme_down = self.v_ratio > 0.75
         
-        # Daca folosim MediaPipe, putem detecta mai bine capul aplecat
+        # If using MediaPipe, better tilted head detection
         if self.use_mediapipe and hasattr(self, 'frame') and self.frame is not None:
             head_tilt_down = self._detect_extreme_head_tilt()
             return pupil_down or extreme_down or head_tilt_down
@@ -475,12 +469,12 @@ class GazeTracker(object):
         return pupil_down or extreme_down
 
     def _detect_extreme_head_tilt(self):
-        """Detectează înclinarea extremă a capului în jos folosind MediaPipe"""
+        """Detect extreme head tilt down using MediaPipe"""
         try:
             if not self.use_mediapipe or self.frame is None:
                 return False
                 
-            # Folosește landmarks pentru a detecta înclinarea extremă
+            # Use landmarks to detect extreme tilt
             rgb_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
             results = self.face_mesh.process(rgb_frame)
             
@@ -490,31 +484,31 @@ class GazeTracker(object):
             face_landmarks = results.multi_face_landmarks[0]
             height, width = self.frame.shape[:2]
             
-            # Calculează poziția relativă a unor puncte cheie
-            # Punct nas (1), fruntea (10), bărbia (152)
+            # Calculate relative position of key points
+            # Nose point 1, forehead 10, chin 152
             nose = face_landmarks.landmark[1]
             forehead = face_landmarks.landmark[10]
             chin = face_landmarks.landmark[152]
             
-            # Convertește la coordonate pixel
+            # Convert to pixel coordinates
             nose_y = nose.y * height
             forehead_y = forehead.y * height
             chin_y = chin.y * height
             
-            # Calculează ratios pentru detectia capului aplecat
-            if chin_y > forehead_y:  # Verificare de bază
+            # Calculate ratios for tilted head detection
+            if chin_y > forehead_y:  # Basic check
                 face_height = chin_y - forehead_y
                 if face_height > 0:
                     nose_position = (nose_y - forehead_y) / face_height
                     
-                    # Dacă nasul este foarte jos în față (>0.8), capul e probabil aplecat în jos
+                    # If nose is very low in face >0.8, head is probably tilted down
                     if nose_position > 0.8:
                         return True
                         
             return False
             
         except Exception as e:
-            print(f"Eroare în detectia înclinării extreme: {e}")
+            print(f"Extreme tilt detection error: {e}")
             return False
 
     def is_center(self):
@@ -536,7 +530,7 @@ class GazeTracker(object):
                 return self.last_valid_direction
 
         # Determine direction with enhanced logic
-        if self.is_down():  # Verifică mai întâi DOWN (prioritate pentru capul aplecat)
+        if self.is_down():  # Check DOWN first priority for tilted head
             direction = "down"
         elif self.is_right():
             direction = "right" if not self.mirror_image else "left"
@@ -606,36 +600,36 @@ class GazeTracker(object):
     def detect_gaze_direction(self, frame):
         """Process frame and detect gaze direction with enhanced capabilities"""
         
-        # Pentru imagini statice, resetează starea complet
+        # For static images, completely reset state
         if self._image_mode:
             self.reset_all_state()
         
         self.frame_count += 1
 
-        # Pentru imagini, procesează la fiecare frame; pentru video, skip frames
+        # For images, process every frame; for video, skip frames
         process_frame = True
         if not self._image_mode:
             process_frame = (self.frame_count % self.process_every_n_frames == 0)
 
         if process_frame:
-            # Update frame și analiză
+            # Update frame and analyze
             self.frame = frame
             self._analyze()
 
-            # Determinare direcție cu logică îmbunătățită
+            # Direction determination with enhanced logic
             direction = self.determine_direction()
 
-            # Salvează frame-ul cu adnotări
+            # Save annotated frame
             annotated_result = self.annotated_frame()
             if annotated_result is not None:
                 self.last_annotated_frame, self.h_ratio, self.v_ratio = annotated_result
             else:
                 self.last_annotated_frame = frame
         else:
-            # Pentru frame-uri neprocesate, folosește direcția salvată
+            # For unprocessed frames, use saved direction
             direction = self.last_valid_direction
 
-        # Returnează ultimul frame anotat valid
+        # Return last valid annotated frame
         if hasattr(self, 'last_annotated_frame') and self.last_annotated_frame is not None:
             return direction, self.last_annotated_frame, self.h_ratio, self.v_ratio
         else:
