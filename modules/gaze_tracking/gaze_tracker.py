@@ -1,6 +1,5 @@
 from __future__ import division
 import cv2
-import dlib
 import json
 import numpy as np
 import gc
@@ -8,7 +7,7 @@ import mediapipe as mp
 from .eye import Eye
 
 class GazeTracker(object):
-    """Enhanced gaze tracker with MediaPipe and dlib support"""
+    """Gaze tracker with MediaPipe support"""
 
     def __init__(self, mirror_image=True, config_path="config.json", use_mediapipe=True):
         self.frame = None
@@ -20,8 +19,6 @@ class GazeTracker(object):
         # Initialize detection systems
         if self.use_mediapipe:
             self._init_mediapipe()
-        else:
-            self._init_dlib()
 
         self.frames_without_detection = 0
         self.max_frames_without_detection = 10
@@ -61,16 +58,7 @@ class GazeTracker(object):
             print("MediaPipe Face Mesh initialized successfully")
         except Exception as e:
             print(f"MediaPipe initialization error: {e}")
-            print("Falling back to dlib...")
             self.use_mediapipe = False
-            self._init_dlib()
-
-    def _init_dlib(self):
-        """Initialize dlib fallback"""
-        self._face_detector = dlib.get_frontal_face_detector()
-        model_path = "shape_predictor_68_face_landmarks.dat"
-        self._predictor = dlib.shape_predictor(model_path)
-        print("dlib initialized successfully")
 
     def load_config(self, config_path):
         with open(config_path, 'r') as f:
@@ -187,69 +175,10 @@ class GazeTracker(object):
             self.frames_without_detection += 1
             return False
 
-    def _analyze_dlib(self):
-        """Detect face and eyes using dlib original method"""
-        if self.frame is None:
-            return False
-
-        frame_copy = self.frame.copy()
-
-        # Resize for faster processing
-        scale_factor = 0.5
-        small_frame = cv2.resize(frame_copy, None, fx=scale_factor, fy=scale_factor)
-        gray = cv2.cvtColor(small_frame, cv2.COLOR_BGR2GRAY)
-
-        # Detect face
-        faces = self._face_detector(gray, 1)
-
-        if len(faces) == 0:
-            self.frames_without_detection += 1
-            return False
-
-        try:
-            # Convert coordinates
-            face_orig = dlib.rectangle(
-                int(faces[0].left() / scale_factor),
-                int(faces[0].top() / scale_factor),
-                int(faces[0].right() / scale_factor),
-                int(faces[0].bottom() / scale_factor)
-            )
-
-            gray_orig = cv2.cvtColor(frame_copy, cv2.COLOR_BGR2GRAY)
-            landmarks = self._predictor(gray_orig, face_orig)
-
-            # Calculate head orientation
-            new_h_ratio, new_v_ratio = self.calculate_head_orientation_dlib(landmarks)
-
-            # Apply smoothing
-            if self._image_mode or self.smoothing_factor == 0.0:
-                self.h_ratio = new_h_ratio
-                self.v_ratio = new_v_ratio
-            else:
-                self.h_ratio = self.prev_h_ratio * (1 - self.smoothing_factor) + new_h_ratio * self.smoothing_factor
-                self.v_ratio = self.prev_v_ratio * (1 - self.smoothing_factor) + new_v_ratio * self.smoothing_factor
-
-            self.prev_h_ratio = self.h_ratio
-            self.prev_v_ratio = self.v_ratio
-
-            # Initialize eyes with dlib landmarks
-            self.eye_left = Eye(gray_orig, landmarks, 0, landmark_type="dlib")
-            self.eye_right = Eye(gray_orig, landmarks, 1, landmark_type="dlib")
-
-            self.frames_without_detection = 0
-            return True
-            
-        except Exception as e:
-            self.frames_without_detection += 1
-            print(f"dlib analysis error: {e}")
-            return False
-
     def _analyze(self):
         """Analyze frame using configured method"""
         if self.use_mediapipe:
             return self._analyze_mediapipe()
-        else:
-            return self._analyze_dlib()
 
     def calculate_head_orientation_mediapipe(self, landmarks_px):
         """Calculate head orientation using MediaPipe landmarks"""
@@ -298,45 +227,6 @@ class GazeTracker(object):
             print(f"MediaPipe head orientation calculation error: {e}")
             return 0.5, 0.5
 
-    def calculate_head_orientation_dlib(self, landmarks):
-        """Calculate head orientation using dlib landmarks original method"""
-        if landmarks is None:
-            return 0.5, 0.5
-
-        # For horizontal orientation
-        nose_point = (landmarks.part(30).x, landmarks.part(30).y)
-        left_face = (landmarks.part(0).x, landmarks.part(0).y)
-        right_face = (landmarks.part(16).x, landmarks.part(16).y)
-
-        # Calculate distances
-        left_dist = abs(nose_point[0] - left_face[0])
-        right_dist = abs(nose_point[0] - right_face[0])
-
-        total_dist = left_dist + right_dist
-        if total_dist == 0:
-            h_ratio = 0.5
-        else:
-            h_ratio = left_dist / total_dist
-
-        # For vertical orientation
-        eye_left = (landmarks.part(36).x, landmarks.part(36).y)
-        eye_right = (landmarks.part(45).x, landmarks.part(45).y)
-        mouth = (landmarks.part(57).x, landmarks.part(57).y)
-
-        eyes_mid_x = (eye_left[0] + eye_right[0]) // 2
-        eyes_mid_y = (eye_left[1] + eye_right[1]) // 2
-        eyes_mid = (eyes_mid_x, eyes_mid_y)
-
-        face_height = abs(eyes_mid[1] - mouth[1])
-
-        if face_height == 0:
-            v_ratio = 0.5
-        else:
-            nose_to_eyes = abs(nose_point[1] - eyes_mid[1])
-            v_ratio = nose_to_eyes / face_height
-
-        return h_ratio, v_ratio
-
     def refresh(self, frame):
         """Update frame and analyze"""
         self.frame = frame
@@ -373,7 +263,7 @@ class GazeTracker(object):
         return left_valid and right_valid
 
     def horizontal_ratio(self):
-        """Returns horizontal gaze ratio with MediaPipe or dlib support"""
+        """Returns horizontal gaze ratio with MediaPipe support"""
         if not self.pupils_located:
             return self.prev_h_ratio if hasattr(self, 'prev_h_ratio') else 0.5
         

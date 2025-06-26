@@ -1,5 +1,4 @@
 opencv-python-headless>=4.5.0
-dlib>=19.22.0
 numpy>=1.26.4
 PyQt5>=5.15.0
 PyQt5-sip>=12.9.0
