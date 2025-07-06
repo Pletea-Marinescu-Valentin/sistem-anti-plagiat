@@ -1,0 +1,48 @@
+# Git files
+.git
+.gitignore
+README.md
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Output directories (will be mounted as volumes)
+analyzed_images/
+analyzed_images_mediapipe/
+logs/
+reports/
+recordings/
+snapshots/
+
+# Large model files (download in container)
+*.dat
+models/
+
+# Test images (mount as volume instead)
+input_images/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore

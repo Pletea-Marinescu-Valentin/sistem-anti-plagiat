@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  anti-plagiarism:
+    build: .
+    container_name: anti-plagiarism-system
+    volumes:
+      # Mount input/output directories for data persistence
+      - ./input_images:/app/input_images
+      - ./analyzed_images:/app/analyzed_images
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./recordings:/app/recordings
+      - ./snapshots:/app/snapshots
+      - ./models:/app/models
+      # Mount config for easy editing
+      - ./config.json:/app/config.json
+    environment:
+      - DISPLAY=host.docker.internal:0
+      - QT_QPA_PLATFORM=xcb
+      - PYTHONPATH=/app
+    devices:
+      # Camera access
+      - /dev/video0:/dev/video0
+    network_mode: host
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  # Alternative service for analysis only (no GUI)
+  analyzer:
+    build: .
+    container_name: anti-plagiarism-analyzer
+    command: python clean_mediapipe_analyzer.py
+    volumes:
+      - ./input_images:/app/input_images
+      - ./analyzed_images_mediapipe:/app/analyzed_images_mediapipe
+      - ./logs:/app/logs
+      - ./config.json:/app/config.json
+    profiles:
+      - analysis
+
+  # Service for Linux systems with X11 and camera
+  anti-plagiarism-linux:
+    build: .
+    container_name: anti-plagiarism-system-linux
+    volumes:
+      - ./input_images:/app/input_images
+      - ./analyzed_images:/app/analyzed_images
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./recordings:/app/recordings
+      - ./snapshots:/app/snapshots
+      - ./models:/app/models
+      - ./config.json:/app/config.json
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_QPA_PLATFORM=xcb
+      - QT_QPA_PLATFORM_PLUGIN_PATH=""
+      - PYTHONPATH=/app
+    devices:
+      - /dev/video0:/dev/video0
+    group_add:
+      - video
+    network_mode: host
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    profiles:
+      - linux
