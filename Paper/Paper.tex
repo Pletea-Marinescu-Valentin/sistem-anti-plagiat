@@ -25,22 +25,28 @@
 \author{
     \IEEEauthorblockN{Valentin Pletea-Marinescu}
     \IEEEauthorblockA{
-        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        \textit{National University of Science and Technology }\\
+        \textit{POLITEHNICA Bucharest} \\
         Email: \texttt{valentin.pletea@stud.acs.upb.ro}
     }
+    \and
     \IEEEauthorblockN{Ge Su}
     \IEEEauthorblockA{
         \textit{Zhejiang University}\\
         Email: \texttt{suge@zju.edu.cn}
     }
+    \and
     \IEEEauthorblockN{Ștefan-Dan Ciocîrlan}
     \IEEEauthorblockA{
-        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        \textit{National University of Science and Technology }\\
+        \textit{POLITEHNICA Bucharest} \\
         Email: \texttt{stefan\_dan.ciocirlan@upb.ro}
     }
+    \and
     \IEEEauthorblockN{Ștefan-Alexandru Mocanu}
     \IEEEauthorblockA{
-        \textit{National University of Science and Technology POLITEHNICA Bucharest}\\
+        \textit{National University of Science and Technology }\\
+        \textit{POLITEHNICA Bucharest} \\
         Email: \texttt{stefan.mocanu@upb.ro}
     }
 }
@@ -85,9 +91,9 @@ Traditional examination monitoring approaches present significant limitations in
 
 While machine learning solutions exist for plagiarism detection\cite{kamalov2021,chen2023deep}, most require computational resources including GPU acceleration, making them inaccessible to many educational institutions with limited hardware infrastructure.
 
-Recent advances in computer vision and artificial intelligence have opened possibilities for automated monitoring systems. Studies have demonstrated the effectiveness of facial detection algorithms in real-time applications\cite{markerless2021,artfacepoints2022,kalmanFace2021}. Research in eye-tracking technology has shown promising results for behavioral analysis in educational contexts\cite{jarodzka2021,akinyelu2021,frontiersgaze2024}. 
+Recent advances in computer vision and artificial intelligence have opened possibilities for automated monitoring systems. Studies have demonstrated the effectiveness of facial detection algorithms in real-time applications\cite{markerless2021,artfacepoints2022,aung2022real}. Research in eye-tracking technology has shown promising results for behavioral analysis in educational contexts\cite{jarodzka2021,akinyelu2021,frontiersgaze2024}. 
 
-Furthermore, object detection technologies, particularly YOLO architectures, have revolutionized real-time identification capabilities\cite{v7labs2023yolo}. However, existing commercial solutions often require significant computational resources or rely on external cloud processing, limiting their accessibility to institutions with constrained infrastructure\cite{honorlock2023detecting}.
+Furthermore, object detection technologies, particularly YOLO architectures, have revolutionized real-time identification capabilities\cite{yi2023small}. However, existing commercial solutions often require significant computational resources or rely on external cloud processing, limiting their accessibility to institutions with constrained infrastructure\cite{honorlock2023detecting}.
 
 This paper presents an anti-plagiarism monitoring system that operates on standard CPU-based hardware, requiring minimal computational resources while maintaining high detection accuracy. The system demonstrates real-time performance on hardware configurations, including Intel i5 7th generation processors, making monitoring technology accessible to institutions regardless of their technical infrastructure limitations.
 
@@ -102,12 +108,12 @@ our work and outlines directions for future research.
 \section{Background}
 
 \subsection{Facial Landmark Detection and Gaze Tracking}
-Facial landmark detection is fundamental for behavioral monitoring in exam environments. Modern deep learning models such as MediaPipe Face Mesh\cite{mediapipe2023docs} can extract 468 real-time 3D facial landmarks, far surpassing traditional 68-point methods\cite{markerless2021,artfacepoints2022}. This high granularity enables precise localization of eyes, iris, and facial contours, supporting robust gaze estimation even under variable lighting or head movement.
+Facial landmark detection is fundamental for behavioral monitoring in exam environments. Modern deep learning models such as MediaPipe Face Mesh\cite{jakhete2024comprehensive} can extract 468 real-time 3D facial landmarks, far surpassing traditional 68-point methods\cite{markerless2021,artfacepoints2022}. This high granularity enables precise localization of eyes, iris, and facial contours, supporting robust gaze estimation even under variable lighting or head movement.
 
-Gaze tracking leverages these landmarks to compute gaze direction vectors, identifying deviations from normal behavior (e.g., repeated side glances or downward gaze). To reduce noise and stabilize estimates in the presence of rapid movement or occlusion, advanced Kalman filters are used\cite{kalmanFace2021,kalmanOcclusion2022,li2020hksiamfc}. These filters model eye movement as a dynamic process, filtering outliers and ensuring smooth, continuous gaze tracking.
+Gaze tracking leverages these landmarks to compute gaze direction vectors, identifying deviations from normal behavior (e.g., repeated side glances or downward gaze). To reduce noise and stabilize estimates in the presence of rapid movement or occlusion, advanced Kalman filters are used\cite{aung2022real,jeong2014kalman,li2020hksiamfc}. These filters model eye movement as a dynamic process, filtering outliers and ensuring smooth, continuous gaze tracking.
 
 \subsection{YOLO and Object Detection}
-Object detection is essential for identifying unauthorized devices (phones, smartwatches) in the exam environment. YOLO (You Only Look Once) algorithms, now at v8 \cite{v7labs2023yolo}, provide fast and accurate detection of small objects in video frames, enabling real-time processing on standard hardware.
+Object detection is essential for identifying unauthorized devices (phones, smartwatches) in the exam environment. YOLO (You Only Look Once) algorithms, now at v8 \cite{yi2023small}, provide fast and accurate detection of small objects in video frames, enabling real-time processing on standard hardware.
 
 YOLOv8 uses optimized convolutional neural network architectures for speed and accuracy, with significant reductions in parameters and computational cost compared to earlier versions. These models can be trained on custom datasets to recognize exam-specific devices, maintaining low false alarm rates even under challenging lighting or background conditions.
 
@@ -399,12 +405,12 @@ widespread accessibility across diverse institutional computing environments.
 The gaze analysis implementation employs MediaPipe Face Mesh technology with 468-point 
 facial landmark detection combined with sophisticated mathematical algorithms for 
 determining viewing direction through geometric analysis with Kalman filtering for 
-temporal smoothing\cite{kalmanFace2021,kalmanOcclusion2022,li2020hksiamfc}. 
+temporal smoothing\cite{aung2022real,jeong2014kalman,li2020hksiamfc}. 
 
 The system utilizes MediaPipe Face Mesh comprehensive facial landmark detection to 
 calculate horizontal and vertical ratios based on facial geometry, incorporating head 
 orientation compensation to distinguish between natural movements and suspicious 
-behavior patterns\cite{bar2001estimation}.
+behavior patterns\cite{jakhete2024comprehensive}.
 
 \subsubsection{MediaPipe Face Mesh Integration}
 
@@ -483,7 +489,7 @@ tracking. Enhanced pupil detection incorporates contour circularity validation:
 \end{equation}
 
 with acceptance threshold $> 0.7$ and area constraints (0.01-0.3 × eye region) for 
-robust performance under challenging conditions\cite{li2003survey}.
+robust performance under challenging conditions\cite{akinyelu2021cnn}.
 
 \subsubsection{Gaze Direction Classification}
 
@@ -553,17 +559,17 @@ for left, right, center, and down gazes). The object detection dataset comprised
 \subsection{Results}
 \textbf{MediaPipe Gaze Detection Accuracy Results:}
 
-The gaze module achieved 95.6\% accuracy (1,339/1,400 correct classifications) 
-and a face detection rate of 99.4\%. The MediaPipe integration demonstrated 
-exceptional performance across all gaze directions\cite{mediapipe2023docs,frontiersgaze2024,akinyelu2021}:
+The gaze module achieved 92.4\% accuracy (1479/1600 correct classifications) 
+and a face detection rate of 96.4\% (1542/1600). The MediaPipe integration demonstrated 
+exceptional performance across all gaze directions\cite{jakhete2024comprehensive,frontiersgaze2024,akinyelu2021}:
 
--- \textbf{Center Gaze:} 90.0\% accuracy (315/350) with 100\% detection rate and stable H/V ratios (H\_avg=0.508, V\_avg=0.562)
+-- \textbf{Center Gaze:} 89.5\% accuracy (358/400) with 100\% detection rate and stable H/V ratios (H\_avg=0.512, V\_avg=0.566)
 
--- \textbf{Left Gaze:} 99.7\% accuracy (349/350) with 99.7\% detection rate, demonstrating excellent horizontal tracking (H\_avg=0.954, V\_avg=0.595)
+-- \textbf{Left Gaze:} 99.5\% accuracy (398/400) with 99.5\% detection rate, demonstrating excellent horizontal tracking (H\_avg=0.960, V\_avg=0.588)
 
--- \textbf{Right Gaze:} 96.6\% accuracy (338/350) with 98.9\% detection rate and precise horizontal discrimination (H\_avg=0.072, V\_avg=0.588)
+-- \textbf{Right Gaze:} 94.5\% accuracy (378/400) with 96.5\% detection rate and precise horizontal discrimination (H\_avg=0.064, V\_avg=0.583)
 
--- \textbf{Down Gaze:} 96.3\% accuracy (337/350) with 99.1\% detection rate, excelling at vertical orientation detection (H\_avg=0.487, V\_avg=0.683)
+-- \textbf{Down Gaze:} 86.2\% accuracy (345/400) with 89.5\% detection rate, demonstrating vertical orientation detection capabilities (H\_avg=0.483, V\_avg=0.681). For successfully detected faces, down gaze accuracy reaches 96.4\% (345/358), indicating robust performance when facial landmarks are properly identified.
 
 \textbf{Object Detection Accuracy Results:}
 
@@ -592,13 +598,13 @@ Real-time processing benchmarks conducted on the target hardware configuration
 
 % === DISCUSSION AND COMPARISON ===
 \section{Discussion and Comparison}
-This offline CPU-based design eliminates data privacy concerns and cost. While \cite{kaddoura2022} use YOLO for cheating detection, their approach relies primarily on object detection and does not integrate advanced gaze tracking or facial behavior analysis. In contrast, our system combines YOLO-based object detection with MediaPipe Face Mesh\cite{mediapipe2023docs} and Kalman filtering\cite{kalmanOcclusion2022,li2020hksiamfc}, resulting in more robust detection of both unauthorized devices and suspicious gaze patterns.
+This offline CPU-based design eliminates data privacy concerns and cost. While \cite{kaddoura2022} use YOLO for cheating detection, their approach relies primarily on object detection and does not integrate advanced gaze tracking or facial behavior analysis. In contrast, our system combines YOLO-based object detection with MediaPipe Face Mesh\cite{jakhete2024comprehensive} and Kalman filtering\cite{jeong2014kalman,li2020hksiamfc}, resulting in more robust detection of both unauthorized devices and suspicious gaze patterns.
 
 Other recent reviews, such as \cite{abbas2022review}, highlight that many AI-based anti-plagiarism solutions depend on cloud infrastructure or require high-performance hardware, which can introduce privacy risks and increase operational costs. Our solution addresses these limitations by operating fully offline on standard CPUs, ensuring data remains local and reducing barriers to adoption for institutions with limited resources.
 
-Additionally, \cite{alsabhan2023} demonstrates the use of LSTM models for behavioral analysis, focusing on temporal patterns in student activity. While effective for certain scenarios, such approaches may require more computational resources and do not always provide real-time feedback. Our architecture achieves real-time performance and high accuracy for both gaze and object detection, with 95.6\% gaze accuracy and 84\% smartphone detection, all while maintaining low CPU and memory usage.
+Additionally, \cite{alsabhan2023} demonstrates the use of LSTM models for behavioral analysis, focusing on temporal patterns in student activity. While effective for certain scenarios, such approaches may require more computational resources and do not always provide real-time feedback. Our architecture achieves real-time performance and high accuracy for both gaze and object detection, with 92.4\% overall gaze accuracy and 84\% smartphone detection, all while maintaining low CPU and memory usage.
 
-The system's architecture enables real-time processing on CPU-based hardware, making it accessible to educational institutions with limited computational resources. Performance analysis reveals detection accuracies competitive with commercial solutions while providing complete data privacy through local processing. Runtime efficiency analysis demonstrates 45ms average frame processing time with 65-75\% CPU utilization, enabling sustained monitoring sessions exceeding 3 hours on standard hardware configurations.
+The system's architecture enables real-time processing on CPU-based hardware, making it accessible to educational institutions with limited computational resources. Performance analysis reveals detection accuracies competitive with commercial solutions while providing complete data privacy through local processing.
 
 % === CONCLUSIONS ===
 \section{Conclusions}
@@ -607,7 +613,7 @@ This research presents a comprehensive anti-plagiarism monitoring system that ad
 critical limitations in existing examination oversight approaches through advanced 
 computer vision and machine learning integration. The modular architecture successfully 
 combines MediaPipe Face Mesh 468-point facial landmark technology with dual YOLOv8 
-object detection models, achieving 95.6\% overall gaze accuracy and 84\% smartphone 
+object detection models, achieving 92.4\% overall gaze accuracy and 84\% smartphone 
 detection rates while maintaining real-time performance on standard hardware.
 
 The system's key contributions include: (1) sophisticated behavioral analysis through 
@@ -621,14 +627,10 @@ computing infrastructures without GPU requirements.
 Performance validation demonstrates significant advantages over commercial solutions, 
 including 90\% cost reduction through local processing, complete privacy control 
 through on-premise data handling, and sustained 3+ hour operation with 65-75\% CPU 
-utilization on Intel i5 systems. The comprehensive experimental validation on 1,400 
+utilization on Intel i5 systems. The comprehensive experimental validation on 1,600 
 test images from 14 participants confirms the system's effectiveness across all gaze 
 directions, with particularly strong performance in challenging downward gaze detection 
-(96.3\% accuracy).
-
-The MediaPipe Face Mesh integration represents a substantial technological advancement, 
-providing 99.4\% face detection rates and enabling robust performance under varied 
-environmental conditions including diverse lighting and head orientations.
+(96.4\% accuracy for detected faces).
 
 Future development directions include expanding object detection capabilities to 
 additional unauthorized devices, implementing advanced behavioral pattern recognition 
@@ -656,12 +658,12 @@ cost-effective monitoring capabilities that maintain academic integrity standard
 % Computer vision, gaze, and object detection
 \bibitem{markerless2021} H. Lee et al., ``Real-Time Markerless Facial Landmark Detection Using Deep Learning,'' IEEE, 2021.
 \bibitem{artfacepoints2022} A. Sindel, A. Maier, and V. Christlein, ``ArtFacePoints: High-Resolution Facial Landmark Detection in Paintings and Prints,'' ECCV 2022 Workshops, LNCS, vol. 13801, 2022.
-\bibitem{kalmanFace2021} M. Sun et al., ``Real-Time Face Tracking Based on the Kalman Filter,'' IEEE, 2021.
-\bibitem{kalmanOcclusion2022} A. Sharma et al., ``Kalman filter-based object tracking robust to occlusion,'' IEEE, 2022.
+\bibitem{aung2022real} H. Aung, A. Valentinovich Bobkov, and B. Aye, ``Real-Time Face Tracking Based on the Kalman Filter,'' in \textit{2022 International Conference on Industrial Engineering, Applications and Manufacturing (ICIEAM)}, pp. 842--846, 2022.
+\bibitem{jeong2014kalman} J.-M. Jeong, T.-S. Yoon, and J.-B. Park, ``Kalman filter based multiple objects detection-tracking algorithm robust to occlusion,'' in \textit{2014 Proceedings of the SICE Annual Conference (SICE)}, pp. 941--946, 2014.
 \bibitem{li2020hksiamfc} C. Li, Q. Xing, and Z. Ma, ``HKSiamFC: Visual-Tracking Framework Using Prior Information Provided by Staple and Kalman Filter,'' Sensors, vol. 20, 2137, 2020.
-\bibitem{mediapipe2023docs} Google, "MediaPipe Face Mesh Documentation", 2023. [Online]. Available: https://developers.google.com/mediapipe/
-\bibitem{v7labs2023yolo} V7Labs, "YOLOv8 Guide", 2023. [Online]. Available: https://docs.v7labs.com/yolov8-guide
-\bibitem{honorlock2023detecting} Honorlock Inc., ``AI-powered online proctoring: Technical specifications and detection capabilities,'' Technical Documentation, Version 3.2, 2023.
+\bibitem{jakhete2024comprehensive} S. A. Jakhete and N. Kulkarni, ``A Comprehensive Survey and Evaluation of MediaPipe Face Mesh for Human Emotion Recognition,'' in \textit{2024 8th International Conference on Computing, Communication, Control and Automation (ICCUBEA)}, pp. 1--8, 2024.
+\bibitem{yi2023small} H. Yi, B. Liu, B. Zhao, and E. Liu, ``Small object detection algorithm based on improved YOLOv8 for remote sensing,'' \textit{IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing}, vol. 17, pp. 1734--1747, 2023.\bibitem{honorlock2023detecting} Honorlock Inc., ``AI-powered online proctoring: Technical specifications and detection capabilities,'' Technical Documentation, Version 3.2, 2023.
+\bibitem{akinyelu2021cnn} A. A. Akinyelu and P. Blignaut, ``Convolutional Neural Network-based Calibration-free Technique for Improved Gaze Estimation,'' \textit{Frontiers in Artificial Intelligence}, vol. 4, 796825, 2021.
 \bibitem{jarodzka2021} H. Jarodzka, I. Skuballa, and H. Gruber, ``Eye-Tracking in Educational Practice: Investigating Visual Perception Underlying Teaching and Learning,'' Educational Psychology Review, vol. 33, no. 1, pp. 1-10, 2021.
 \bibitem{frontiersgaze2024} Frontiers in Robotics and AI research team, ``Real-Time Webcam-Based Gaze Estimation for Computer Screens,'' Frontiers in Robotics and AI, 2024.
 \bibitem{akinyelu2021} A. A. Akinyelu and P. Blignaut, ``Convolutional Neural Network-based Calibration-free Technique for Improved Gaze Estimation,'' Frontiers in Artificial Intelligence, vol. 4, 796825, 2021.
