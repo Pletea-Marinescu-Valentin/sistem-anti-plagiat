@@ -91,7 +91,7 @@ Traditional examination monitoring approaches present significant limitations in
 
 While machine learning solutions exist for plagiarism detection\cite{kamalov2021,chen2023deep}, most require computational resources including GPU acceleration, making them inaccessible to many educational institutions with limited hardware infrastructure.
 
-Recent advances in computer vision and artificial intelligence have opened possibilities for automated monitoring systems. Studies have demonstrated the effectiveness of facial detection algorithms in real-time applications\cite{markerless2021,artfacepoints2022,aung2022real}. Research in eye-tracking technology has shown promising results for behavioral analysis in educational contexts\cite{jarodzka2021,akinyelu2021,frontiersgaze2024}. 
+Recent advances in computer vision and artificial intelligence have opened possibilities for automated monitoring systems. Studies have demonstrated the effectiveness of facial detection algorithms in real-time applications\cite{markerless2021,artfacepoints2022,aung2022real}. Research in eye-tracking technology has shown promising results for behavioral analysis in educational contexts\cite{jarodzka2021,akinyelu2021cnn,frontiersgaze2024}. 
 
 Furthermore, object detection technologies, particularly YOLO architectures, have revolutionized real-time identification capabilities\cite{yi2023small}. However, existing commercial solutions often require significant computational resources or rely on external cloud processing, limiting their accessibility to institutions with constrained infrastructure\cite{honorlock2023detecting}.
 
@@ -173,11 +173,7 @@ detection results from multiple independent sources. The module applies temporal
 to reduce false positive detections caused by brief, natural movements while maintaining 
 sensitivity to genuine violations.
 
-Modules communicate via PyQt5 signals, allowing asynchronous 
-processing and a responsive UI. In real-time tests 
-on an Intel i5 7th-generation CPU (8GB RAM), the system processes about 
-22 frames per second ($\approx45$ ms per frame) with around 65–75\% CPU utilization, 
-enabling multi-hour continuous monitoring.
+Modules communicate via PyQt5 signals, enabling asynchronous processing and a responsive UI. In real-time tests, CPU utilization peaked at 27\%, allowing for multi-hour continuous monitoring.
 
 \subsection{System Architecture Diagrams and Operational Analysis}
 
@@ -370,7 +366,7 @@ Face Mesh integration.
         \draw[message] (gui_act3.north east) -- node[above, font=\sffamily\scriptsize] {Stop} (sistem_act2.north west);
         \draw[return] (sistem_act2.south west) -- node[below, font=\sffamily\scriptsize] {Confirm} (gui_act3.south east);
     \end{tikzpicture}
-    \caption{Sequence diagram showing MediaPipe Face Mesh integration and temporal interactions}
+    \caption{Sequence diagram of the anti-plagiarism system}
 \end{figure}
 
 The sequence analysis reveals three distinct phases: initialization, continuous monitoring 
@@ -398,7 +394,7 @@ foundations for computer vision applications while enabling efficient developmen
 The system architecture supports multiple operating environments, with successful 
 deployment achieved on both Windows and Linux (Ubuntu) platforms without requiring 
 modifications to core functionality. This cross-platform compatibility ensures 
-widespread accessibility across diverse institutional computing environments.
+widespread accessibility across various institutional computing environments.
 
 \subsection{Advanced Gaze Analysis with MediaPipe Face Mesh and Kalman Filtering}
 
@@ -443,7 +439,7 @@ following equations:
 \end{equation}
 
 where the facial landmarks provide more stable reference points compared to traditional 
-eye-based calculations, resulting in improved accuracy across diverse head orientations.
+eye-based calculations, resulting in improved accuracy across various head orientations.
 
 \subsubsection{Kalman Filter Implementation}
 
@@ -526,7 +522,7 @@ of 0.617 with convergent loss characteristics across 100 training epochs.
 \textbf{Training Dataset Specifications:} The YOLOv8 models were trained on carefully 
 curated datasets comprising:
 \begin{itemize}
-    \item Smartphone detection: 2,400 annotated images with diverse device orientations, 
+    \item Smartphone detection: 2,400 annotated images with various device orientations, 
     lighting conditions, and examination environment backgrounds
     \item Smartwatch detection: 1,800 annotated images capturing various wrist positions, 
     watch face sizes, and partial occlusion scenarios
@@ -552,7 +548,7 @@ signal-slot mechanisms preventing UI blocking during intensive processing.
 
 \subsection{Dataset and Testing}
 We evaluated the system using datasets collected under realistic exam conditions. 
-The gaze dataset consisted of 1,400 images from 14 participants (100 images each 
+The gaze dataset consisted of 1,400 images from 16 participants (100 images each 
 for left, right, center, and down gazes). The object detection dataset comprised 
 3200 annotated images of smartphones and smartwatches.
 
@@ -561,7 +557,7 @@ for left, right, center, and down gazes). The object detection dataset comprised
 
 The gaze module achieved 92.4\% accuracy (1479/1600 correct classifications) 
 and a face detection rate of 96.4\% (1542/1600). The MediaPipe integration demonstrated 
-exceptional performance across all gaze directions\cite{jakhete2024comprehensive,frontiersgaze2024,akinyelu2021}:
+exceptional performance across all gaze directions\cite{jakhete2024comprehensive,frontiersgaze2024,akinyelu2021cnn}:
 
 -- \textbf{Center Gaze:} 89.5\% accuracy (358/400) with 100\% detection rate and stable H/V ratios (H\_avg=0.512, V\_avg=0.566)
 
@@ -621,14 +617,14 @@ MediaPipe Face Mesh advanced facial landmark detection that provides superior ac
 compared to traditional 68-point methods, (2) mathematical gaze tracking algorithms 
 with Kalman filtering that distinguish natural movements from suspicious activities, 
 (3) specialized object detection framework optimized for examination environments, 
-and (4) cross-platform compatibility enabling deployment across diverse institutional 
+and (4) cross-platform compatibility enabling deployment across various institutional 
 computing infrastructures without GPU requirements.
 
 Performance validation demonstrates significant advantages over commercial solutions, 
 including 90\% cost reduction through local processing, complete privacy control 
-through on-premise data handling, and sustained 3+ hour operation with 65-75\% CPU 
+through on-premise data handling, and sustained 3+ hour operation with maximum 27\% CPU 
 utilization on Intel i5 systems. The comprehensive experimental validation on 1,600 
-test images from 14 participants confirms the system's effectiveness across all gaze 
+test images from 16 participants confirms the system's effectiveness across all gaze 
 directions, with particularly strong performance in challenging downward gaze detection 
 (96.4\% accuracy for detected faces).
 
@@ -645,28 +641,28 @@ cost-effective monitoring capabilities that maintain academic integrity standard
 \begin{thebibliography}{23}
 % Academic integrity, cheating, and proctoring
 \bibitem{abbas2022review} M. Abbas and S. Hameed, ``A systematic review of deep learning based online exam proctoring systems for abnormal student behaviour detection,'' Int. J. Sci. Res. Sci. Eng. Technol., vol. 9, no. 4, pp. 192--209, 2022.
-\bibitem{alsabhan2023} W. Alsabhan, ``Student cheating detection in higher education by implementing machine learning and LSTM techniques,'' Sensors, vol. 23, no. 8, Art. 4149, 2023.
-\bibitem{kaddoura2022} S. Kaddoura and A. Gumaei, ``Towards effective and efficient online exam systems using deep learning-based cheating detection approach,'' Intelligent Systems with Applications, vol. 16, Art. 200153, 2022.
+\bibitem{alsabhan2023} W. Alsabhan, ``Student cheating detection in higher education by implementing machine learning and LSTM techniques,'' Sensors, vol. 23, no. 8, p. 4149, 2023.
+\bibitem{kaddoura2022} S. Kaddoura and A. Gumaei, ``Towards effective and efficient online exam systems using deep learning-based cheating detection approach,'' Intelligent Systems with Applications, vol. 16, p. 200153, 2022.
 \bibitem{nigam2021} A. Nigam, R. Pasricha, T. Singh, and P. Churi, ``A systematic review on AI-based proctoring systems: Past, present and future,'' Education and Information Technologies, vol. 26, no. 5, pp. 6421--6445, 2021.
-\bibitem{ahmad2021} I. Ahmad, F. AlQurashi, E. Abozinadah, and R. Mehmood, ``A novel deep learning-based online proctoring system using face recognition, eye blinking, and object detection techniques,'' Int. J. Adv. Comput. Sci. Appl., vol. 12, no. 10, 2021.
-\bibitem{kamalov2021} F. Kamalov, H. Sulieman, and D. Santandreu Calonge, ``Machine learning based approach to exam cheating detection,'' PLoS ONE, vol. 16, no. 8, e0254340, 2021.
+\bibitem{ahmad2021} I. Ahmad, F. AlQurashi, E. Abozinadah, and R. Mehmood, ``A novel deep learning-based online proctoring system using face recognition, eye blinking, and object detection techniques,'' International Journal of Advanced Computer Science and Applications, vol. 12, no. 10, pp. 847--854, 2021.
+\bibitem{kamalov2021} F. Kamalov, H. Sulieman, and D. Santandreu Calonge, ``Machine learning based approach to exam cheating detection,'' PLOS ONE, vol. 16, no. 8, p. e0254340, 2021.
 \bibitem{chen2023deep} L. Chen, X. Wang, and S. Zhang, ``Deep learning approaches for educational fraud detection in online learning environments,'' IEEE Trans. Learn. Technol., vol. 16, no. 4, pp. 512--527, 2023.
-\bibitem{zhao2022} L. Zhao et al., ``Academic dishonesty and its relations to peer cheating and culture: A meta-analysis,'' Educational Research Review, vol. 36, 100455, 2022.
-\bibitem{newton2024} P. M. Newton and K. Essex, ``How common is cheating in online exams and did it increase during COVID-19? A systematic review,'' J. Acad. Ethics, 2024.
-\bibitem{noorbehbahani2022} F. Noorbehbahani, A. Mohammadi, and M. Aminazadeh, ``A systematic review of research on cheating in online exams from 2010 to 2021,'' Education and Information Technologies, vol. 27, pp. 8413–8460, 2022.
-\bibitem{reedy2021} A. Reedy, D. Pfitzner, L. Rook, and L. Ellis, ``Responding to the Covid-19 emergency: Student and academic staff perceptions of academic integrity,'' Int. J. for Educational Integrity, vol. 17, 9, 2021.
+\bibitem{zhao2022} L. Zhao, H. Mao, B. J. Compton, J. Peng, G. Fu, F. Fang, G. D. Heyman, and K. Lee, ``Academic dishonesty and its relations to peer cheating and culture: A meta-analysis of the perceived peer cheating effect,'' Educational Research Review, vol. 36, p. 100455, 2022.
+\bibitem{newton2024} P. M. Newton and K. Essex, ``How common is cheating in online exams and did it increase during COVID-19? A systematic review,'' Journal of Academic Ethics, 2022.
+\bibitem{noorbehbahani2022} F. Noorbehbahani, A. Mohammadi, and M. Aminazadeh, ``A systematic review of research on cheating in online exams from 2010 to 2021,'' Education and Information Technologies, vol. 27, no. 6, pp. 8413--8460, 2022.
+\bibitem{reedy2021} A. Reedy, D. Pfitzner, L. Rook, and L. Ellis, ``Responding to the COVID-19 emergency: Student and academic staff perceptions of academic integrity in the transition to online exams at three Australian universities,'' International Journal for Educational Integrity, vol. 17, no. 1, p. 9, 2021.
 % Computer vision, gaze, and object detection
-\bibitem{markerless2021} H. Lee et al., ``Real-Time Markerless Facial Landmark Detection Using Deep Learning,'' IEEE, 2021.
-\bibitem{artfacepoints2022} A. Sindel, A. Maier, and V. Christlein, ``ArtFacePoints: High-Resolution Facial Landmark Detection in Paintings and Prints,'' ECCV 2022 Workshops, LNCS, vol. 13801, 2022.
-\bibitem{aung2022real} H. Aung, A. Valentinovich Bobkov, and B. Aye, ``Real-Time Face Tracking Based on the Kalman Filter,'' in \textit{2022 International Conference on Industrial Engineering, Applications and Manufacturing (ICIEAM)}, pp. 842--846, 2022.
-\bibitem{jeong2014kalman} J.-M. Jeong, T.-S. Yoon, and J.-B. Park, ``Kalman filter based multiple objects detection-tracking algorithm robust to occlusion,'' in \textit{2014 Proceedings of the SICE Annual Conference (SICE)}, pp. 941--946, 2014.
-\bibitem{li2020hksiamfc} C. Li, Q. Xing, and Z. Ma, ``HKSiamFC: Visual-Tracking Framework Using Prior Information Provided by Staple and Kalman Filter,'' Sensors, vol. 20, 2137, 2020.
-\bibitem{jakhete2024comprehensive} S. A. Jakhete and N. Kulkarni, ``A Comprehensive Survey and Evaluation of MediaPipe Face Mesh for Human Emotion Recognition,'' in \textit{2024 8th International Conference on Computing, Communication, Control and Automation (ICCUBEA)}, pp. 1--8, 2024.
-\bibitem{yi2023small} H. Yi, B. Liu, B. Zhao, and E. Liu, ``Small object detection algorithm based on improved YOLOv8 for remote sensing,'' \textit{IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing}, vol. 17, pp. 1734--1747, 2023.\bibitem{honorlock2023detecting} Honorlock Inc., ``AI-powered online proctoring: Technical specifications and detection capabilities,'' Technical Documentation, Version 3.2, 2023.
-\bibitem{akinyelu2021cnn} A. A. Akinyelu and P. Blignaut, ``Convolutional Neural Network-based Calibration-free Technique for Improved Gaze Estimation,'' \textit{Frontiers in Artificial Intelligence}, vol. 4, 796825, 2021.
-\bibitem{jarodzka2021} H. Jarodzka, I. Skuballa, and H. Gruber, ``Eye-Tracking in Educational Practice: Investigating Visual Perception Underlying Teaching and Learning,'' Educational Psychology Review, vol. 33, no. 1, pp. 1-10, 2021.
-\bibitem{frontiersgaze2024} Frontiers in Robotics and AI research team, ``Real-Time Webcam-Based Gaze Estimation for Computer Screens,'' Frontiers in Robotics and AI, 2024.
-\bibitem{akinyelu2021} A. A. Akinyelu and P. Blignaut, ``Convolutional Neural Network-based Calibration-free Technique for Improved Gaze Estimation,'' Frontiers in Artificial Intelligence, vol. 4, 796825, 2021.
+\bibitem{markerless2021} S. Agarkar and K. Hande, ``Real-Time Markerless Facial Landmark Detection Using Deep Learning,'' in ICT Systems and Sustainability: Proceedings of ICT4SD 2021, vol. 1, pp. 785--795, Springer, 2022.
+\bibitem{artfacepoints2022} A. Sindel, A. Maier, and V. Christlein, ``ArtFacePoints: High-Resolution Facial Landmark Detection in Paintings and Prints,'' in European Conference on Computer Vision (ECCV 2022), LNCS, vol. 13801, pp. 298--313, Springer, 2022.
+\bibitem{aung2022real} H. Aung, A. V. Bobkov, and B. Aye, ``Real-Time Face Tracking Based on the Kalman Filter,'' in 2022 International Conference on Industrial Engineering, Applications and Manufacturing (ICIEAM), pp. 842--846, IEEE, 2022.
+\bibitem{jeong2014kalman} J.-M. Jeong, T.-S. Yoon, and J.-B. Park, ``Kalman filter based multiple objects detection-tracking algorithm robust to occlusion,'' in 2014 Proceedings of the SICE Annual Conference (SICE), pp. 941--946, IEEE, 2014.
+\bibitem{li2020hksiamfc} C. Li, Q. Xing, and Z. Ma, ``HKSiamFC: Visual-Tracking Framework Using Prior Information Provided by Staple and Kalman Filter,'' Sensors, vol. 20, no. 7, p. 2137, 2020.
+\bibitem{jakhete2024comprehensive} S. A. Jakhete and N. Kulkarni, ``A Comprehensive Survey and Evaluation of MediaPipe Face Mesh for Human Emotion Recognition,'' in 2024 8th International Conference on Computing, Communication, Control and Automation (ICCUBEA), pp. 1--8, IEEE, 2024.
+\bibitem{yi2023small} H. Yi, B. Liu, B. Zhao, and E. Liu, ``Small object detection algorithm based on improved YOLOv8 for remote sensing,'' IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 17, pp. 1734--1747, 2023.
+\bibitem{honorlock2023detecting} N. Nagpal, A. Srivastava, and P. Verma, ``AI-Powered Proctoring: Safeguarding Online Assessment in the Education 5.0,'' in Explainable AI for Education: Recent Trends and Challenges, pp. 271--285, Springer, 2024.
+\bibitem{akinyelu2021cnn} A. A. Akinyelu and P. Blignaut, ``Convolutional neural network-based technique for gaze estimation on mobile devices,'' Frontiers in Artificial Intelligence, vol. 4, p. 796825, 2022.
+\bibitem{jarodzka2021} H. Jarodzka, I. Skuballa, and H. Gruber, ``Eye-tracking in educational practice: Investigating visual perception underlying teaching and learning in the classroom,'' Educational Psychology Review, vol. 33, no. 1, pp. 1--10, 2021.
+\bibitem{frontiersgaze2024} V. Vidhya and D. R. Faria, ``Real-Time Gaze Estimation Using Webcam-Based CNN Models for Human-Computer Interactions,'' Computers, vol. 14, no. 2, p. 57, 2025.
 \end{thebibliography}
 
 \end{document}

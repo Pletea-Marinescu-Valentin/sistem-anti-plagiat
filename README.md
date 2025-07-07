@@ -25,57 +25,111 @@ An advanced real-time monitoring system for preventing plagiarism during examina
 - **Statistical Analysis**: Provides violation frequency and pattern analysis
 - **Batch Image Processing**: Standalone utility for testing gaze detection on static images
 
+## ⚡ Quick Start
+
+**For experienced users - minimum steps to run:**
+
+```bash
+# 1. Install system dependencies (Linux)
+sudo apt update && sudo apt install cmake
+sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
+
+# 2. Create conda environment
+conda env create -f environment.yml
+conda activate anti-plagiat
+
+# 3. Install additional packages
+pip install ultralytics
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless
+pip install opencv-python-headless==4.8.1.78
+
+# 4. Run application
+python gui_app.py
+```
+
 ## 📋 Requirements
 
 ### System Requirements
-- Python 3.7+
-- OpenCV 4.5+
-- Qt5 libraries
-- Webcam or compatible camera device
-- Minimum 4GB RAM (8GB recommended)
-- Multi-core processor recommended for real-time processing
+- **OS**: Linux (Ubuntu/Debian/Kali Linux recommended)
+- **Python**: 3.11+
+- **Memory**: Minimum 4GB RAM (8GB recommended)
+- **Processor**: Multi-core processor recommended for real-time processing
+- **Camera**: Webcam or compatible camera device
+- **Storage**: 2GB free space for models and recordings
 
-### Python Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-**Key Dependencies:**
-- `opencv-python-headless>=4.5.0`
-- `numpy>=1.21.0,<2.0.0`
-- `PyQt5>=5.15.0`
-- `mediapipe>=0.10.0`
-- `ultralytics>=8.0.0`
-- `torch>=2.0.0`
+### Key Dependencies
+- **conda/miniconda**: Environment management
+- **CMake**: Required for dlib compilation
+- **OpenCV**: Computer vision library
+- **MediaPipe**: Face and landmark detection
+- **PyQt5/PySide6**: GUI framework
+- **YOLOv8 (ultralytics)**: Object detection
+- **PyTorch**: Deep learning framework
 
 ## 🛠️ Installation
 
-### 1. Clone the Repository
+### Prerequisites
+
+**System Requirements:**
+- Linux (Ubuntu/Debian/Kali Linux recommended)
+- Python 3.11+
+- Conda/Miniconda
+- CMake (for dlib compilation)
+
+### 1. Install System Dependencies
+
+**Install CMake and GUI libraries:**
+```bash
+# Install CMake (required for dlib)
+sudo apt update
+sudo apt install cmake
+
+# Install Qt/GUI dependencies for Linux
+sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
+```
+
+### 2. Clone the Repository
 ```bash
 git clone <repository-url>
 cd anti-plagiat
 ```
 
-### 2. Create Virtual Environment (Recommended)
+### 3. Create Conda Environment
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create environment from environment.yml
+conda env create -f environment.yml
+
+# Activate the environment
+conda activate anti-plagiat
 ```
 
-### 3. Install Dependencies
+### 4. Install Additional Dependencies
 ```bash
-pip install -r requirements.txt
-```
+# Install ultralytics (YOLO)
+pip install ultralytics
 
-### 4. Configure System
-```bash
-# Copy and edit configuration file
-cp config.json.example config.json
-# Edit config.json to match your requirements
+# Fix OpenCV for GUI compatibility
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless
+pip install opencv-python-headless==4.8.1.78
 ```
 
 ### 5. Run the Application
 ```bash
+python gui_app.py
+```
+
+### Alternative Installation (pip-only)
+If you prefer not to use conda:
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+pip install ultralytics
+
+# Run application
 python gui_app.py
 ```
 
@@ -300,6 +354,86 @@ python test_camera.py
 - Optimize camera resolution for use case
 - Regular threshold adjustment based on environment
 - Use headless OpenCV to avoid GUI conflicts
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. CMake Error During Installation
+**Error:** `CMake is not installed on your system!`
+```bash
+# Solution: Install CMake
+sudo apt update
+sudo apt install cmake
+cmake --version  # Verify installation
+```
+
+#### 2. Qt Platform Plugin Error
+**Error:** `Could not load the Qt platform plugin "xcb"`
+```bash
+# Solution: Install GUI dependencies
+sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
+
+# Alternative: Run headless
+export QT_QPA_PLATFORM=offscreen
+python gui_app.py
+```
+
+#### 3. ModuleNotFoundError: ultralytics
+**Error:** `No module named 'ultralytics'`
+```bash
+# Solution: Install ultralytics
+conda activate anti-plagiat
+pip install ultralytics
+```
+
+#### 4. OpenCV GUI Conflicts
+**Error:** GUI freezing or display issues
+```bash
+# Solution: Use headless OpenCV
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless
+pip install opencv-python-headless==4.8.1.78
+```
+
+#### 5. Conda Environment Issues
+**Error:** Environment creation fails
+```bash
+# Solution: Clean conda cache and retry
+conda clean --all
+conda env remove -n anti-plagiat  # If exists
+conda env create -f environment.yml
+```
+
+#### 6. Camera Access Issues
+**Error:** Camera not detected or permission denied
+```bash
+# Solution: Check camera permissions
+sudo usermod -a -G video $USER
+# Logout and login again
+
+# Test camera
+python -c "import cv2; cap = cv2.VideoCapture(0); print('Camera OK' if cap.isOpened() else 'Camera FAIL')"
+```
+
+#### 7. Low FPS Performance
+**Issue:** Application running slowly
+```bash
+# Solutions:
+# 1. Reduce camera resolution in config.json
+# 2. Close other applications
+# 3. Use GPU acceleration if available
+# 4. Check CPU usage: htop
+```
+
+#### 8. Export Environment for Other Devices
+```bash
+# Export current environment
+conda env export > environment.yml
+
+# On new device:
+conda env create -f environment.yml
+conda activate anti-plagiat
+```
 
 ## 🤝 Contributing
 
