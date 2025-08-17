@@ -3,15 +3,19 @@ import logging
 import cv2
 import numpy as np
 import mediapipe as mp
+from .gaze_tracking.gaze_tracker import GazeTracker
 
 class FaceDetector:
     """
-    Face detector using MediaPipe for gaze tracking
+    Face detector using MediaPipe for gaze tracking with head pose compensation
     """
     def __init__(self, mirror_image=True):
         self.mirror_image = mirror_image
         self._init_mediapipe()
-    
+        
+        # Initialize GazeTracker pentru head pose compensation
+        self.gaze_tracker = GazeTracker(mirror_image=mirror_image, use_mediapipe=True)
+        
     def _init_mediapipe(self):
         """Initialize MediaPipe face mesh"""
         self.mp_face_mesh = mp.solutions.face_mesh
@@ -78,11 +82,15 @@ class FaceDetector:
         return self.current_v_ratio > self.config['detection']['gaze']['down_limit'] or self.current_v_ratio > 0.75
 
     def detect_direction(self, frame):
-        """Detect gaze direction from frame"""
+        """Detect gaze direction from frame with head pose compensation"""
         if frame is None:
             return "center", frame, 0.5, 0.5
         
         try:
+            # Procesează cu GazeTracker pentru head pose compensation
+            self.gaze_tracker.refresh(frame)
+            
+            # Procesează cu MediaPipe original pentru gaze detection
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = self.face_mesh.process(rgb_frame)
             
@@ -108,6 +116,7 @@ class FaceDetector:
             return direction, annotated_frame, h_ratio, v_ratio
             
         except Exception as e:
+            logging.error(f"Eroare detectare directie privire: {e}")
             self.pupils_detected = False
             return "center", frame, self.current_h_ratio, self.current_v_ratio
     
@@ -149,7 +158,7 @@ class FaceDetector:
             return 0.5, 0.5
     
     def _determine_direction(self, h_ratio, v_ratio):
-        """Determine gaze direction from ratios"""
+        """Determine gaze direction from ratios (legacy compatibility)"""
         if v_ratio > self.config['detection']['gaze']['down_limit'] or v_ratio > 0.75:
             return "down"
         elif h_ratio > self.config['detection']['gaze']['left_limit']:
@@ -230,6 +239,8 @@ class FaceDetector:
     def set_mirror_mode(self, mirror_mode):
         """Update mirror mode"""
         self.mirror_image = mirror_mode
+        if hasattr(self, 'gaze_tracker'):
+            self.gaze_tracker.mirror_image = mirror_mode
     
     def pupil_left_coords(self):
         """Get left pupil coordinates"""

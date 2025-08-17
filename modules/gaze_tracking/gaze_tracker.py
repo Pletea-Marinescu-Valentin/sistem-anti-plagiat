@@ -1,6 +1,7 @@
 from __future__ import division
 import cv2
 import json
+import logging
 import numpy as np
 import gc
 import mediapipe as mp
@@ -37,9 +38,29 @@ class GazeTracker(object):
 
         # Load configuration
         self.config = self.load_config(config_path)
-        self.left_limit = self.config["detection"]["gaze"]["left_limit"]
-        self.right_limit = self.config["detection"]["gaze"]["right_limit"]
-        self.down_limit = self.config["detection"]["gaze"]["down_limit"]
+        # Base thresholds (will be dynamically adjusted)
+        self.base_left_limit = self.config["detection"]["gaze"]["left_limit"]
+        self.base_right_limit = self.config["detection"]["gaze"]["right_limit"]
+        self.base_down_limit = self.config["detection"]["gaze"]["down_limit"]
+        
+        # Current adjusted thresholds
+        self.left_limit = self.base_left_limit
+        self.right_limit = self.base_right_limit
+        self.down_limit = self.base_down_limit
+        
+        # Head pose compensation parameters
+        self.head_pose_compensation_enabled = True
+        self.horizontal_rotation_threshold = 15.0  # degrees
+        self.vertical_tilt_threshold = 10.0  # degrees
+        self.horizontal_threshold_adjustment = 0.1
+        
+        # Current head pose angles
+        self.current_yaw = 0.0
+        self.current_pitch = 0.0
+        
+        # Head pose calculation throttling
+        self.head_pose_frame_count = 0
+        self.head_pose_update_interval = 20  # Calculate head pose every 20 frames
 
         # Image mode for static image processing
         self._image_mode = False
@@ -164,14 +185,14 @@ class GazeTracker(object):
             gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
             # Initialize eyes with MediaPipe landmarks
-            self.eye_left = Eye(gray_frame, landmarks_px, 0, landmark_type="mediapipe")
-            self.eye_right = Eye(gray_frame, landmarks_px, 1, landmark_type="mediapipe")
+            self.eye_left = Eye(gray_frame, landmarks_px, 0)
+            self.eye_right = Eye(gray_frame, landmarks_px, 1)
 
             self.frames_without_detection = 0
             return True
             
         except Exception as e:
-            print(f"MediaPipe analysis error: {e}")
+            logging.error(f"MediaPipe analysis error: {e}")
             self.frames_without_detection += 1
             return False
 
@@ -193,7 +214,19 @@ class GazeTracker(object):
             
             # Points for V calculation
             forehead = landmarks_px[10] if len(landmarks_px) > 10 else (0, 0)
-            chin = landmarks_px[175] if len(landmarks_px) > 175 else (0, 0)
+            chin = landmarks_px[152] if len(landmarks_px) > 152 else (0, 0)  # Updated to use landmark 152
+
+            # Calculate head pose angles for compensation (throttled to reduce lag)
+            self.head_pose_frame_count += 1
+            if self.head_pose_frame_count >= self.head_pose_update_interval:
+                self.head_pose_frame_count = 0
+                yaw_angle, pitch_angle = self.calculate_head_pose_angles(landmarks_px)
+                self.current_yaw = yaw_angle
+                self.current_pitch = pitch_angle
+                
+                # Apply head pose compensation if enabled
+                if self.head_pose_compensation_enabled:
+                    self.adjust_thresholds_for_head_pose(yaw_angle, pitch_angle)
 
             # Calculate H ratio horizontal
             if left_face != (0, 0) and right_face != (0, 0):
@@ -224,8 +257,95 @@ class GazeTracker(object):
             return h_ratio, v_ratio
             
         except Exception as e:
-            print(f"MediaPipe head orientation calculation error: {e}")
+            logging.error(f"MediaPipe head orientation calculation error: {e}")
             return 0.5, 0.5
+
+    def calculate_head_pose_angles(self, landmarks_px):
+        try:
+            # Key landmarks for angle calculation
+            nose_tip = landmarks_px[1] if len(landmarks_px) > 1 else None
+            left_face = landmarks_px[234] if len(landmarks_px) > 234 else None
+            right_face = landmarks_px[454] if len(landmarks_px) > 454 else None
+            forehead = landmarks_px[10] if len(landmarks_px) > 10 else None
+            chin = landmarks_px[152] if len(landmarks_px) > 152 else None
+            
+            if not all([nose_tip, left_face, right_face, forehead, chin]):
+                return 0.0, 0.0
+            
+            # Calculate horizontal rotation (yaw) angle
+            face_width = abs(right_face[0] - left_face[0])
+            if face_width > 0:
+                # Center of face horizontally
+                face_center_x = (left_face[0] + right_face[0]) / 2
+                nose_offset_x = nose_tip[0] - face_center_x
+                
+                yaw_ratio = nose_offset_x / (face_width / 2)
+                yaw_angle = yaw_ratio * 30.0
+            else:
+                yaw_angle = 0.0
+            
+            # Calculate vertical tilt (pitch) angle
+            face_height = abs(chin[1] - forehead[1])
+            if face_height > 0:
+                # Center of face vertically
+                face_center_y = (forehead[1] + chin[1]) / 2
+                nose_offset_y = nose_tip[1] - face_center_y
+                
+                pitch_ratio = nose_offset_y / (face_height / 2)
+                pitch_angle = pitch_ratio * 25.0  # Scale to approximate degrees
+            else:
+                pitch_angle = 0.0
+            
+            # Clamp angles to reasonable ranges
+            yaw_angle = max(-45.0, min(45.0, yaw_angle))
+            pitch_angle = max(-30.0, min(30.0, pitch_angle))
+            
+            return yaw_angle, pitch_angle
+            
+        except Exception as e:
+            logging.error(f"Head pose angle calculation error: {e}")
+            return 0.0, 0.0
+
+    def adjust_thresholds_for_head_pose(self, yaw_angle, pitch_angle):
+        try:
+            # Reset to base thresholds
+            self.left_limit = self.base_left_limit
+            self.right_limit = self.base_right_limit
+            self.down_limit = self.base_down_limit
+            
+            # Horizontal adjustment for yaw rotation
+            if abs(yaw_angle) > self.horizontal_rotation_threshold:
+                adjustment = self.horizontal_threshold_adjustment
+                
+                if yaw_angle > 0:  # Head turned right
+                    # Make right detection more sensitive, left less sensitive
+                    self.right_limit += adjustment
+                    self.left_limit -= adjustment
+                else:  # Head turned left
+                    # Make left detection more sensitive, right less sensitive
+                    self.left_limit += adjustment
+                    self.right_limit -= adjustment
+            
+            # Vertical adjustment for pitch tilt
+            if abs(pitch_angle) > self.vertical_tilt_threshold:
+                # Proportional adjustment based on tilt angle
+                tilt_factor = abs(pitch_angle) / 30.0  # Normalize to 0-1 range
+                vertical_adjustment = 0.1 * tilt_factor
+                
+                if pitch_angle > 0:  # Head tilted down
+                    # Make down detection less sensitive
+                    self.down_limit += vertical_adjustment
+                else:  # Head tilted up
+                    # Make down detection more sensitive
+                    self.down_limit -= vertical_adjustment
+            
+            # Ensure thresholds remain within valid ranges
+            self.left_limit = max(0.1, min(0.9, self.left_limit))
+            self.right_limit = max(0.1, min(0.9, self.right_limit))
+            self.down_limit = max(0.1, min(0.9, self.down_limit))
+            
+        except Exception as e:
+            logging.error(f"Threshold adjustment error: {e}")
 
     def refresh(self, frame):
         """Update frame and analyze"""
@@ -398,7 +518,7 @@ class GazeTracker(object):
             return False
             
         except Exception as e:
-            print(f"Extreme tilt detection error: {e}")
+            logging.error(f"Extreme tilt detection error: {e}")
             return False
 
     def is_center(self):
@@ -524,3 +644,45 @@ class GazeTracker(object):
             return direction, self.last_annotated_frame, self.h_ratio, self.v_ratio
         else:
             return direction, frame, self.h_ratio, self.v_ratio
+
+    def get_head_pose_info(self):
+        """
+        Get current head pose information for monitoring and debugging
+        
+        Returns:
+            dict: Head pose information including angles and adjusted thresholds
+        """
+        return {
+            'yaw_angle': round(self.current_yaw, 2),
+            'pitch_angle': round(self.current_pitch, 2),
+            'compensation_enabled': self.head_pose_compensation_enabled,
+            'base_thresholds': {
+                'left_limit': self.base_left_limit,
+                'right_limit': self.base_right_limit,
+                'down_limit': self.base_down_limit
+            },
+            'adjusted_thresholds': {
+                'left_limit': round(self.left_limit, 3),
+                'right_limit': round(self.right_limit, 3),
+                'down_limit': round(self.down_limit, 3)
+            },
+            'threshold_adjustments': {
+                'horizontal_threshold': self.horizontal_rotation_threshold,
+                'vertical_threshold': self.vertical_tilt_threshold,
+                'horizontal_adjustment': self.horizontal_threshold_adjustment
+            }
+        }
+
+    def set_head_pose_compensation(self, enabled):
+        """
+        Enable or disable head pose compensation
+        
+        Args:
+            enabled (bool): Whether to enable head pose compensation
+        """
+        self.head_pose_compensation_enabled = enabled
+        if not enabled:
+            # Reset to base thresholds
+            self.left_limit = self.base_left_limit
+            self.right_limit = self.base_right_limit
+            self.down_limit = self.base_down_limit

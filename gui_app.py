@@ -3,6 +3,7 @@ import sys
 import cv2
 import json
 import os
+os.environ.pop('QT_QPA_PLATFORM_PLUGIN_PATH', None)
 import numpy as np
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -30,18 +31,40 @@ class VideoProcessingThread(QThread):
 
     def run(self):
         try:
-            print("Initializing webcam")
-            cap = cv2.VideoCapture(0)  # Use webcam directly (id=0)
+            print("Initializing camera")
+            
+            # Try to find external USB camera
+            camera_id = None
+            for i in range(4):  # Check camera indices 0-3
+                cap_test = cv2.VideoCapture(i)
+                if cap_test.isOpened():
+                    ret, frame = cap_test.read()
+                    if ret:
+                        print(f"Found camera at index {i}")
+                        if camera_id is None:
+                            camera_id = i
+                        if i == 2:  # Prefer external USB camera (index 2)
+                            camera_id = i
+                            cap_test.release()
+                            break
+                    cap_test.release()
+            
+            if camera_id is None:
+                print("Error: No camera found")
+                return
+                
+            print(f"Using camera at index {camera_id}")
+            cap = cv2.VideoCapture(camera_id)
 
             if not cap.isOpened():
-                print("Error: Could not access webcam")
+                print(f"Error: Could not access camera {camera_id}")
                 return
 
-            print("Webcam initialized successfully")
+            print(f"Camera {camera_id} initialized successfully")
 
             # camera resolution
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
             self.running = True
 
@@ -163,6 +186,28 @@ class AntiPlagiatGUI(QMainWindow):
         stats_layout.addWidget(self.recording_time_label)
         stats_group.setLayout(stats_layout)
 
+        # head pose information group
+        head_pose_group = QGroupBox("Head Pose Compensation")
+        head_pose_layout = QVBoxLayout()
+
+        # head pose angle labels
+        self.yaw_label = QLabel("Yaw: 0.0°")
+        self.pitch_label = QLabel("Pitch: 0.0°")
+        self.compensation_status_label = QLabel("Compensation: ON")
+        self.threshold_adjustments_label = QLabel("Thresholds: Base")
+
+        # head pose compensation toggle
+        self.head_pose_compensation_check = QCheckBox("Enable Head Pose Compensation")
+        self.head_pose_compensation_check.setChecked(True)
+        self.head_pose_compensation_check.stateChanged.connect(self.toggle_head_pose_compensation)
+
+        head_pose_layout.addWidget(self.yaw_label)
+        head_pose_layout.addWidget(self.pitch_label)
+        head_pose_layout.addWidget(self.compensation_status_label)
+        head_pose_layout.addWidget(self.threshold_adjustments_label)
+        head_pose_layout.addWidget(self.head_pose_compensation_check)
+        head_pose_group.setLayout(head_pose_layout)
+
         # report display area
         report_group = QGroupBox("Live Report")
         report_layout = QVBoxLayout()
@@ -182,6 +227,7 @@ class AntiPlagiatGUI(QMainWindow):
         # add groups to controls layout
         controls_layout.addWidget(system_group)
         controls_layout.addWidget(stats_group)
+        controls_layout.addWidget(head_pose_group)
         controls_layout.addWidget(report_group)
 
         # gaze limits configuration
@@ -305,6 +351,9 @@ class AntiPlagiatGUI(QMainWindow):
                 # save current frame
                 self.current_frame = frame.copy()
 
+                # update head pose information
+                self.update_head_pose_info()
+
                 # convert OpenCV frame to QImage
                 h, w, ch = frame.shape
                 bytes_per_line = ch * w
@@ -319,6 +368,37 @@ class AntiPlagiatGUI(QMainWindow):
                 self.video_display.setPixmap(QPixmap.fromImage(scaled_frame))
             except Exception as e:
                 print(f"Error updating frame: {e}")
+
+    def update_head_pose_info(self):
+        """Update head pose information display"""
+        try:
+            if hasattr(self, 'system') and hasattr(self.system, 'face_detector') and hasattr(self.system.face_detector, 'gaze_tracker'):
+                gaze_tracker = self.system.face_detector.gaze_tracker
+                head_pose_info = gaze_tracker.get_head_pose_info()
+                
+                # Update labels (removed debug print to reduce terminal spam)
+                self.yaw_label.setText(f"Yaw: {head_pose_info['yaw_angle']}°")
+                self.pitch_label.setText(f"Pitch: {head_pose_info['pitch_angle']}°")
+                self.compensation_status_label.setText(f"Compensation: {'ON' if head_pose_info['compensation_enabled'] else 'OFF'}")
+                
+                # Show threshold adjustments
+                adj_thresh = head_pose_info['adjusted_thresholds']
+                base_thresh = head_pose_info['base_thresholds']
+                
+                # Check if thresholds are adjusted
+                if (abs(adj_thresh['left_limit'] - base_thresh['left_limit']) > 0.001 or
+                    abs(adj_thresh['right_limit'] - base_thresh['right_limit']) > 0.001 or
+                    abs(adj_thresh['down_limit'] - base_thresh['down_limit']) > 0.001):
+                    self.threshold_adjustments_label.setText(f"L:{adj_thresh['left_limit']:.2f} R:{adj_thresh['right_limit']:.2f} D:{adj_thresh['down_limit']:.2f}")
+                else:
+                    self.threshold_adjustments_label.setText("Thresholds: Base")
+            else:
+                print("GUI: Cannot access gaze_tracker")
+                    
+        except Exception as e:
+            print(f"Error updating head pose info: {e}")
+            import traceback
+            traceback.print_exc()
 
     def handle_violation(self, violation_data):
         try:
@@ -420,6 +500,12 @@ class AntiPlagiatGUI(QMainWindow):
         self.config["camera"]["mirror_image"] = is_checked
         if hasattr(self, 'system'):
             self.system.set_mirror_mode(is_checked)
+
+    def toggle_head_pose_compensation(self, state):
+        is_checked = state == Qt.Checked
+        if hasattr(self, 'system') and hasattr(self.system, 'face_detector') and hasattr(self.system.face_detector, 'gaze_tracker'):
+            self.system.face_detector.gaze_tracker.set_head_pose_compensation(is_checked)
+            self.compensation_status_label.setText(f"Compensation: {'ON' if is_checked else 'OFF'}")
 
     def capture_snapshot(self):
         if self.monitoring:
