@@ -99,12 +99,13 @@ class ObjectDetector:
                     frame, timestamp = frame_data
                     
                     # Process frame in background
-                    detections = self._process_frame_background(frame)
+                    detections, processing_time = self._process_frame_background(frame)
                     
                     # Store results
                     self.results_queue.append({
                         'detections': detections,
-                        'timestamp': timestamp
+                        'timestamp': timestamp,
+                        'processing_time': processing_time
                     })
                     
                 except Exception as e:
@@ -114,6 +115,7 @@ class ObjectDetector:
     
     def _process_frame_background(self, frame):
         """Process frame in background thread"""
+        start_time = time.time()
         detected_objects = []
         
         try:
@@ -131,12 +133,15 @@ class ObjectDetector:
                 )
                 detected_objects.extend(smartwatch_detections)
             
+            # Measure processing time in milliseconds
+            processing_time = (time.time() - start_time) * 1000
+            
             # Limit detections for performance
-            return detected_objects[:5]
+            return detected_objects[:5], processing_time
             
         except Exception as e:
             logging.error(f"Background frame processing error: {e}")
-            return []
+            return [], 0
     
     def set_mirror_state(self, mirror_state):
         """Update mirror state from GUI"""
@@ -179,6 +184,7 @@ class ObjectDetector:
         if self.results_queue:
             latest_result = self.results_queue[-1]
             detected_objects = latest_result['detections']
+            processing_time = latest_result.get('processing_time', 0)
             
             # Scale coordinates back to original frame size
             scale_factor = 1.0 / self.resize_factor
@@ -191,7 +197,7 @@ class ObjectDetector:
                 scaled_detections.append((obj_type, conf, scaled_x1, scaled_y1, scaled_x2, scaled_y2))
             
             self.last_detections = scaled_detections
-            self.last_detection_time = current_time
+            self.last_detection_time = processing_time  # Now stores actual processing time in ms
         
         # Draw all detections on current frame
         for obj_type, conf, x1, y1, x2, y2 in self.last_detections:

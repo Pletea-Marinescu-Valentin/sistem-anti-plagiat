@@ -1,6 +1,7 @@
 import json
 import logging
 import cv2
+import time
 import numpy as np
 import mediapipe as mp
 from .gaze_tracking.gaze_tracker import GazeTracker
@@ -15,6 +16,9 @@ class FaceDetector:
         
         # Initialize GazeTracker pentru head pose compensation
         self.gaze_tracker = GazeTracker(mirror_image=mirror_image, use_mediapipe=True)
+        
+        # Performance tracking
+        self.last_detection_time = 0
         
     def _init_mediapipe(self):
         """Initialize MediaPipe face mesh"""
@@ -83,6 +87,8 @@ class FaceDetector:
 
     def detect_direction(self, frame):
         """Detect gaze direction from frame with head pose compensation"""
+        start_time = time.time()
+        
         if frame is None:
             return "center", frame, 0.5, 0.5
         
@@ -94,6 +100,7 @@ class FaceDetector:
             
             if not results.multi_face_landmarks:
                 self.pupils_detected = False
+                self.last_detection_time = (time.time() - start_time) * 1000  # ms
                 return "no_face", frame, self.current_h_ratio, self.current_v_ratio
             
             face_landmarks = results.multi_face_landmarks[0]
@@ -104,6 +111,9 @@ class FaceDetector:
             self.current_h_ratio = h_ratio
             self.current_v_ratio = v_ratio
             self.pupils_detected = True
+            
+            # Record processing time
+            self.last_detection_time = (time.time() - start_time) * 1000  # ms
             
             direction = self._determine_direction(h_ratio, v_ratio)
             self.last_direction = direction

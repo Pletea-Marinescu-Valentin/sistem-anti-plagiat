@@ -1,13 +1,13 @@
 {
     "camera": {
-        "source": 0,
+        "source": 1,
         "mirror_image": false,
         "resolution": [
             640,
             480
         ],
         "fps": 30,
-        "index": 0
+        "index": 1
     },
     "detection": {
         "gaze": {

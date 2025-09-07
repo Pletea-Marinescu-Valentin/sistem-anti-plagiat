@@ -5,6 +5,9 @@ import json
 import os
 os.environ.pop('QT_QPA_PLATFORM_PLUGIN_PATH', None)
 import numpy as np
+import time
+import psutil
+from collections import deque
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                             QLabel, QPushButton, QGroupBox, QCheckBox, QTextEdit, QMessageBox, QSpinBox, QFormLayout)
@@ -15,6 +18,7 @@ from main import AntiPlagiarismSystem
 class VideoProcessingThread(QThread):
     frame_ready = pyqtSignal(np.ndarray)
     violation_detected = pyqtSignal(dict)
+    performance_update = pyqtSignal(dict)
 
     def __init__(self, config, system):
         super().__init__()
@@ -28,26 +32,53 @@ class VideoProcessingThread(QThread):
         # process every third frame for efficiency
         self.process_every_n_frames = 3
         self.frame_count = 0
+        
+        # Performance tracking
+        self.fps_history = deque(maxlen=30)  # Last 30 measurements
+        self.face_latency_history = deque(maxlen=30)
+        self.object_latency_history = deque(maxlen=30)
+        self.total_latency_history = deque(maxlen=30)
+        self.last_performance_update = time.time()
 
     def run(self):
         try:
             print("Initializing camera")
             
-            # Try to find external USB camera
+            # Use camera source from config first
+            camera_source = self.config.get('camera', {}).get('source', 0)
+            print(f"Config camera source: {camera_source}")
+            
+            # Try configured camera first
             camera_id = None
-            for i in range(4):  # Check camera indices 0-3
-                cap_test = cv2.VideoCapture(i)
-                if cap_test.isOpened():
-                    ret, frame = cap_test.read()
-                    if ret:
-                        print(f"Found camera at index {i}")
-                        if camera_id is None:
-                            camera_id = i
-                        if i == 2:  # Prefer external USB camera (index 2)
+            cap_test = cv2.VideoCapture(camera_source)
+            if cap_test.isOpened():
+                ret, frame = cap_test.read()
+                if ret:
+                    print(f"Using configured camera at index {camera_source}")
+                    camera_id = camera_source
+                    cap_test.release()
+                else:
+                    print(f"Configured camera {camera_source} cannot read frames")
+                    cap_test.release()
+            else:
+                print(f"Configured camera {camera_source} cannot open")
+                cap_test.release()
+            
+            # If configured camera fails, try fallback cameras
+            if camera_id is None:
+                print("Trying fallback cameras...")
+                for i in range(4):  # Check camera indices 0-3
+                    if i == camera_source:  # Skip already tested camera
+                        continue
+                    cap_test = cv2.VideoCapture(i)
+                    if cap_test.isOpened():
+                        ret, frame = cap_test.read()
+                        if ret:
+                            print(f"Found fallback camera at index {i}")
                             camera_id = i
                             cap_test.release()
                             break
-                    cap_test.release()
+                        cap_test.release()
             
             if camera_id is None:
                 print("Error: No camera found")
@@ -62,9 +93,11 @@ class VideoProcessingThread(QThread):
 
             print(f"Camera {camera_id} initialized successfully")
 
-            # camera resolution
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+            # Set camera resolution from config
+            resolution = self.config.get('camera', {}).get('resolution', [640, 480])
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, resolution[0])
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution[1])
+            print(f"Camera resolution set to: {resolution[0]}x{resolution[1]}")
 
             self.running = True
 
@@ -79,7 +112,35 @@ class VideoProcessingThread(QThread):
                     # process frame only at certain intervals
                     if self.frame_count % self.process_every_n_frames == 0:
                         try:
+                            # Start performance timing
+                            frame_start_time = time.time()
+                            
+                            # Measure face detection time
+                            face_start = time.time()
                             processed_frame = self.system.process_frame(frame)
+                            face_end = time.time()
+                            face_latency = (face_end - face_start) * 1000  # ms
+                            
+                            # Get real object detection time from object detector
+                            object_latency = 0
+                            if hasattr(self.system, 'object_detector'):
+                                object_latency = self.system.object_detector.last_detection_time
+                            
+                            # Calculate total processing time and FPS
+                            frame_end_time = time.time()
+                            total_latency = (frame_end_time - frame_start_time) * 1000  # ms
+                            current_fps = 1.0 / (frame_end_time - frame_start_time) if (frame_end_time - frame_start_time) > 0 else 0
+                            
+                            # Store performance data
+                            self.fps_history.append(current_fps)
+                            self.face_latency_history.append(face_latency)
+                            self.object_latency_history.append(object_latency)
+                            self.total_latency_history.append(total_latency)
+                            
+                            # Emit performance update every 2 seconds
+                            if time.time() - self.last_performance_update > 2.0:
+                                self.emit_performance_update()
+                                self.last_performance_update = time.time()
 
                             # emit signals
                             self.frame_ready.emit(processed_frame)
@@ -93,6 +154,8 @@ class VideoProcessingThread(QThread):
                             import traceback
                             traceback.print_exc()
 
+                    self.frame_count += 1
+
                 # short pause to not overload CPU
                 self.msleep(15)
         except Exception as e:
@@ -100,6 +163,36 @@ class VideoProcessingThread(QThread):
         finally:
             if 'cap' in locals() and cap is not None:
                 cap.release()
+
+    def emit_performance_update(self):
+        """Emit performance statistics"""
+        try:
+            if len(self.fps_history) > 0:
+                avg_fps = sum(self.fps_history) / len(self.fps_history)
+                avg_face_latency = sum(self.face_latency_history) / len(self.face_latency_history) if self.face_latency_history else 0
+                avg_object_latency = sum(self.object_latency_history) / len(self.object_latency_history) if self.object_latency_history else 0
+                avg_total_latency = sum(self.total_latency_history) / len(self.total_latency_history) if self.total_latency_history else 0
+                
+                # Get memory usage and CPU
+                process = psutil.Process()
+                memory_mb = process.memory_info().rss / 1024 / 1024
+                
+                # CPU percent requires interval for accurate measurement
+                cpu_percent = process.cpu_percent(interval=0.1) or psutil.cpu_percent(interval=0.1)
+                
+                performance_data = {
+                    'fps': avg_fps,
+                    'face_latency': avg_face_latency,
+                    'object_latency': avg_object_latency,
+                    'total_latency': avg_total_latency,
+                    'memory_mb': memory_mb,
+                    'cpu_percent': cpu_percent,
+                    'frame_count': self.frame_count
+                }
+                
+                self.performance_update.emit(performance_data)
+        except Exception as e:
+            print(f"Error emitting performance update: {e}")
 
     def stop(self):
         self.running = False
@@ -124,6 +217,7 @@ class AntiPlagiatGUI(QMainWindow):
         self.video_thread = VideoProcessingThread(self.config, self.system)
         self.video_thread.frame_ready.connect(self.update_frame)
         self.video_thread.violation_detected.connect(self.handle_violation)
+        self.video_thread.performance_update.connect(self.update_performance)
 
         self.recording = False
         self.monitoring = False
@@ -186,6 +280,26 @@ class AntiPlagiatGUI(QMainWindow):
         stats_layout.addWidget(self.recording_time_label)
         stats_group.setLayout(stats_layout)
 
+        # performance group
+        performance_group = QGroupBox("System Performance")
+        performance_layout = QVBoxLayout()
+
+        # performance metrics
+        self.fps_label = QLabel("FPS: --")
+        self.face_latency_label = QLabel("Face Detection: -- ms")
+        self.object_latency_label = QLabel("Object Detection: -- ms")
+        self.total_latency_label = QLabel("Total Latency: -- ms")
+        self.memory_label = QLabel("Memory: -- MB")
+        self.cpu_label = QLabel("CPU: -- %")
+
+        performance_layout.addWidget(self.fps_label)
+        performance_layout.addWidget(self.face_latency_label)
+        performance_layout.addWidget(self.object_latency_label)
+        performance_layout.addWidget(self.total_latency_label)
+        performance_layout.addWidget(self.memory_label)
+        performance_layout.addWidget(self.cpu_label)
+        performance_group.setLayout(performance_layout)
+
         # head pose information group
         head_pose_group = QGroupBox("Head Pose Compensation")
         head_pose_layout = QVBoxLayout()
@@ -227,6 +341,7 @@ class AntiPlagiatGUI(QMainWindow):
         # add groups to controls layout
         controls_layout.addWidget(system_group)
         controls_layout.addWidget(stats_group)
+        controls_layout.addWidget(performance_group)
         controls_layout.addWidget(head_pose_group)
         controls_layout.addWidget(report_group)
 
@@ -399,6 +514,18 @@ class AntiPlagiatGUI(QMainWindow):
             print(f"Error updating head pose info: {e}")
             import traceback
             traceback.print_exc()
+
+    def update_performance(self, performance_data):
+        """Update performance metrics display"""
+        try:
+            self.fps_label.setText(f"FPS: {performance_data['fps']:.1f}")
+            self.face_latency_label.setText(f"Face Detection: {performance_data['face_latency']:.1f} ms")
+            self.object_latency_label.setText(f"Object Detection: {performance_data['object_latency']:.1f} ms")
+            self.total_latency_label.setText(f"Total Latency: {performance_data['total_latency']:.1f} ms")
+            self.memory_label.setText(f"Memory: {performance_data['memory_mb']:.1f} MB")
+            self.cpu_label.setText(f"CPU: {performance_data['cpu_percent']:.1f} %")
+        except Exception as e:
+            print(f"Error updating performance display: {e}")
 
     def handle_violation(self, violation_data):
         try:
