@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap, QFont, QColor, QPalette
 
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = ''
+
 class GazeCaptureGUI(QMainWindow):
     def __init__(self):
         super().__init__()

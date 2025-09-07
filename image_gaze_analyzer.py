@@ -70,7 +70,7 @@ class CleanMediaPipeAnalyzer:
                     'gaze': {
                         'left_limit': 0.65,
                         'right_limit': 0.35,
-                        'down_limit': 0.55
+                        'down_limit': 0.6
                     }
                 }
             }
