@@ -166,6 +166,47 @@ class CleanMediaPipeAnalyzer:
         
         return None
 
+    def calculate_covariance_matrix(self, results):
+        """Calculate covariance matrix for H_R and V_R ratios"""
+        # Extract successful detections only
+        successful_results = [r for r in results if not r['detection_failed']]
+        
+        if len(successful_results) < 10:
+            print("Not enough data for covariance analysis")
+            return None, None
+        
+        h_ratios = [r['h_ratio'] for r in successful_results]
+        v_ratios = [r['v_ratio'] for r in successful_results]
+        
+        # Create data matrix
+        data = np.array([h_ratios, v_ratios])
+        
+        # Calculate covariance matrix
+        cov_matrix = np.cov(data)
+        
+        # Calculate correlation coefficient
+        correlation = np.corrcoef(h_ratios, v_ratios)[0, 1]
+        
+        print(f"\nCOVARIANCE MATRIX ANALYSIS:")
+        print(f"H_R variance: {cov_matrix[0,0]:.6f}")
+        print(f"V_R variance: {cov_matrix[1,1]:.6f}")
+        print(f"H_R-V_R covariance: {cov_matrix[0,1]:.6f}")
+        print(f"Correlation coefficient: {correlation:.3f}")
+        
+        print(f"\nCovariance Matrix:")
+        print(f"[{cov_matrix[0,0]:.6f}  {cov_matrix[0,1]:.6f}]")
+        print(f"[{cov_matrix[1,0]:.6f}  {cov_matrix[1,1]:.6f}]")
+        
+        # Interpret the correlation
+        if abs(correlation) < 0.2:
+            print("INTERPRETATION: Very low correlation - H_R and V_R are largely independent")
+        elif abs(correlation) < 0.5:
+            print("INTERPRETATION: Low to moderate correlation - some dependence exists")
+        else:
+            print("INTERPRETATION: Strong correlation - H_R and V_R are dependent")
+        
+        return cov_matrix, correlation
+
     def create_annotated_image(self, frame, filename, expected, h_ratio, v_ratio, is_correct):
         """Create detailed annotated image"""
         if frame is None:
@@ -443,6 +484,9 @@ class CleanMediaPipeAnalyzer:
             annotated_count = sum(1 for r in results if not r['detection_failed'])
             print(f"\nAnnotated images saved to: {self.output_dir}/")
             print(f"Total annotated images: {annotated_count}")
+            
+            # Calculate covariance matrix
+            cov_matrix, correlation = self.calculate_covariance_matrix(results)
             
         else:
             print("No images were found with expected directions!")
