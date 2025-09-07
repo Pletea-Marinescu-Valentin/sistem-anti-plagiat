@@ -491,7 +491,7 @@ class AntiPlagiatGUI(QMainWindow):
                 gaze_tracker = self.system.face_detector.gaze_tracker
                 head_pose_info = gaze_tracker.get_head_pose_info()
                 
-                # Update labels (removed debug print to reduce terminal spam)
+                # Update labels
                 self.yaw_label.setText(f"Yaw: {head_pose_info['yaw_angle']}°")
                 self.pitch_label.setText(f"Pitch: {head_pose_info['pitch_angle']}°")
                 self.compensation_status_label.setText(f"Compensation: {'ON' if head_pose_info['compensation_enabled'] else 'OFF'}")

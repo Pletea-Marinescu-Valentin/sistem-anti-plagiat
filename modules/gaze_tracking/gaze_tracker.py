@@ -60,7 +60,7 @@ class GazeTracker(object):
         
         # Head pose calculation throttling
         self.head_pose_frame_count = 0
-        self.head_pose_update_interval = 25  # Calculate head pose every 20 frames
+        self.head_pose_update_interval = 25  # Calculate head pose every 25 frames
 
         # Image mode for static image processing
         self._image_mode = False
@@ -126,7 +126,7 @@ class GazeTracker(object):
         else:
             print("Video mode enabled")
             self.smoothing_factor = 0.3
-            self.process_every_n_frames = 2
+            self.process_every_n_frames = 3
             
             # Update MediaPipe for video
             if self.use_mediapipe:
