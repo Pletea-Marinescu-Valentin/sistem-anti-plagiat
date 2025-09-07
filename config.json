@@ -19,8 +19,8 @@
         "object": {
             "enabled": true,
             "confidence_thresholds": {
-                "phone": 0.5,
-                "smartwatch": 0.4
+                "phone": 0.65,
+                "smartwatch": 0.65
             },
             "objects_of_interest": [
                 "phone",

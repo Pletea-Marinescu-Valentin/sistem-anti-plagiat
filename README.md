@@ -1,483 +1,476 @@
-# Anti-Plagiarism Monitoring System
+# Anti-Plagiarism Monitoring System 
 
-An advanced real-time monitoring system for preventing plagiarism during examinations, implemented in Python with PyQt5 and enhanced computer vision algorithms using MediaPipe and YOLOv8.
+## Features 
 
-## 🚀 Features
+* Core Monitoring Features 
+* Real-time candidate activity monitoring using webcam video stream
+* Accurate and improved gaze tracking with MediaPipe facial landmark detection with custom eye tracking algorithm
+* Multi-method and geometrically validated pupil detection 
+* Detection of prohibited objects (smartphone, smartwatch, other electronic gadgets) with YOLOv8
+* Violation logging 
+* Video recording with violations overlay 
+* Live notifications on detected violations 
 
-### Core Monitoring Capabilities
-- **Real-time Surveillance**: Continuously monitors candidate activity using webcam feed
-- **Advanced Gaze Tracking**: Utilizes MediaPipe facial landmark detection with sophisticated eye-tracking algorithms for precise gaze direction detection
-- **Prohibited Object Detection**: Identifies forbidden items such as mobile phones, smartwatches, and other electronic devices using YOLOv8 models
-- **Video Recording**: Records video streams with violation annotations for later review
-- **Live Violation Alerts**: Instant notifications when suspicious behavior is detected
+* Enhanced Detection System 
+* 468-landmark MediaPipe Face Mesh detection for high-precision landmark localization (updated from FaceMesh module)
+* Eye region isolation based on specific facial landmarks
+* Multi-method enhanced pupil localization with shape and size estimation (updated)
+* Automatic head rotation and tilt compensation (yaw/pitch control) (updated)
+* Filtering based on detection confidence scores (updated) 
+* Advanced temporal filtering for smooth, noise-free pupil tracking (updated)
+* User-calibrated detection thresholds for individualized user settings 
 
-### Enhanced Detection System
-- **MediaPipe Face Mesh**: High-precision 468-point facial landmark detection for robust eye tracking
-- **Multi-layered Pupil Detection**: Combines contour analysis with circularity validation for robust pupil identification
-- **Head Pose Compensation**: Automatically adjusts for head rotation and tilt to maintain accuracy
-- **Confidence-based Filtering**: Uses detection confidence scores to reduce false positives
-- **Temporal Smoothing**: Implements advanced filtering for stable, noise-free tracking
-- **User Calibration**: Personalizes detection thresholds for individual users
+* Reporting and Analysis 
+* Automated violation report generation with screenshots, timestamps and descriptive violation annotations
+* Comprehensive export of recorded data in various formats including JSON, CSV and PDF files
+* Violation frequency and pattern analysis 
+* Standalone utility for batch processing of images to test and analyze gaze detection
 
-### Reporting and Analysis
-- **Comprehensive Reports**: Generates detailed violation reports with timestamps, screenshots, and descriptions
-- **Data Export**: Exports monitoring data in multiple formats (JSON, CSV, PDF)
-- **Statistical Analysis**: Provides violation frequency and pattern analysis
-- **Batch Image Processing**: Standalone utility for testing gaze detection on static images
+## ⚡ Quick Start 
 
-## ⚡ Quick Start
+**For advanced users - minimum steps to run:** 
 
-**For experienced users - minimum steps to run:**
-
-```bash
-# 1. Install system dependencies (Linux)
-sudo apt update && sudo apt install cmake
+```bash 
+# 1. Install system dependencies (Linux) 
+sudo apt update && sudo apt install cmake 
 sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
 
-# 2. Create conda environment
-conda env create -f environment.yml
-conda activate anti-plagiat
+# 2. Create conda environment 
+conda env create -f environment.yml 
+conda activate anti-plagiat 
 
-# 3. Install additional packages
-pip install ultralytics
-pip uninstall opencv-python opencv-contrib-python opencv-python-headless
-pip install opencv-python-headless==4.8.1.78
+# 3. Install additional packages 
+pip install ultralytics 
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless 
+pip install opencv-python-headless==4.8.1.78 
 
-# 4. Run application
-python gui_app.py
-```
+# 4. Run application 
+python gui_app.py 
+``` 
 
-## 📋 Requirements
+## Requirements 
 
-### System Requirements
-- **OS**: Linux (Ubuntu/Debian/Kali Linux recommended)
-- **Python**: 3.11+
-- **Memory**: Minimum 4GB RAM (8GB recommended)
-- **Processor**: Multi-core processor recommended for real-time processing
-- **Camera**: Webcam or compatible camera device
-- **Storage**: 2GB free space for models and recordings
+### System Requirements 
 
-### Key Dependencies
-- **conda/miniconda**: Environment management
-- **CMake**: Required for dlib compilation
-- **OpenCV**: Computer vision library
-- **MediaPipe**: Face and landmark detection
-- **PyQt5/PySide6**: GUI framework
-- **YOLOv8 (ultralytics)**: Object detection
-- **PyTorch**: Deep learning framework
+* **OS**: Linux (recommended: Ubuntu/Debian/Kali Linux, other flavors should also work but are not tested)
+* **Python**: 3.11+ (recommended: 3.11.5) 
+* **Memory**: Minimum 4GB (8GB recommended) 
+* **Processor**: Multi-core processor (recommended for faster real-time image processing)
+* **Camera**: Webcam or other compatible camera device 
+* **Storage**: 2GB free space (for models, recordings) 
 
-## 🛠️ Installation
+### Key Dependencies 
 
-### Prerequisites
+* **conda/miniconda** - conda environment management system 
+* **CMake** - Required to compile dlib module 
+* **OpenCV** - Open Source Computer Vision Library 
+* **MediaPipe** - Face and facial landmarks detection models 
+* **PyQt5/PySide6** - Python binding for Qt GUI application framework
+* **YOLOv8 (ultralytics)** - State-of-the-art real-time object detection and computer vision
+* **PyTorch** - Deep learning framework 
 
-**System Requirements:**
-- Linux (Ubuntu/Debian/Kali Linux recommended)
-- Python 3.11+
-- Conda/Miniconda
-- CMake (for dlib compilation)
+## Installation 
 
-### 1. Install System Dependencies
+### Prerequisites 
 
-**Install CMake and GUI libraries:**
-```bash
-# Install CMake (required for dlib)
-sudo apt update
-sudo apt install cmake
+**System Requirements:** 
 
-# Install Qt/GUI dependencies for Linux
+* **Linux**: The system should run on Linux. Ubuntu, Debian or Kali Linux are recommended (others may work but not tested)
+* **Python**: Make sure to have at least 3.11 (recommended 3.11.5) installed on your system.
+* **Conda/Miniconda**: Must have conda or miniconda environment management tool installed
+* **CMake**: Required to compile dlib module 
+
+### 1. Install System Dependencies 
+
+The following script will install: 
+
+* **CMake** (required for dlib compilation) 
+* **Qt/GUI** Linux dependencies 
+
+Run these commands to install: 
+
+```bash 
+# Install CMake (required for dlib) 
+sudo apt update 
+sudo apt install cmake 
+
+# Install Qt/GUI dependencies for Linux 
 sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
-```
+``` 
 
-### 2. Clone the Repository
-```bash
-git clone <repository-url>
-cd anti-plagiat
-```
+### 2. Clone the Repository 
 
-### 3. Create Conda Environment
-```bash
-# Create environment from environment.yml
-conda env create -f environment.yml
+Open a terminal and clone this repository by running:
 
-# Activate the environment
-conda activate anti-plagiat
-```
+```bash 
+git clone <repository-url> 
+cd anti-plagiat 
+``` 
 
-### 4. Install Additional Dependencies
-```bash
-# Install ultralytics (YOLO)
-pip install ultralytics
+### 3. Create Conda Environment 
 
-# Fix OpenCV for GUI compatibility
-pip uninstall opencv-python opencv-contrib-python opencv-python-headless
-pip install opencv-python-headless==4.8.1.78
-```
+Run the following commands to create and activate the environment:
 
-### 5. Run the Application
-```bash
-python gui_app.py
-```
+```bash 
+# Create environment from environment.yml 
+conda env create -f environment.yml 
 
-### Alternative Installation (pip-only)
-If you prefer not to use conda:
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Activate environment 
+conda activate anti-plagiat 
+``` 
 
-# Install dependencies
-pip install -r requirements.txt
-pip install ultralytics
+### 4. Install Additional Dependencies 
 
-# Run application
-python gui_app.py
-```
+```bash 
+# Install ultralytics (YOLO) from PyPi 
+pip install ultralytics 
 
-## ⚙️ Configuration
+# Uninstall original OpenCV packages (required for GUI compatibility)
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless 
 
-The system is configured through `config.json`:
+# Install a specific version of opencv-python-headless without GUI dependencies
+pip install opencv-python-headless==4.8.1.78 
+``` 
 
-```json
+### 5. Run the Application 
+
+```bash 
+python gui_app.py 
+``` 
+
+### Alternative installation (pip only) 
+
+```bash 
+# Create virtual environment 
+python -m venv venv 
+source venv/bin/activate # On Windows: venv\Scripts\activate 
+
+# Install dependencies 
+pip install -r requirements.txt 
+pip install ultralytics 
+
+# Run the application 
+python gui_app.py 
+``` 
+
+## Configuration 
+
+System is configured using config.json: 
+
+```json 
 {
-  "camera": {
-    "source": 0,
-    "mirror_image": true,
-    "resolution": [640, 480],
-    "fps": 30
-  },
-  "detection": {
-    "gaze": {
-      "left_limit": 0.65,
-      "right_limit": 0.35,
-      "down_limit": 0.55,
-      "smoothing_factor": 0.3
+    "camera": {
+        "source": 0,
+        "mirror_image": false,
+        "resolution": [
+            640,
+            480
+        ],
+        "fps": 30,
+        "index": 0
     },
-    "objects": {
-      "phone_confidence": 0.55,
-      "watch_confidence": 0.4,
-      "nms_threshold": 0.4
+    "detection": {
+        "gaze": {
+            "left_limit": 0.65,
+            "right_limit": 0.35,
+            "down_limit": 0.6,
+            "smoothing_factor": 0.3
+        },
+        "object": {
+            "enabled": true,
+            "confidence_thresholds": {
+                "phone": 0.65,
+                "smartwatch": 0.65
+            },
+            "objects_of_interest": [
+                "phone",
+                "smartwatch"
+            ]
+        }
+    },
+    "recording": {
+        "save_path": "./recordings",
+        "format": "mp4"
+    },
+    "reporting": {
+        "save_path": "./reports",
+        "export_formats": [
+            "html",
+            "csv",
+            "json"
+        ]
+    },
+    "snapshots": {
+        "save_path": "./snapshots"
     }
-  },
-  "recording": {
-    "enabled": true,
-    "save_path": "./recordings",
-    "format": "mp4",
-    "quality": "high"
-  },
-  "video": {
-    "mirror_image": true,
-    "show_landmarks": false,
-    "alert_duration": 3.0
-  }
 }
-```
+``` 
 
-### Key Configuration Parameters
+### Gaze detection parameters 
 
-#### Gaze Detection
-- `left_limit` / `right_limit`: Horizontal gaze boundaries (0.0-1.0)
-- `down_limit`: Vertical downward gaze threshold
-- `smoothing_factor`: Temporal smoothing intensity (0.0-1.0)
+* `left_limit` / `right_limit` - Horizontal gaze boundaries (values range from 0.0 to 1.0)
+* `down_limit` - Vertical down gaze threshold 
+* `smoothing_factor` - Temporal smoothing factor (range from 0.0 to 1.0)
 
-#### Object Detection
-- `phone_confidence`: Minimum confidence for phone detection
-- `watch_confidence`: Minimum confidence for smartwatch detection
-- `nms_threshold`: Non-maximum suppression threshold
+### Object detection parameters 
 
-#### Recording Settings
-- `save_path`: Directory for recorded videos
-- `format`: Video output format (mp4, avi)
-- `quality`: Recording quality (low, medium, high)
+* `phone_confidence` - Minimum required confidence threshold for phone detection
+* `watch_confidence` - Minimum required confidence threshold for smartwatch detection
+* `nms_threshold` - Non-maximum suppression threshold 
 
-## 🎯 Usage
+### Recording parameters 
 
-### Basic Operation
+* `save_path` - Path for saving recorded video files 
+* `format` - Recording file format (mp4, avi) 
+* `quality` - Recording quality (low, medium, high) 
 
-1. **Start Monitoring**
-   ```bash
-   python gui_app.py
-   ```
+## Usage 
 
-2. **Generate Test Images** (Optional)
-   ```bash
-   python generate_test_images.py
-   ```
+### Basic Usage 
 
-3. **Begin Examination**
-   - Click "Start Monitoring" to begin surveillance
-   - System will automatically detect and log violations
-   - Red alerts appear for detected violations
+1. **Run Monitoring** - Open a terminal and run: 
 
-### Batch Image Processing
+```bash 
+python gui_app.py 
+``` 
 
-For testing gaze detection on static images:
+2. **Generate Test Images** (Optional) - Run: 
 
-```bash
-# Place test images in input_images/ directory
-python image_gaze_analyzer.py
-# Check results in analyzed_images/ directory and logs/
-```
+```bash 
+python generate_test_images.py 
+``` 
 
-### Advanced Features
+3. **Start Exam** - In GUI, click "Start Monitoring" to begin candidate activity surveillance.
+Monitoring system automatically detects and logs violations, issues live violation alerts (shown as red alerts in system window).
 
-#### Custom Violation Rules
-```python
-# Add custom violation detection
-system.violation_monitor.add_custom_rule(
-    name="extended_downward_gaze",
-    condition=lambda data: data['v_ratio'] > 0.7,
-    duration_threshold=3.0
-)
-```
+### Batch image processing 
 
-#### Testing and Analysis Tools
-- **Generate Test Images**: PyQt5-based tool for capturing calibrated gaze images
-- **Image Gaze Analyzer**: Batch processing tool with detailed logging and analysis
-- **Configuration Testing**: Tools to validate and optimize detection thresholds
+Batch processing utility to test gaze detection on static images.
 
-## 🏗️ Architecture
+Steps: 
+1. Place all test images in input_images/ folder 
+2. Run image analysis 
 
-### Core Components
+```bash 
+python image_gaze_analyzer.py 
+``` 
 
-```
-anti-plagiat/
-├── modules/
-│   ├── gaze_tracking/
-│   │   ├── gaze_tracker.py      # MediaPipe-based gaze tracking engine
-│   │   ├── eye.py               # Eye region detection and analysis
-│   │   ├── pupil.py             # Enhanced pupil detection
-│   │   └── pupil_tracker.py     # Temporal tracking and filtering
-│   ├── face_detector.py         # Face detection integration
-│   ├── object_detector.py       # YOLOv8-based object detection
-│   ├── violation_monitor.py     # Violation detection logic
-│   ├── video_handler.py         # Video processing and recording
-│   └── report_generator.py      # Report generation
-├── gui_app.py                   # Main PyQt5 GUI application
-├── main.py                      # Core system logic
-├── generate_test_images.py      # PyQt5-based test image generator
-├── image_gaze_analyzer.py       # Batch image analysis tool
-└── config.json                  # Configuration file
-```
+3. Check analyzed images in analyzed_images/ folder and logs/
 
-### Algorithm Overview
+The image gaze analyzer automatically detects and analyzes all images in input_images/ folder and saves them to analyzed_images/. Check logs/ folder for analysis results. 
 
-#### Gaze Tracking Pipeline
-1. **Face Detection**: MediaPipe Face Mesh detection with 468 landmarks
-2. **Eye Region Isolation**: Extract left and right eye regions using specific landmarks
-3. **Pupil Detection**: Multi-method pupil localization with geometric validation
-4. **Gaze Calculation**: Compute horizontal and vertical ratios for direction determination
-5. **Temporal Filtering**: Smoothing and noise reduction
-6. **Violation Assessment**: Compare against configurable thresholds
+### Advanced Usage 
 
-#### Enhanced Object Detection
-- **Dual YOLOv8 Models**: Separate specialized models for phones and smartwatches
-- **Confidence Thresholding**: Different confidence levels for different object types
-- **Dimension-based Classification**: Additional validation based on object dimensions
-- **Temporal Consistency**: Multi-frame validation to reduce false positives
+#### Custom Violation Rules 
 
-#### MediaPipe Integration
-- **Face Mesh Detection**: 468 facial landmarks for precise eye tracking
-- **Real-time Processing**: Optimized for live video streams
-- **Robust Landmark Detection**: Works across various lighting conditions and poses
-- **Silent Operation**: Suppressed output for clean user experience
+You can add custom violation detection rules by extending the violation detection logic:
 
-## 🔧 Troubleshooting
+```python 
+# Example: Add custom violation detection rule 
+system.violation_monitor.add_custom_rule( 
+name="extended_downward_gaze", 
+condition=lambda data: data['v_ratio'] > 0.7, 
+duration_threshold=3.0 
+) 
+``` 
 
-### Common Issues
+#### Testing and Analysis Tools 
 
-#### Camera Not Detected
-```bash
-# Check available cameras
-python -c "import cv2; print([i for i in range(10) if cv2.VideoCapture(i).isOpened()])"
-# Update camera source in config.json
-```
+* **Generate Test Images** - PyQt5-based image capturing tool to generate calibrated test images for gaze detection testing
+* **Image Gaze Analyzer** - Batch image processing tool with verbose logging and detailed analysis options
+* **Configuration Testing** - Various helper tools to validate and optimize detection thresholds
 
-#### Poor Gaze Detection Accuracy
-1. Ensure good lighting conditions
-2. Adjust detection thresholds in config.json
-3. Check camera positioning (eye-level recommended)
-4. Test with generate_test_images.py for calibration
+## Architecture 
 
-#### High CPU Usage
-1. Reduce camera resolution in config.json
-2. Increase frame processing interval
-3. Disable recording if not needed
-4. Close other resource-intensive applications
+### High-level architecture 
 
-#### Qt Platform Plugin Errors
-```bash
-# If using conda environment
-export QT_QPA_PLATFORM_PLUGIN_PATH=""
-export OPENCV_IO_ENABLE_OPENEXR=0
-```
+``` 
+anti-plagiat/ 
+├── modules/ 
+│ ├── gaze_tracking/ 
+│ │ ├── gaze_tracker.py # MediaPipe-based gaze tracking engine 
+│ │ ├── eye.py # Eye region detection and analysis 
+│ │ ├── pupil.py # Enhanced pupil detection 
+│ │ └── pupil_tracker.py # Temporal tracking and filtering 
+│ ├── face_detector.py # Face detection integration 
+│ ├── object_detector.py # YOLOv8-based object detection 
+│ ├── violation_monitor.py # Violation detection logic 
+│ ├── video_handler.py # Video processing and recording 
+│ └── report_generator.py # Report generation 
+├── gui_app.py # Main PyQt5 GUI application 
+├── main.py # Core system logic 
+├── generate_test_images.py # PyQt5-based test image generator 
+├── image_gaze_analyzer.py # Batch image analysis tool 
+└── config.json # Configuration file 
+``` 
 
-### Debug Mode
-```bash
-# Check logs in logs/ directory after running image analysis
-python image_gaze_analyzer.py
-# Logs saved to logs/gaze_analysis_YYYYMMDD_HHMMSS.log
-```
+### Algorithm Pipeline 
 
-## 🧪 Testing
+#### Gaze Tracking Pipeline 
 
-### Test Image Generation
-```bash
-# Generate calibrated test images
-python generate_test_images.py
-# Images saved to input_images/ directory
-```
+1. Face detection - Implemented using MediaPipe Face Mesh detection with 468 facial landmarks.
+2. Eye region isolation - Detects left and right eye regions based on specific eye landmarks.
+3. Pupil detection - Improved pupil localization with multi-method validation, including geometric constraints.
+4. Gaze Calculation - Calculates horizontal and vertical gaze ratios to determine gaze direction.
+5. Temporal Filtering - Applies smoothing and noise reduction for stable gaze tracking.
+6. Violation Assessment - Compares gaze ratios against configurable thresholds.
 
-### Batch Analysis
-```bash
-# Analyze generated test images
-python image_gaze_analyzer.py
-# Results in analyzed_images/ and logs/
-```
+#### Enhanced Object Detection 
 
-### Performance Testing
-```bash
-# Test camera functionality
-python test_camera.py
-```
+* Dual YOLOv8 models - Uses two separate specialized models (phone and watch)
+* Custom confidence thresholds - Applies different confidence levels for different objects
+* Dimension-based object classification - Additional dimension-based validation for detected objects
+* Temporal consistency checks - Multi-frame validation to reduce false positives
 
-## 📊 Performance Metrics
+#### MediaPipe Integration 
 
-### Typical Performance
-- **Gaze Detection Accuracy**: 85-95% (with proper lighting and positioning)
-- **Processing Speed**: 25-30 FPS (640x480 resolution)
-- **False Positive Rate**: <5%
-- **Object Detection Accuracy**: 88-94% (YOLOv8 models)
+* Face Mesh detection - Provides 468 facial landmarks required for precise eye tracking
+* Real-time optimized - Designed to work with live video streams
+* Robust to conditions - Performs well under various lighting conditions and head poses
+* Silent - Suppresses output for cleaner integration with the main application
 
-### Optimization Tips
-- Use proper lighting setup
-- Position camera at eye level
-- Optimize camera resolution for use case
-- Regular threshold adjustment based on environment
-- Use headless OpenCV to avoid GUI conflicts
+## 🔧 Troubleshooting 
 
-## 🔧 Troubleshooting
+### Common Issues and Solutions 
 
-### Common Issues and Solutions
+#### 1. CMake Error During Installation 
 
-#### 1. CMake Error During Installation
-**Error:** `CMake is not installed on your system!`
-```bash
-# Solution: Install CMake
-sudo apt update
-sudo apt install cmake
-cmake --version  # Verify installation
-```
+``` 
+CMake is not installed on your system! 
+... 
+CMake Error: CMake could not find an appropriate module for processing the Information "PROJECT_NAME".
+``` 
 
-#### 2. Qt Platform Plugin Error
-**Error:** `Could not load the Qt platform plugin "xcb"`
-```bash
-# Solution: Install GUI dependencies
+**Solution:** Install CMake. 
+
+Run these commands: 
+
+```bash 
+sudo apt update 
+sudo apt install cmake 
+cmake --version # Verify it is installed 
+``` 
+
+#### 2. Qt Platform Plugin Error 
+
+``` 
+Could not load the Qt platform plugin "xcb" in ""
+This application failed to start because no Qt platform plugin could be initialized.
+Reinstalling the application may fix this problem. 
+``` 
+
+**Solution:** Install GUI dependencies or run headless. 
+
+Run these commands: 
+
+```bash 
 sudo apt install -y libxcb-xinerama0 libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
+``` 
 
-# Alternative: Run headless
-export QT_QPA_PLATFORM=offscreen
-python gui_app.py
-```
+Alternative way: Run application in headless mode 
 
-#### 3. ModuleNotFoundError: ultralytics
-**Error:** `No module named 'ultralytics'`
-```bash
-# Solution: Install ultralytics
-conda activate anti-plagiat
-pip install ultralytics
-```
+```bash 
+export QT_QPA_PLATFORM=offscreen 
+python gui_app.py 
+``` 
 
-#### 4. OpenCV GUI Conflicts
-**Error:** GUI freezing or display issues
-```bash
-# Solution: Use headless OpenCV
-pip uninstall opencv-python opencv-contrib-python opencv-python-headless
-pip install opencv-python-headless==4.8.1.78
-```
+#### 3. ModuleNotFoundError: ultralytics 
 
-#### 5. Conda Environment Issues
-**Error:** Environment creation fails
-```bash
-# Solution: Clean conda cache and retry
-conda clean --all
-conda env remove -n anti-plagiat  # If exists
-conda env create -f environment.yml
-```
+```pycon 
+ModuleNotFoundError: No module named 'ultralytics' 
+``` 
 
-#### 6. Camera Access Issues
-**Error:** Camera not detected or permission denied
-```bash
-# Solution: Check camera permissions
-sudo usermod -a -G video $USER
-# Logout and login again
+**Solution:** Install ultralytics. 
 
-# Test camera
+Run these commands: 
+
+```bash 
+conda activate anti-plagiat 
+pip install ultralytics 
+``` 
+
+#### 4. OpenCV GUI related issues 
+
+GUI freezing or improper display 
+
+**Solution:** Use headless OpenCV 
+
+Run these commands: 
+
+```bash 
+pip uninstall opencv-python opencv-contrib-python opencv-python-headless 
+pip install opencv-python-headless==4.8.1.78 
+``` 
+
+#### 5. Conda environment issues 
+
+Errors during environment creation or activation 
+
+**Solution:** Clean conda cache and retry. 
+
+Run these commands: 
+
+```bash 
+conda clean --all 
+conda env remove -n anti-plagiat # If it already exists
+conda env create -f environment.yml 
+``` 
+
+#### 6. Camera access not granted 
+
+Camera device not detected or permission denied 
+
+**Solution:** Check camera permissions. 
+
+Run these commands: 
+
+```bash 
+sudo usermod -a -G video $USER 
+# Logout and log back in again 
+
+# Test camera 
 python -c "import cv2; cap = cv2.VideoCapture(0); print('Camera OK' if cap.isOpened() else 'Camera FAIL')"
-```
+``` 
 
-#### 7. Low FPS Performance
-**Issue:** Application running slowly
-```bash
-# Solutions:
-# 1. Reduce camera resolution in config.json
-# 2. Close other applications
-# 3. Use GPU acceleration if available
-# 4. Check CPU usage: htop
-```
+#### 7. Low FPS issues (slow performance) 
 
-#### 8. Export Environment for Other Devices
-```bash
-# Export current environment
-conda env export > environment.yml
+Application runs slowly 
 
-# On new device:
-conda env create -f environment.yml
-conda activate anti-plagiat
-```
+**Solution:** Multiple options: 
 
-## 🤝 Contributing
+1. Reduce camera resolution (adjust in config.json) 
+2. Close other apps 
+3. GPU acceleration (if supported) 
+4. Check CPU load: `htop` 
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+#### 8. Export environment to other device 
 
-### Development Guidelines
-- Follow PEP 8 style guide
-- Add docstrings for all functions
-- Include unit tests for new features
-- Update documentation as needed
-- Test with both PyQt5 GUI and batch processing tools
+Run these commands: 
 
-## 📄 License
+```bash 
+conda env export > environment.yml 
+
+# In new device 
+conda env create -f environment.yml 
+conda activate anti-plagiat 
+``` 
+
+## Contributing 
+
+1. Fork the project 
+2. Create a feature branch 
+3. Make your changes 
+4. Add tests for new features or components 
+5. Submit a pull request 
+
+### Development Guidelines 
+
+* Follow PEP 8 Python style guide 
+* Add docstrings to all functions 
+* Include unit tests for any new features 
+* Update documentation to match changes 
+* Test with both standard PyQt5 GUI and batch image processing
+
+## License 
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- **MediaPipe** library for facial landmark detection
-- **OpenCV** for computer vision capabilities
-- **PyQt5** for GUI framework
-- **YOLOv8/Ultralytics** for object detection
-- **NumPy** for numerical computations
-- Research papers on gaze tracking and eye detection algorithms
-
-## 📞 Support
-
-For support and questions:
-- Create an issue on GitHub
-- Check the troubleshooting section
-- Review configuration documentation
-- Check logs in logs/ directory for detailed analysis
-
-## 🔄 Version History
-
-- **v3.0.0**: Complete redesign with MediaPipe, YOLOv8, and enhanced PyQt5 tools
-- **v2.0.0**: Enhanced gaze tracking with Kalman filtering and user calibration
-- **v1.5.0**: Added object detection and improved GUI
-- **v1.0.0**: Initial release with basic gaze tracking
-
----
-
-**Note**: This system is designed for educational and examination monitoring purposes. Ensure compliance with local privacy laws and institutional policies before deployment.
