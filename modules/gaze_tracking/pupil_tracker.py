@@ -72,7 +72,7 @@ class KalmanPupilTracker:
         prediction = self.predict()
         
         if confidence < self.confidence_threshold:
-            # Low confidence measurement - rely more on prediction
+            # Low confidence measurement
             if prediction:
                 return prediction
             else:

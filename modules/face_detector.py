@@ -87,10 +87,8 @@ class FaceDetector:
             return "center", frame, 0.5, 0.5
         
         try:
-            # Procesează cu GazeTracker pentru head pose compensation
             self.gaze_tracker.refresh(frame)
             
-            # Procesează cu MediaPipe original pentru gaze detection
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = self.face_mesh.process(rgb_frame)
             
@@ -116,7 +114,6 @@ class FaceDetector:
             return direction, annotated_frame, h_ratio, v_ratio
             
         except Exception as e:
-            logging.error(f"Eroare detectare directie privire: {e}")
             self.pupils_detected = False
             return "center", frame, self.current_h_ratio, self.current_v_ratio
     
@@ -158,7 +155,7 @@ class FaceDetector:
             return 0.5, 0.5
     
     def _determine_direction(self, h_ratio, v_ratio):
-        """Determine gaze direction from ratios (legacy compatibility)"""
+        """Determine gaze direction from ratios"""
         if v_ratio > self.config['detection']['gaze']['down_limit'] or v_ratio > 0.75:
             return "down"
         elif h_ratio > self.config['detection']['gaze']['left_limit']:

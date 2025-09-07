@@ -35,6 +35,8 @@ snapshots/
 *.heic
 *.heif
 /screenshots/
+Documentatie/
+Documentation/
 
 # Temporary files
 .DS_Store

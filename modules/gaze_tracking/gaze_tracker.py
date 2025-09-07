@@ -60,7 +60,7 @@ class GazeTracker(object):
         
         # Head pose calculation throttling
         self.head_pose_frame_count = 0
-        self.head_pose_update_interval = 20  # Calculate head pose every 20 frames
+        self.head_pose_update_interval = 25  # Calculate head pose every 20 frames
 
         # Image mode for static image processing
         self._image_mode = False
